@@ -8,6 +8,7 @@ import com.android.common.base.BaseBindFragment
 import com.android.common.ext.buildRefreshAdapter
 import com.android.common.ext.liner
 import com.android.common.ext.load
+import com.android.common.utils.LogUtils
 import com.android.common.utils.RvDecoration
 import com.campaign.common.constants.RoutePath
 import com.example.network.bean.Recipe

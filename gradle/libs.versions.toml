@@ -2,6 +2,8 @@
 compileSdk = "34"
 minSdk = "24"
 targetSdk = "34"
+versionCode = "1"
+versionName = "1.0.1"
 
 # AndroidX
 androidx-appcompat = "1.6.1"

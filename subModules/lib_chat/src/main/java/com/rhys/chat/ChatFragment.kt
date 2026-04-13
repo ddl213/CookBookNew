@@ -2,6 +2,7 @@ package com.rhys.chat
 
 
 import com.android.common.base.BaseBindFragment
+import com.android.common.utils.LogUtils
 import com.android.common.view.TitleBar
 import com.campaign.common.constants.RoutePath.PAGE_CHAT
 import com.marky.route.annotation.Route

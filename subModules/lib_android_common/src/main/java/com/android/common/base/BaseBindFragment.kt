@@ -35,8 +35,9 @@ abstract class BaseBindFragment<V : ViewBinding>(private val inflate: (LayoutInf
         super.onViewCreated(view, savedInstanceState)
         initImmersionBar()
         initView(binding)
-        initListener(binding)
         initData(binding)
+        initListener(binding)
+        initObserver(binding)
 
     }
 
@@ -50,34 +51,30 @@ abstract class BaseBindFragment<V : ViewBinding>(private val inflate: (LayoutInf
      */
     abstract fun initData(binding: V)
 
-    /**
-     * 初始化状态栏
-     */
-    open fun initImmersionBar(){
-        val titleView = initTitleBar()
-        if (titleView != null) {
-            ImmersionBar.with(requireActivity())
-                .transparentStatusBar()
-                .statusBarColor(statusBarColor())
-                .titleBar(initTitleBar())
-                .init()
-        }else {
-            ImmersionBar.with(requireActivity())
-                .transparentStatusBar()
-                .statusBarColor(statusBarColor())
-                .init()
-        }
-    }
-    open fun initTitleBar() : View? = null
-    open fun statusBarColor() : Int = R.color.white
-    open fun immersionBarDarkFont() : Boolean = true
 
     /**
      * 初始化监听器
      */
     open fun initListener(binding: V)  {}
+    /**
+     * 初始化监听器
+     */
+    open fun initObserver(binding: V)  {}
 
     open fun onViewDestroy() {}
+
+
+    /**
+     * 初始化状态栏
+     */
+    protected open fun initImmersionBar(){
+        ImmersionBar.with(requireActivity())
+            .statusBarDarkFont(immersionBarDarkFont())
+            .statusBarColor(statusBarColor())
+            .titleBar(initTitleBar())
+            .init()
+
+    }
 
 
     //将binding置为空,防止内存消耗
@@ -87,4 +84,18 @@ abstract class BaseBindFragment<V : ViewBinding>(private val inflate: (LayoutInf
         _binding = null
         super.onDestroyView()
     }
+
+    /**
+     * 设置状态栏顶部View
+     */
+    protected open fun initTitleBar() : View? = null
+    /**
+     * 设置状态栏颜色
+     */
+    protected open fun statusBarColor() : Int = R.color.transparent
+
+    /**
+     * 状态栏字体颜色
+     */
+    protected open fun immersionBarDarkFont() : Boolean = true
 }

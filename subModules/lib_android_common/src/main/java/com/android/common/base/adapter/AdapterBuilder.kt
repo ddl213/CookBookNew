@@ -11,6 +11,7 @@ import com.android.common.base.adapter.listener.OnItemLongClick
 import com.android.common.base.adapter.refresh.RefreshRecyclerView
 import com.android.common.base.adapter.refresh.header.RefreshHeaderAdapter
 import com.android.common.base.adapter.refresh.header.RefreshHeaderView
+import com.android.common.utils.LogUtils
 
 class AdapterBuilder<T : Any> {
     @PublishedApi

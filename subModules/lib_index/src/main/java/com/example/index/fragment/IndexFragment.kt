@@ -7,6 +7,7 @@ import com.android.common.ext.gone
 import com.android.common.ext.visible
 import com.campaign.common.constants.RoutePath.PAGE_INDEX
 import com.android.common.ext.liner
+import com.android.common.utils.LogUtils
 import com.example.index.databinding.IndexFragmentIndexBinding
 import com.example.index.databinding.IndexLayoutRvIndexDiscoverBinding
 import com.example.index.databinding.IndexLayoutRvIndexFeatureCategoriesBinding

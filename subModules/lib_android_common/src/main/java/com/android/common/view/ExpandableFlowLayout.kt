@@ -11,6 +11,7 @@ import android.widget.ImageView
 import com.android.common.R
 import com.android.common.bean.HistorySearchInfo
 import com.android.common.ext.dp
+import com.android.common.utils.LogUtils
 import com.android.common.view.base.GImageView
 import com.android.common.view.base.GTextView
 

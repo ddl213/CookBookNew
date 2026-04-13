@@ -2,6 +2,7 @@ package com.android.common.base.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.android.common.utils.LogUtils
 import kotlinx.coroutines.launch
 
 open class BaseViewModel() : ViewModel() {
@@ -17,7 +18,7 @@ open class BaseViewModel() : ViewModel() {
                 LogUtils.d("当前执行的方法是：$callerClass.$callerMethod")
                 block()
             } catch (e: Exception) {
-                LogUtils.e("崩溃位置在： $callerClass.$callerMethod", tr = e)
+                LogUtils.e(e,"崩溃位置在： $callerClass.$callerMethod")
             }
         }
     }

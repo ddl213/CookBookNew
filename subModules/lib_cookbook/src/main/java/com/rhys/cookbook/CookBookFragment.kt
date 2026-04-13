@@ -11,6 +11,7 @@ import com.android.common.bean.TabInfo
 import com.android.common.ext.attach
 import com.android.common.ext.dp
 import com.android.common.ext.setNavigator
+import com.android.common.utils.LogUtils
 import com.campaign.common.constants.RoutePath.PAGE_COOK_BOOK_ADD
 import com.campaign.common.constants.RoutePath.PAGE_COOK_BOOK
 import com.campaign.common.constants.RoutePath.PAGE_COOK_BOOK_CHILD

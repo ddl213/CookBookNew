@@ -5,6 +5,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import androidx.recyclerview.widget.RecyclerView
 import com.android.common.base.adapter.refresh.header.listener.IRefreshHeader
+import com.android.common.utils.LogUtils
 import kotlin.math.abs
 
 class RefreshRecyclerView @JvmOverloads constructor(
