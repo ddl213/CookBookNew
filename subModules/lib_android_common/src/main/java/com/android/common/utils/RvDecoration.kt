@@ -1,6 +1,8 @@
 package com.android.common.utils
 
 import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
 import android.graphics.Rect
 import android.view.View
 import androidx.annotation.Keep
@@ -41,7 +43,7 @@ class RvDecoration private constructor(private val builder: Builder) : RecyclerV
             }
 
             is androidx.recyclerview.widget.LinearLayoutManager -> {
-                val isVertical = type.orientation ==RecyclerView.VERTICAL
+                val isVertical = type.orientation == RecyclerView.VERTICAL
 
                 //判断是否是垂直排列
                 if (isVertical){
@@ -66,11 +68,54 @@ class RvDecoration private constructor(private val builder: Builder) : RecyclerV
         }
     }
 
-
-
     override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
         super.onDraw(c, parent, state)
+        val dividerPaint = builder.getPaint()
+        // 绘制分割线
+        if (dividerPaint != null) {
+            val layoutManager = parent.layoutManager ?: return
 
+            // 最后一个item是否显示分割线
+            val showLast = builder.getShowLastDivider()
+
+            val childCount = parent.childCount.run { if (showLast) this else this - 1 }
+            val dividerHeight = builder.getPaintHeight()
+            val dividerSpacing = builder.getDividerSpacing()
+            val dividerHorizontalSpacing = builder.getDividerHorizontalSpacing()
+
+            // 用于水平布局的情况
+            val isHorizontal = (layoutManager is androidx.recyclerview.widget.LinearLayoutManager) &&
+                              (layoutManager.orientation == RecyclerView.HORIZONTAL)
+
+            for (i in 1 until childCount) {
+                val child = parent.getChildAt(i)
+                val position = parent.getChildAdapterPosition(child)
+                if (position == RecyclerView.NO_POSITION) continue
+
+                val params = child.layoutParams as RecyclerView.LayoutParams
+
+                val left: Float
+                val right: Float
+                val top: Float
+                val bottom: Float
+
+                if (isHorizontal) {
+                    // 水平布局
+                    left = child.right.toFloat() + dividerSpacing
+                    right = left + dividerHeight
+                    top = child.top.toFloat() + dividerHorizontalSpacing
+                    bottom = child.bottom.toFloat() - dividerHorizontalSpacing
+                } else {
+                    // 垂直布局
+                    left = child.left.toFloat() + dividerHorizontalSpacing
+                    right = child.right.toFloat()- dividerHorizontalSpacing
+                    top = child.bottom.toFloat() + dividerSpacing
+                    bottom = top + dividerHeight
+                }
+
+                c.drawRect(left, top, right, bottom, dividerPaint)
+            }
+        }
     }
 
 
@@ -84,28 +129,28 @@ class RvDecoration private constructor(private val builder: Builder) : RecyclerV
         private var right = 0
         //间距配置
         private var spacingConfig = SpacingConfig()
-        fun applyAll(applyAll : Int) = also{
-            this.applyAll = applyAll
-        }
 
-        fun setTop(top: Int) = also{
-            this.top = top.dp().toInt()
-        }
+        // 分割线配置
+        private var dividerPaint: Paint? = null
+        private var dividerHeight = 1f
+
+        /** 设置是否显示最后一个item的分割线 */
+        private var showLastDivider = true
+        private var dividerSpacing = 0f
+        private var dividerHorizontalSpacing = 0f
+
+        fun applyAll(applyAll : Int) = also{ this.applyAll = applyAll }
+
+        fun setTop(top: Int) = also{ this.top = top.dp().toInt() }
         fun getTop() = top
 
-        fun setBottom(bottom: Int)  = also{
-            this.bottom = bottom.dp().toInt()
-        }
+        fun setBottom(bottom: Int)  = also{ this.bottom = bottom.dp().toInt() }
         fun getBottom() = bottom
 
-        fun setLeft(left: Int)  = also{
-            this.left = left.dp().toInt()
-        }
+        fun setLeft(left: Int)  = also{ this.left = left.dp().toInt() }
         fun getLeft() = left
 
-        fun setRight(right: Int)  = also{
-            this.right = right.dp().toInt()
-        }
+        fun setRight(right: Int)  = also{ this.right = right.dp().toInt() }
         fun getRight() = right
 
         fun setVertical(vertical: Int)  = also{
@@ -117,6 +162,35 @@ class RvDecoration private constructor(private val builder: Builder) : RecyclerV
             this.left = horizontal.dp().toInt()
             this.right = horizontal.dp().toInt()
         }
+
+        /**
+         * 设置分割线颜色和高度
+         */
+        fun setDivider(color: Int, height: Float = 1f) = also {
+            this.dividerPaint = Paint().apply {
+                this.color = color
+                strokeWidth = height.toFloat()
+            }
+            this.dividerHeight = height
+        }
+
+        /** 设置分割线画笔（允许更多自定义） */
+        fun setDividerPaint(paint: Paint, height: Float = 1f) = also {
+            this.dividerPaint = paint
+            this.dividerHeight = height
+        }
+
+        /** 获取分割线画笔 */
+        fun getPaint() = dividerPaint
+        /** 获取分割线高度 */
+        fun getPaintHeight() = dividerHeight
+
+        fun setShowLastDivider(showLastDivider: Boolean) = also{ this.showLastDivider = showLastDivider }
+        fun getShowLastDivider() = showLastDivider
+        fun setDividerSpacing(dividerSpacing: Int) = also{ this.dividerSpacing = dividerSpacing.dp() }
+        fun getDividerSpacing() = dividerSpacing
+        fun setDividerHorizontalSpacing(dividerHorizontalSpacing: Int) = also{ this.dividerHorizontalSpacing = dividerHorizontalSpacing.dp() }
+        fun getDividerHorizontalSpacing() = dividerHorizontalSpacing
 
         internal fun getSpacingConfig() = spacingConfig
 

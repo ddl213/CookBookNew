@@ -31,3 +31,19 @@ fun Int.sp(): Float {
     return if (this == 0) 0f
     else TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, this.toFloat(), DensityUtil.getDisplayMetrics())
 }
+
+
+fun Float.dp(): Float {
+    // 获取当前手机的像素密度（1个dp对应几个px）
+    return if (this == 0f)
+        0f
+    else
+        TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, this, DensityUtil.getDisplayMetrics())
+}
+
+
+fun Float.sp(): Float {
+    // 获取当前手机的像素密度（1个sp对应几个px）
+    return if (this == 0f) 0f
+    else TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, this, DensityUtil.getDisplayMetrics())
+}

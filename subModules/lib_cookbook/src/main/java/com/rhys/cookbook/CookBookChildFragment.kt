@@ -1,11 +1,14 @@
 package com.rhys.cookbook
 
+import android.graphics.Color
 import android.graphics.Rect
 import android.graphics.RectF
 import android.view.View
 import androidx.core.view.WindowCompat
+import androidx.recyclerview.widget.RecyclerView
 import com.android.common.base.BaseBindFragment
 import com.android.common.ext.buildRefreshAdapter
+import com.android.common.ext.dp
 import com.android.common.ext.liner
 import com.android.common.ext.load
 import com.android.common.utils.LogUtils
@@ -113,7 +116,11 @@ class CookBookChildFragment :
 
     private fun initRecyclerView() {
         binding.apply {
-            rv.addItemDecoration(RvDecoration.Builder().setHorizontal(10).setVertical(10).build())
+            rv.addItemDecoration(RvDecoration.Builder().setHorizontal(10).setVertical(30)
+                .setDivider(Color.RED,0.33f.dp())
+                .setShowLastDivider(false)
+                .setDividerSpacing(15)
+                .setDividerHorizontalSpacing(50).build())
             rv.liner().buildRefreshAdapter<Recipe>(true) {
                 setDiff(areItemsSame = { old, new -> old.id == new.id}, areContentsSame = { old, new -> old == new})
                 setLayout(CookbookLayoutChildBinding::class.java)
