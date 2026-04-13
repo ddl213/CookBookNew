@@ -69,8 +69,8 @@ abstract class BaseBindFragment<V : ViewBinding>(private val inflate: (LayoutInf
      */
     protected open fun initImmersionBar(){
         ImmersionBar.with(requireActivity())
-            .statusBarDarkFont(immersionBarDarkFont())
-            .statusBarColor(statusBarColor())
+            .statusBarDarkFont(getStartBarDarkFont())
+            .statusBarColor(getStatusBarColor())
             .titleBar(initTitleBar())
             .init()
 
@@ -92,10 +92,10 @@ abstract class BaseBindFragment<V : ViewBinding>(private val inflate: (LayoutInf
     /**
      * 设置状态栏颜色
      */
-    protected open fun statusBarColor() : Int = R.color.transparent
+    protected open fun getStatusBarColor() : Int = R.color.transparent
 
     /**
      * 状态栏字体颜色
      */
-    protected open fun immersionBarDarkFont() : Boolean = true
+    protected open fun getStartBarDarkFont() : Boolean = true
 }

@@ -128,12 +128,9 @@ class CookBookChildFragment :
                 addChildClickViewIds(R.id.iv_recipe_pic)
                 setOnItemChildClickListener { adapter, view, _ ->
                     //hideStatusBar()
-                    val rect = Rect()
-                    view.getGlobalVisibleRect(rect)
-                    val rectF = RectF(rect)
+
                     LogUtils.addCurrentTagInFilter()
-                    LogUtils.d("rectF:%s",rectF)
-                    BasePhotoDialog.show(requireActivity(),rectF)
+                    BasePhotoDialog.show(requireActivity(),view)
                 }
             }
 

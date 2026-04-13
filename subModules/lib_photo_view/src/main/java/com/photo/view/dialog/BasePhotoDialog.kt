@@ -4,6 +4,7 @@ import android.animation.TimeInterpolator
 import android.animation.ValueAnimator
 import android.app.Activity
 import android.graphics.Color
+import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -26,6 +27,10 @@ import com.photo.view.R
 import com.photo.view.listener.OnViewExitListener
 import kotlin.math.absoluteValue
 
+/**
+ * 图片查看器基类.可对图片进行缩放、拖拽、退出动画。
+ * 后续需要修改为抽象类，作为单个图片查看器，和图片列表查看器。
+ */
 class BasePhotoDialog(
     val context: Activity,
     private val normalRectF: RectF,
@@ -64,7 +69,10 @@ class BasePhotoDialog(
     private var currentColor = darkColor
 
     companion object{
-        fun show(activity: Activity,rectF: RectF,layoutId : Int = R.layout.dialog_base_photo) {
+        fun show(activity: Activity,view: View,layoutId : Int = R.layout.dialog_base_photo) {
+            val rect = Rect()
+            view.getGlobalVisibleRect(rect)
+            val rectF = RectF(rect)
             val dialog = BasePhotoDialog(activity,rectF,layoutId)
             dialog.show()
         }
@@ -223,10 +231,10 @@ class BasePhotoDialog(
             duration = 250L,
             interpolator = AccelerateDecelerateInterpolator()
         ) {
-
             dismiss()
         }
     }
+
     /**
      * 平滑复原到初始状态
      */
@@ -287,7 +295,7 @@ class BasePhotoDialog(
         destroyDialog()
         super.dismiss()
     }
-    open fun destroyDialog() {
+    fun destroyDialog() {
         ImmersionBar.destroy(context, this)
     }
 }
