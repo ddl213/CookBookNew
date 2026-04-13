@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.android.common.view.base.GConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:padding="12dp"
+    android:background="@color/white"
+    app:radius="12dp">
+
+    <com.android.common.view.base.GImageView
+        android:id="@+id/iv_recipe_pic"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/white"
+        app:radius="12dp"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintWidth_percent="0.25"/>
+
+    <TextView
+        android:id="@+id/tv_recipe_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="12dp"
+        android:textSize="16sp"
+        android:textColor="@color/textTitle"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@+id/iv_recipe_pic"
+        app:layout_constraintTop_toTopOf="@+id/iv_recipe_pic"
+        tools:text="abcdef"/>
+
+    <TextView
+        android:id="@+id/tv_recipe_desc"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textSize="12sp"
+        android:textColor="@color/textNormal"
+        android:lines="2"
+        android:ellipsize="end"
+        app:layout_constraintStart_toStartOf="@+id/tv_recipe_name"
+        app:layout_constraintTop_toBottomOf="@+id/tv_recipe_name"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="abcdef\n\n"/>
+
+</com.android.common.view.base.GConstraintLayout>

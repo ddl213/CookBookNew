@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="start_color" format="color"/>
+    <attr name="center_color" format="color"/>
+    <attr name="end_color" format="color"/>
+    <attr name="g_angle" format="float"/>
+    <attr name="border" format="dimension"/>
+    <attr name="border_color" format="color"/>
+    <attr name="border_start_color" format="color"/>
+    <attr name="border_center_color" format="color"/>
+    <attr name="border_end_color" format="color"/>
+    <attr name="border_color_angle" format="float"/>
+    <attr name="radius" format="dimension"/>
+    <attr name="radius_top_left" format="dimension"/>
+    <attr name="radius_top_right" format="dimension"/>
+    <attr name="radius_bottom_right" format="dimension"/>
+    <attr name="radius_bottom_left" format="dimension"/>
+    <!-- 供 BaseDrawable/GStyler 统一解析用：只维护这一份 -->
+    <declare-styleable name="CommonGradientAttrs">
+        <attr name="android:background" />
+        <attr name="start_color" />
+        <attr name="center_color" />
+        <attr name="end_color" />
+        <attr name="g_angle" />
+        <attr name="border" />
+        <attr name="border_color" />
+        <attr name="border_start_color" />
+        <attr name="border_center_color" />
+        <attr name="border_end_color" />
+        <attr name="border_color_angle" />
+        <attr name="radius" />
+        <attr name="radius_top_left" />
+        <attr name="radius_top_right" />
+        <attr name="radius_bottom_right" />
+        <attr name="radius_bottom_left" />
+    </declare-styleable>
+    <declare-styleable name="GConstraintLayout">
+        <attr name="start_color"/>
+        <attr name="center_color"/>
+        <attr name="end_color"/>
+        <attr name="g_angle"/>
+        <attr name="border"/>
+        <attr name="border_color"/>
+        <attr name="border_start_color"/>
+        <attr name="border_center_color"/>
+        <attr name="border_end_color"/>
+        <attr name="border_color_angle"/>
+        <attr name="radius"/>
+        <attr name="radius_top_left"/>
+        <attr name="radius_top_right"/>
+        <attr name="radius_bottom_right"/>
+        <attr name="radius_bottom_left"/>
+    </declare-styleable>
+    <declare-styleable name="GImageView">
+        <attr name="start_color"/>
+        <attr name="center_color"/>
+        <attr name="end_color"/>
+        <attr name="g_angle"/>
+        <attr name="border"/>
+        <attr name="border_color"/>
+        <attr name="border_start_color"/>
+        <attr name="border_center_color"/>
+        <attr name="border_end_color"/>
+        <attr name="border_color_angle"/>
+        <attr name="radius"/>
+        <attr name="radius_top_left"/>
+        <attr name="radius_top_right"/>
+        <attr name="radius_bottom_right"/>
+        <attr name="radius_bottom_left"/>
+    </declare-styleable>
+    <declare-styleable name="GLinearLayout">
+        <attr name="start_color"/>
+        <attr name="center_color"/>
+        <attr name="end_color"/>
+        <attr name="g_angle"/>
+        <attr name="border"/>
+        <attr name="border_color"/>
+        <attr name="border_start_color"/>
+        <attr name="border_center_color"/>
+        <attr name="border_end_color"/>
+        <attr name="border_color_angle"/>
+        <attr name="radius"/>
+        <attr name="radius_top_left"/>
+        <attr name="radius_top_right"/>
+        <attr name="radius_bottom_right"/>
+        <attr name="radius_bottom_left"/>
+    </declare-styleable>
+    <declare-styleable name="GView">
+        <attr name="start_color"/>
+        <attr name="center_color"/>
+        <attr name="end_color"/>
+        <attr name="g_angle"/>
+        <attr name="border"/>
+        <attr name="border_color"/>
+        <attr name="border_start_color"/>
+        <attr name="border_center_color"/>
+        <attr name="border_end_color"/>
+        <attr name="border_color_angle"/>
+        <attr name="radius"/>
+        <attr name="radius_top_left"/>
+        <attr name="radius_top_right"/>
+        <attr name="radius_bottom_right"/>
+        <attr name="radius_bottom_left"/>
+    </declare-styleable>
+
+    <declare-styleable name="GTextView">
+        <attr name="text_start_color" format="color"/>
+        <attr name="text_center_color" format="color"/>
+        <attr name="text_end_color" format="color"/>
+        <attr name="text_color_angle" format="float"/>
+        <attr name="text_drawable" format="reference"/>
+
+        <attr name="start_color"/>
+        <attr name="center_color"/>
+        <attr name="end_color"/>
+        <attr name="g_angle"/>
+        <attr name="border"/>
+        <attr name="border_color"/>
+        <attr name="border_start_color"/>
+        <attr name="border_center_color"/>
+        <attr name="border_end_color"/>
+        <attr name="border_color_angle"/>
+        <attr name="radius"/>
+        <attr name="radius_top_left"/>
+        <attr name="radius_top_right"/>
+        <attr name="radius_bottom_right"/>
+        <attr name="radius_bottom_left"/>
+    </declare-styleable>
+
+
+    <declare-styleable name="TitleBar">
+        <attr name="left_src" format="reference"/>
+        <attr name="right_src" format="reference"/>
+        <attr name="title_text" format="string"/>
+        <attr name="title_text_size" format="float"/>
+        <attr name="title_text_color" format="color"/>
+        <attr name="right_text" format="string"/>
+        <attr name="right_text_size" format="float"/>
+        <attr name="right_text_color" format="color"/>
+    </declare-styleable>
+
+    <declare-styleable name="ExpandableFlowLayout">
+        <attr name="element_divider_horizontal" format="dimension"/>
+        <attr name="element_divider_vertical" format="dimension"/>
+    </declare-styleable>
+
+    <declare-styleable name="ProcessView">
+        <attr name="progressColor" format="reference|color" />
+        <attr name="progressWidth" format="dimension" />
+
+        <attr name="backgroundColor" format="reference|color" />
+        <attr name="backgroundWidth" format="dimension" />
+
+        <attr name="outerBorderColor" format="reference|color" />
+        <attr name="outerBorderWidth" format="dimension" />
+
+        <attr name="cornerRadius" format="dimension" />
+
+        <attr name="startDirection" format="enum">
+            <enum name="TOP" value="0" />
+            <enum name="RIGHT" value="1" />
+            <enum name="BOTTOM" value="2" />
+            <enum name="LEFT" value="3" />
+        </attr>
+    </declare-styleable>
+
+    <declare-styleable name="CircleLoadingView">
+        <attr name="circleColor" format="color|reference" />
+        <attr name="circleBgColor" format="color|reference" />
+        <attr name="strokeWidth" format="dimension" />
+    </declare-styleable>
+</resources>

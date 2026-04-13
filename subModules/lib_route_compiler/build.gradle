@@ -1,0 +1,26 @@
+plugins {
+    id 'java-library'
+    id 'org.jetbrains.kotlin.jvm'
+    id 'kotlin'
+}
+
+compileJava {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+dependencies {
+    compileOnly project(':lib_route_annotation')
+    compileOnly("com.squareup:kotlinpoet:1.11.0")
+    compileOnly("com.squareup:kotlinpoet-ksp:1.11.0")
+    compileOnly("com.squareup:kotlinpoet-metadata:1.11.0")
+    implementation 'com.alibaba:fastjson:1.2.69'
+    compileOnly 'org.apache.commons:commons-lang3:3.5'
+    compileOnly 'org.apache.commons:commons-collections4:4.1'
+    compileOnly(libs.com.google.devtools.ksp)
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
