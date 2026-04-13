@@ -30,10 +30,11 @@ class RvDecoration private constructor(private val builder: Builder) : RecyclerV
         if (position == RecyclerView.NO_POSITION) {
             return
         }
-        val left = builder.getLeft()
-        val right = builder.getRight()
-        val bottom = builder.getBottom()
-        val top = builder.getTop()
+        val spacingConfig = builder.getSpacingConfig()
+        val left = spacingConfig.leftPx
+        val right = spacingConfig.rightPx
+        val bottom = spacingConfig.bottomPx
+        val top = spacingConfig.topPx
 
         when (type) {
             is androidx.recyclerview.widget.GridLayoutManager -> {
@@ -155,41 +156,30 @@ class RvDecoration private constructor(private val builder: Builder) : RecyclerV
          * 统一设置所有边距值
          */
         fun applyAll(applyAll : Int) = also{ this.applyAll = applyAll }
-
         /** 设置顶部间距 */
-        fun setTop(top: Int) = also{ this.top = top.dp().toInt() }
-        /** 获取顶部间距值 */
-        fun getTop() = top
-
+        fun setTop(top: Int) = also{ this.top = top }
         /** 设置底部间距 */
-        fun setBottom(bottom: Int)  = also{ this.bottom = bottom.dp().toInt() }
-        /** 获取底部间距值 */
-        fun getBottom() = bottom
-
-
+        fun setBottom(bottom: Int)  = also{ this.bottom = bottom }
         /** 设置左侧间距 */
-        fun setLeft(left: Int)  = also{ this.left = left.dp().toInt() }
-        /** 获取左侧间距值 */
-        fun getLeft() = left
-
-
+        fun setLeft(left: Int)  = also{ this.left = left }
         /** 设置右侧间距 */
-        fun setRight(right: Int)  = also{ this.right = right.dp().toInt() }
-        /** 获取右侧间距值 */
-        fun getRight() = right
+        fun setRight(right: Int)  = also{ this.right = right }
 
         /** 同时设置垂直方向的上下间距 */
         fun setVertical(vertical: Int)  = also{
-            this.top = vertical.dp().toInt()
-            this.bottom = vertical.dp().toInt()
+            this.top = vertical
+            this.bottom = vertical
         }
-
         /** 同时设置水平方向的左右间距 */
         fun setHorizontal(horizontal: Int)  = also{
-            this.left = horizontal.dp().toInt()
-            this.right = horizontal.dp().toInt()
+            this.left = horizontal
+            this.right = horizontal
         }
 
+        /** 获取间距配置 */
+        internal fun getSpacingConfig() = spacingConfig
+
+        /** ===============================分割线配置 =============================== */
         /** 设置分割线颜色和高度 */
         fun setDivider(color: Int, height: Float = 1f) = also {
             this.dividerPaint = Paint().apply {
@@ -199,34 +189,31 @@ class RvDecoration private constructor(private val builder: Builder) : RecyclerV
             this.dividerHeight = height
         }
 
-        /** 设置分割线画笔（允许更多自定义） */
+        /** 设置分割线画笔 */
         fun setDividerPaint(paint: Paint, height: Float = 1f) = also {
             this.dividerPaint = paint
             this.dividerHeight = height
         }
-
         /** 获取分割线画笔 */
-        fun getPaint() = dividerPaint
+        internal fun getPaint() = dividerPaint
         /** 获取分割线高度 */
-        fun getPaintHeight() = dividerHeight
+        internal fun getPaintHeight() = dividerHeight
+
 
         /** 设置是否显示最后一个item的分割线 */
         fun setShowLastDivider(showLastDivider: Boolean) = also{ this.showLastDivider = showLastDivider }
         /** 获取是否显示最后一个item的分割线 */
-        fun getShowLastDivider() = showLastDivider
+        internal fun getShowLastDivider() = showLastDivider
 
         /** 设置分割线水平间距 */
         fun setDividerSpacing(dividerSpacing: Int) = also{ this.dividerSpacing = dividerSpacing.dp() }
         /** 获取分割线水平间距 */
-        fun getDividerSpacing() = dividerSpacing
+        internal fun getDividerSpacing() = dividerSpacing
 
         /** 设置分割线水平方向的间距 */
         fun setDividerHorizontalSpacing(dividerHorizontalSpacing: Int) = also{ this.dividerHorizontalSpacing = dividerHorizontalSpacing.dp() }
         /**  获取分割线水平方向的间距 */
-        fun getDividerHorizontalSpacing() = dividerHorizontalSpacing
-
-        /** 获取间距配置 */
-        internal fun getSpacingConfig() = spacingConfig
+        internal fun getDividerHorizontalSpacing() = dividerHorizontalSpacing
 
         /** 构建RvDecoration实例 */
         fun build() :RvDecoration{
