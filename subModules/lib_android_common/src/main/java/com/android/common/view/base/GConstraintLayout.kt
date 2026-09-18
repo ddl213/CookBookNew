@@ -5,20 +5,25 @@ import android.util.AttributeSet
 import androidx.constraintlayout.widget.ConstraintLayout
 
 /**
- * GConstraintLayout (Gradient ConstraintLayout) 通过持有 GStyler 实例来获得渐变背景、边框和圆角功能。
- * 自身类中不再包含任何公共样式方法的声明或实现。
+ * 支持渐变背景、边框、圆角的 ConstraintLayout。
+ *
+ * 它本身仍然继承 ConstraintLayout，
+ * 所以 ConstraintLayout 原有的所有功能都还在。
+ *
+ * 同时实现 GStyleable，
+ * 通过 GStyler 增加通用样式能力。
  */
-class GConstraintLayout : ConstraintLayout {
+class GConstraintLayout @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
+) : ConstraintLayout(context, attrs, defStyleAttr), GStyleable {
 
-    private val styler: GStyler
-
-    constructor(context: Context) : this(context, null)
-    constructor(context: Context,  attrs: AttributeSet?) : this(context, attrs, 0)
-    constructor(context: Context,  attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
-        styler = GStyler(this, context, attrs)
-    }
-
-    fun getStyler(): GStyler {
-        return styler
-    }
+    /**
+     * 通用样式处理器。
+     *
+     * 负责解析 XML 中的 CommonGradientAttrs，
+     * 并把 BaseDrawable 设置为当前 View 的 background。
+     */
+    override val gStyler: GStyler = GStyler(this, context, attrs)
 }

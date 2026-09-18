@@ -87,25 +87,3 @@ fun ViewPager2.attach(indicator: MagicIndicator) {
     })
 }
 
-
-/**
- * --------------------------------- RecyclerView ---------------------------------
- */
-//构建适配器，必需显示设置数据类型，不然设置差异回调时类型一直是any
-inline fun <reified T : Any> RecyclerView.buildAdapter(block: AdapterBuilder<T>.() -> Unit): RecyclerView.Adapter<out RecyclerView.ViewHolder> {
-    val builder = AdapterBuilder<T>()
-    builder.block()
-    val adapter = builder.build()
-
-    this.adapter = adapter
-    return adapter
-}
-//构建可上拉刷新，下拉加载的适配器
-inline fun <reified T : Any> RefreshRecyclerView.buildRefreshAdapter(header:Boolean = false, footer:Boolean = false, block: AdapterBuilder<T>.() -> Unit): ConcatAdapter {
-    val builder = AdapterBuilder<T>()
-    builder.block()
-    val adapter = builder.buildRefresh(this,header,footer)
-
-    this.adapter = adapter
-    return adapter
-}

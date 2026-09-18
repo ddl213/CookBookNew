@@ -4,10 +4,12 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.util.Log
 import android.widget.ImageView
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.common.R
+import com.android.common.base.adapter.AdapterBuilder
 import com.android.common.base.adapter.refresh.RefreshRecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -26,13 +28,31 @@ fun RecyclerView.liner(orientation : Int = RecyclerView.VERTICAL, reverse : Bool
 fun RecyclerView.grid(spanCount : Int = 2,orientation : Int = RecyclerView.VERTICAL,reverse : Boolean = false) = also{
     layoutManager = GridLayoutManager(context, spanCount, orientation, reverse)
 }
-
 fun RefreshRecyclerView.liner(orientation : Int = RecyclerView.VERTICAL, reverse : Boolean = false) = also{
     layoutManager = LinearLayoutManager(context, orientation, reverse)
 }
 
 fun RefreshRecyclerView.grid(spanCount : Int = 2,orientation : Int = RecyclerView.VERTICAL,reverse : Boolean = false) = also{
     layoutManager = GridLayoutManager(context, spanCount, orientation, reverse)
+}
+
+//构建适配器，必需显示设置数据类型，不然设置差异回调时类型一直是any
+inline fun <reified T : Any> RecyclerView.buildAdapter(block: AdapterBuilder<T>.() -> Unit): RecyclerView.Adapter<out RecyclerView.ViewHolder> {
+    val builder = AdapterBuilder<T>()
+    builder.block()
+    val adapter = builder.build()
+
+    this.adapter = adapter
+    return adapter
+}
+//构建可上拉刷新，下拉加载的适配器
+inline fun <reified T : Any> RefreshRecyclerView.buildRefreshAdapter(header:Boolean = false, footer:Boolean = false, block: AdapterBuilder<T>.() -> Unit): ConcatAdapter {
+    val builder = AdapterBuilder<T>()
+    builder.block()
+    val adapter = builder.buildRefresh(this,header,footer)
+
+    this.adapter = adapter
+    return adapter
 }
 
 

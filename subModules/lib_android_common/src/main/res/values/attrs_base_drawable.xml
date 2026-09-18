@@ -1,0 +1,525 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- ========================================================= -->
+    <!-- 通用渐变 / 边框 / 圆角属性 -->
+    <!-- ========================================================= -->
+
+    <!-- 背景渐变起始色 -->
+    <attr name="start_color" format="color" />
+
+    <!-- 背景渐变中心色 -->
+    <attr name="center_color" format="color" />
+
+    <!-- 背景渐变结束色 -->
+    <attr name="end_color" format="color" />
+
+    <!-- 背景渐变角度 -->
+    <attr name="g_angle" format="float" />
+
+    <!-- 背景渐变中间色位置，范围建议 0 ~ 1，默认 0.5 -->
+    <attr name="g_center_position" format="float" />
+
+    <!-- 边框宽度 -->
+    <attr name="border" format="dimension" />
+
+    <!-- 纯色边框颜色 -->
+    <attr name="border_color" format="color" />
+
+    <!-- 边框渐变起始色 -->
+    <attr name="border_start_color" format="color" />
+
+    <!-- 边框渐变中心色 -->
+    <attr name="border_center_color" format="color" />
+
+    <!-- 边框渐变结束色 -->
+    <attr name="border_end_color" format="color" />
+
+    <!-- 边框渐变角度 -->
+    <attr name="border_color_angle" format="float" />
+
+    <!-- 边框渐变中间色位置，范围建议 0 ~ 1，默认 0.5 -->
+    <attr name="border_center_position" format="float" />
+
+    <!-- 统一圆角 -->
+    <attr name="radius" format="dimension" />
+
+    <!-- 左上角圆角 -->
+    <attr name="radius_top_left" format="dimension" />
+
+    <!-- 右上角圆角 -->
+    <attr name="radius_top_right" format="dimension" />
+
+    <!-- 右下角圆角 -->
+    <attr name="radius_bottom_right" format="dimension" />
+
+    <!-- 左下角圆角 -->
+    <attr name="radius_bottom_left" format="dimension" />
+
+    <!-- ========================================================= -->
+    <!-- 阴影属性 -->
+    <!-- ========================================================= -->
+
+    <!-- 阴影颜色 -->
+    <attr name="g_shadow_color" format="color" />
+
+    <!-- 阴影模糊半径 -->
+    <attr name="g_shadow_radius" format="dimension" />
+
+    <!-- 阴影 X 偏移 -->
+    <attr name="g_shadow_dx" format="dimension" />
+
+    <!-- 阴影 Y 偏移 -->
+    <attr name="g_shadow_dy" format="dimension" />
+
+    <!-- ========================================================= -->
+    <!-- selected 选中态背景属性 -->
+    <!-- ========================================================= -->
+
+    <!-- selected 选中态背景 Drawable / 图片 -->
+    <attr name="g_selected_background" format="reference|color" />
+
+    <!-- 选中态背景渐变起始色 -->
+    <attr name="g_selected_start_color" format="color" />
+
+    <!-- 选中态背景渐变中心色 -->
+    <attr name="g_selected_center_color" format="color" />
+
+    <!-- 选中态背景渐变结束色 -->
+    <attr name="g_selected_end_color" format="color" />
+
+    <!-- 选中态背景渐变角度 -->
+    <attr name="g_selected_angle" format="float" />
+
+    <!-- selected 背景渐变中间色位置，范围建议 0 ~ 1，默认 0.5 -->
+    <attr name="g_selected_center_position" format="float" />
+
+    <!-- ========================================================= -->
+    <!-- selected 选中态边框属性 -->
+    <!-- ========================================================= -->
+
+    <!-- 选中态纯色边框 -->
+    <attr name="g_selected_border_color" format="color" />
+
+    <!-- 选中态边框渐变起始色 -->
+    <attr name="g_selected_border_start_color" format="color" />
+
+    <!-- 选中态边框渐变中心色 -->
+    <attr name="g_selected_border_center_color" format="color" />
+
+    <!-- 选中态边框渐变结束色 -->
+    <attr name="g_selected_border_end_color" format="color" />
+
+    <!-- 选中态边框渐变角度 -->
+    <attr name="g_selected_border_angle" format="float" />
+
+    <!-- selected 边框渐变中间色位置，范围建议 0 ~ 1，默认 0.5 -->
+    <attr name="g_selected_border_center_position" format="float" />
+
+
+
+    <!-- ========================================================= -->
+    <!-- 供 BaseDrawable / GStyler 统一解析使用 -->
+    <!-- ========================================================= -->
+
+    <declare-styleable name="CommonGradientAttrs">
+
+        <!-- 系统背景，用于兼容 android:background -->
+        <attr name="android:background" />
+
+        <!-- 普通背景 -->
+        <attr name="start_color" />
+        <attr name="center_color" />
+        <attr name="end_color" />
+        <attr name="g_angle" />
+        <!-- 普通背景渐变中间点位置 -->
+        <attr name="g_center_position" />
+
+
+        <!-- 普通边框 -->
+        <attr name="border" />
+        <attr name="border_color" />
+        <attr name="border_start_color" />
+        <attr name="border_center_color" />
+        <attr name="border_end_color" />
+        <attr name="border_color_angle" />
+        <!-- 普通边框渐变中间点位置 -->
+        <attr name="border_center_position" />
+
+        <!-- 圆角 -->
+        <attr name="radius" />
+        <attr name="radius_top_left" />
+        <attr name="radius_top_right" />
+        <attr name="radius_bottom_right" />
+        <attr name="radius_bottom_left" />
+
+        <!-- 阴影 -->
+        <attr name="g_shadow_color" />
+        <attr name="g_shadow_radius" />
+        <attr name="g_shadow_dx" />
+        <attr name="g_shadow_dy" />
+
+        <!-- selected 选中态背景 -->
+        <attr name="g_selected_background" />
+        <attr name="g_selected_start_color" />
+        <attr name="g_selected_center_color" />
+        <attr name="g_selected_end_color" />
+        <attr name="g_selected_angle" />
+        <!-- selected 背景渐变中间点位置 -->
+        <attr name="g_selected_center_position" />
+
+        <!-- selected 选中态边框 -->
+        <attr name="g_selected_border_color" />
+        <attr name="g_selected_border_start_color" />
+        <attr name="g_selected_border_center_color" />
+        <attr name="g_selected_border_end_color" />
+        <attr name="g_selected_border_angle" />
+        <!-- selected 边框渐变中间点位置 -->
+        <attr name="g_selected_border_center_position" />
+
+    </declare-styleable>
+
+    <declare-styleable name="GConstraintLayout">
+
+        <!-- 普通背景 -->
+        <attr name="start_color" />
+        <attr name="center_color" />
+        <attr name="end_color" />
+        <attr name="g_angle" />
+        <!-- 普通背景渐变中间点位置 -->
+        <attr name="g_center_position" />
+
+
+        <!-- 普通边框 -->
+        <attr name="border" />
+        <attr name="border_color" />
+        <attr name="border_start_color" />
+        <attr name="border_center_color" />
+        <attr name="border_end_color" />
+        <attr name="border_color_angle" />
+        <!-- 普通边框渐变中间点位置 -->
+        <attr name="border_center_position" />
+
+        <!-- 圆角 -->
+        <attr name="radius" />
+        <attr name="radius_top_left" />
+        <attr name="radius_top_right" />
+        <attr name="radius_bottom_right" />
+        <attr name="radius_bottom_left" />
+
+        <!-- 阴影 -->
+        <attr name="g_shadow_color" />
+        <attr name="g_shadow_radius" />
+        <attr name="g_shadow_dx" />
+        <attr name="g_shadow_dy" />
+
+        <!-- selected 选中态背景 -->
+        <attr name="g_selected_background" />
+        <attr name="g_selected_start_color" />
+        <attr name="g_selected_center_color" />
+        <attr name="g_selected_end_color" />
+        <attr name="g_selected_angle" />
+        <!-- selected 背景渐变中间点位置 -->
+        <attr name="g_selected_center_position" />
+
+        <!-- selected 选中态边框 -->
+        <attr name="g_selected_border_color" />
+        <attr name="g_selected_border_start_color" />
+        <attr name="g_selected_border_center_color" />
+        <attr name="g_selected_border_end_color" />
+        <attr name="g_selected_border_angle" />
+        <!-- selected 边框渐变中间点位置 -->
+        <attr name="g_selected_border_center_position" />
+
+    </declare-styleable>
+
+    <declare-styleable name="GImageView">
+
+        <!-- 普通背景 -->
+        <attr name="start_color" />
+        <attr name="center_color" />
+        <attr name="end_color" />
+        <attr name="g_angle" />
+        <!-- 普通背景渐变中间点位置 -->
+        <attr name="g_center_position" />
+
+
+        <!-- 普通边框 -->
+        <attr name="border" />
+        <attr name="border_color" />
+        <attr name="border_start_color" />
+        <attr name="border_center_color" />
+        <attr name="border_end_color" />
+        <attr name="border_color_angle" />
+        <!-- 普通边框渐变中间点位置 -->
+        <attr name="border_center_position" />
+
+        <!-- 圆角 -->
+        <attr name="radius" />
+        <attr name="radius_top_left" />
+        <attr name="radius_top_right" />
+        <attr name="radius_bottom_right" />
+        <attr name="radius_bottom_left" />
+
+        <!-- 阴影 -->
+        <attr name="g_shadow_color" />
+        <attr name="g_shadow_radius" />
+        <attr name="g_shadow_dx" />
+        <attr name="g_shadow_dy" />
+
+        <!-- selected 选中态背景 -->
+        <attr name="g_selected_background" />
+        <attr name="g_selected_start_color" />
+        <attr name="g_selected_center_color" />
+        <attr name="g_selected_end_color" />
+        <attr name="g_selected_angle" />
+        <!-- selected 背景渐变中间点位置 -->
+        <attr name="g_selected_center_position" />
+
+        <!-- selected 选中态边框 -->
+        <attr name="g_selected_border_color" />
+        <attr name="g_selected_border_start_color" />
+        <attr name="g_selected_border_center_color" />
+        <attr name="g_selected_border_end_color" />
+        <attr name="g_selected_border_angle" />
+        <!-- selected 边框渐变中间点位置 -->
+        <attr name="g_selected_border_center_position" />
+
+    </declare-styleable>
+
+    <declare-styleable name="GLinearLayout">
+
+        <!-- 普通背景 -->
+        <attr name="start_color" />
+        <attr name="center_color" />
+        <attr name="end_color" />
+        <attr name="g_angle" />
+        <!-- 普通背景渐变中间点位置 -->
+        <attr name="g_center_position" />
+
+
+        <!-- 普通边框 -->
+        <attr name="border" />
+        <attr name="border_color" />
+        <attr name="border_start_color" />
+        <attr name="border_center_color" />
+        <attr name="border_end_color" />
+        <attr name="border_color_angle" />
+        <!-- 普通边框渐变中间点位置 -->
+        <attr name="border_center_position" />
+
+        <!-- 圆角 -->
+        <attr name="radius" />
+        <attr name="radius_top_left" />
+        <attr name="radius_top_right" />
+        <attr name="radius_bottom_right" />
+        <attr name="radius_bottom_left" />
+
+        <!-- 阴影 -->
+        <attr name="g_shadow_color" />
+        <attr name="g_shadow_radius" />
+        <attr name="g_shadow_dx" />
+        <attr name="g_shadow_dy" />
+
+        <!-- selected 选中态背景 -->
+        <attr name="g_selected_background" />
+        <attr name="g_selected_start_color" />
+        <attr name="g_selected_center_color" />
+        <attr name="g_selected_end_color" />
+        <attr name="g_selected_angle" />
+        <!-- selected 背景渐变中间点位置 -->
+        <attr name="g_selected_center_position" />
+
+        <!-- selected 选中态边框 -->
+        <attr name="g_selected_border_color" />
+        <attr name="g_selected_border_start_color" />
+        <attr name="g_selected_border_center_color" />
+        <attr name="g_selected_border_end_color" />
+        <attr name="g_selected_border_angle" />
+        <!-- selected 边框渐变中间点位置 -->
+        <attr name="g_selected_border_center_position" />
+
+    </declare-styleable>
+
+    <declare-styleable name="GView">
+
+        <!-- 普通背景 -->
+        <attr name="start_color" />
+        <attr name="center_color" />
+        <attr name="end_color" />
+        <attr name="g_angle" />
+        <!-- 普通背景渐变中间点位置 -->
+        <attr name="g_center_position" />
+
+
+        <!-- 普通边框 -->
+        <attr name="border" />
+        <attr name="border_color" />
+        <attr name="border_start_color" />
+        <attr name="border_center_color" />
+        <attr name="border_end_color" />
+        <attr name="border_color_angle" />
+        <!-- 普通边框渐变中间点位置 -->
+        <attr name="border_center_position" />
+
+        <!-- 圆角 -->
+        <attr name="radius" />
+        <attr name="radius_top_left" />
+        <attr name="radius_top_right" />
+        <attr name="radius_bottom_right" />
+        <attr name="radius_bottom_left" />
+
+        <!-- 阴影 -->
+        <attr name="g_shadow_color" />
+        <attr name="g_shadow_radius" />
+        <attr name="g_shadow_dx" />
+        <attr name="g_shadow_dy" />
+
+        <!-- selected 选中态背景 -->
+        <attr name="g_selected_background" />
+        <attr name="g_selected_start_color" />
+        <attr name="g_selected_center_color" />
+        <attr name="g_selected_end_color" />
+        <attr name="g_selected_angle" />
+        <!-- selected 背景渐变中间点位置 -->
+        <attr name="g_selected_center_position" />
+
+        <!-- selected 选中态边框 -->
+        <attr name="g_selected_border_color" />
+        <attr name="g_selected_border_start_color" />
+        <attr name="g_selected_border_center_color" />
+        <attr name="g_selected_border_end_color" />
+        <attr name="g_selected_border_angle" />
+        <!-- selected 边框渐变中间点位置 -->
+        <attr name="g_selected_border_center_position" />
+
+    </declare-styleable>
+
+
+
+
+    <declare-styleable name="GEditText">
+
+        <!-- 普通背景 -->
+        <attr name="start_color" />
+        <attr name="center_color" />
+        <attr name="end_color" />
+        <attr name="g_angle" />
+        <!-- 普通背景渐变中间点位置 -->
+        <attr name="g_center_position" />
+
+
+        <!-- 普通边框 -->
+        <attr name="border" />
+        <attr name="border_color" />
+        <attr name="border_start_color" />
+        <attr name="border_center_color" />
+        <attr name="border_end_color" />
+        <attr name="border_color_angle" />
+        <!-- 普通边框渐变中间点位置 -->
+        <attr name="border_center_position" />
+
+        <!-- 圆角 -->
+        <attr name="radius" />
+        <attr name="radius_top_left" />
+        <attr name="radius_top_right" />
+        <attr name="radius_bottom_right" />
+        <attr name="radius_bottom_left" />
+
+        <!-- 阴影 -->
+        <attr name="g_shadow_color" />
+        <attr name="g_shadow_radius" />
+        <attr name="g_shadow_dx" />
+        <attr name="g_shadow_dy" />
+
+        <!-- selected 选中态背景 -->
+        <attr name="g_selected_background" />
+        <attr name="g_selected_start_color" />
+        <attr name="g_selected_center_color" />
+        <attr name="g_selected_end_color" />
+        <attr name="g_selected_angle" />
+        <!-- selected 背景渐变中间点位置 -->
+        <attr name="g_selected_center_position" />
+
+        <!-- selected 选中态边框 -->
+        <attr name="g_selected_border_color" />
+        <attr name="g_selected_border_start_color" />
+        <attr name="g_selected_border_center_color" />
+        <attr name="g_selected_border_end_color" />
+        <attr name="g_selected_border_angle" />
+        <!-- selected 边框渐变中间点位置 -->
+        <attr name="g_selected_border_center_position" />
+
+    </declare-styleable>
+
+    <declare-styleable name="GTextView">
+
+        <!-- 文字渐变 -->
+        <attr name="text_start_color" format="color" />
+        <attr name="text_center_color" format="color" />
+        <attr name="text_end_color" format="color" />
+        <attr name="text_color_angle" format="float" />
+        <!-- selected 选中态纯色字体 -->
+        <attr name="g_selected_text_color" format="color" />
+        <!-- selected 选中态渐变字体 -->
+        <attr name="g_selected_text_start_color" format="color" />
+        <attr name="g_selected_text_center_color" format="color" />
+        <attr name="g_selected_text_end_color" format="color" />
+        <attr name="g_selected_text_color_angle" format="float" />
+
+        <!-- 文字 Drawable 字体色 -->
+        <attr name="text_drawable" format="reference" />
+
+        <!-- 普通背景 -->
+        <attr name="start_color" />
+        <attr name="center_color" />
+        <attr name="end_color" />
+        <attr name="g_angle" />
+        <!-- 普通背景渐变中间点位置 -->
+        <attr name="g_center_position" />
+
+
+        <!-- 普通边框 -->
+        <attr name="border" />
+        <attr name="border_color" />
+        <attr name="border_start_color" />
+        <attr name="border_center_color" />
+        <attr name="border_end_color" />
+        <attr name="border_color_angle" />
+        <!-- 普通边框渐变中间点位置 -->
+        <attr name="border_center_position" />
+
+        <!-- 圆角 -->
+        <attr name="radius" />
+        <attr name="radius_top_left" />
+        <attr name="radius_top_right" />
+        <attr name="radius_bottom_right" />
+        <attr name="radius_bottom_left" />
+
+        <!-- 阴影 -->
+        <attr name="g_shadow_color" />
+        <attr name="g_shadow_radius" />
+        <attr name="g_shadow_dx" />
+        <attr name="g_shadow_dy" />
+
+        <!-- selected 选中态背景 -->
+        <attr name="g_selected_background" />
+        <attr name="g_selected_start_color" />
+        <attr name="g_selected_center_color" />
+        <attr name="g_selected_end_color" />
+        <attr name="g_selected_angle" />
+        <!-- selected 背景渐变中间点位置 -->
+        <attr name="g_selected_center_position" />
+
+        <!-- selected 选中态边框 -->
+        <attr name="g_selected_border_color" />
+        <attr name="g_selected_border_start_color" />
+        <attr name="g_selected_border_center_color" />
+        <attr name="g_selected_border_end_color" />
+        <attr name="g_selected_border_angle" />
+        <!-- selected 边框渐变中间点位置 -->
+        <attr name="g_selected_border_center_position" />
+
+    </declare-styleable>
+
+</resources>

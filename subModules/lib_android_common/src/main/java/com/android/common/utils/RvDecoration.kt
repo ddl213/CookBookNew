@@ -184,7 +184,7 @@ class RvDecoration private constructor(private val builder: Builder) : RecyclerV
         fun setDivider(color: Int, height: Float = 1f) = also {
             this.dividerPaint = Paint().apply {
                 this.color = color
-                strokeWidth = height.toFloat()
+                strokeWidth = height
             }
             this.dividerHeight = height
         }

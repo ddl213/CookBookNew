@@ -5,23 +5,21 @@ import android.util.AttributeSet
 import android.view.View
 
 /**
- * CView (Custom View) 通过持有 GStyler 实例获得渐变背景、边框和圆角功能。
- * 自身类中不再包含任何公共样式方法的声明或实现。
+ * 支持渐变背景、边框、圆角的普通 View。
+ *
+ * 继承 View，保留 View 原有能力。
+ * 实现 GStyleable，通过 GStyler 增加通用背景样式能力。
  */
-class GView : View {
+class GView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
+) : View(context, attrs, defStyleAttr), GStyleable {
 
-    // 持有 GStyler 实例，以便在运行时需要动态修改样式时使用。
-    // 如果你只通过 XML 设置样式，且不需要动态修改，这个字段甚至可以省略。
-    private val styler: GStyler
-
-    constructor(context: Context) : this(context, null)
-    constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
-        // 将自身和 AttributeSet 传递给 GStyler 进行处理
-        styler = GStyler(this, context, attrs)
-    }
-
-    fun getStyler(): GStyler {
-        return styler
-    }
+    /**
+     * 通用样式处理器。
+     *
+     * 负责解析 XML 中的通用样式属性，并设置背景 Drawable。
+     */
+    override val gStyler: GStyler = GStyler(this, context, attrs)
 }
