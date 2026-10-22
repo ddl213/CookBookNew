@@ -37,6 +37,12 @@ object RoutePath {
     const val PAGE_COOK_BOOK_ADD = "action://4002"
 
     /**
+     * 登录 / 注册
+     */
+    const val PAGE_LOGIN = "action://8001"
+    const val PAGE_REGISTER = "action://8002"
+
+    /**
      * 聊天详情
      */
     const val PAGE_CHAT_DETAIL = "action://5001"

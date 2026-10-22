@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="auth_login_title">登录</string>
+    <string name="auth_register_title">注册</string>
+
+    <string name="auth_login_welcome">欢迎回来</string>
+    <string name="auth_login_welcome_subtitle">登录后可继续收藏、评论和查看好友动态</string>
+    <string name="auth_register_welcome">创建账号</string>
+    <string name="auth_register_welcome_subtitle">用户名和密码即可完成注册</string>
+
+    <string name="auth_username_label">用户名</string>
+    <string name="auth_username_hint">请输入 3-32 位用户名</string>
+    <string name="auth_password_label">密码</string>
+    <string name="auth_password_hint">请输入至少 6 位密码</string>
+    <string name="auth_nickname_label">昵称（选填）</string>
+    <string name="auth_nickname_hint">不填则使用用户名</string>
+    <string name="auth_confirm_password_label">确认密码</string>
+    <string name="auth_confirm_password_hint">请再次输入密码</string>
+
+    <string name="auth_login_button">登录</string>
+    <string name="auth_logging_in">登录中…</string>
+    <string name="auth_register_button">注册</string>
+    <string name="auth_registering">注册中…</string>
+
+    <string name="auth_go_register_prefix">还没有账号？</string>
+    <string name="auth_go_register">注册</string>
+    <string name="auth_go_login_prefix">已有账号？</string>
+    <string name="auth_go_login">登录</string>
+
+    <string name="auth_error_default">操作失败，请稍后重试</string>
+</resources>

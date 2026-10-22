@@ -19,4 +19,8 @@
 
     <color name="color_666666">#666666</color>
     <color name="color_999999">#999999</color>
+
+    <!-- 主色：暖橘 -->
+    <color name="color_primary">#FF8A00</color>
+    <color name="color_primary_pressed">#E67A00</color>
 </resources>

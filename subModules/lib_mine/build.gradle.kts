@@ -48,6 +48,8 @@ dependencies {
     implementation(project(":lib_android_common"))
     //当前项目公共模块
     implementation(project(":lib_campaign_common"))
+    //网络与会话
+    implementation(project(":lib_network"))
     //路由模块
     implementation(project(":lib_route_api"))
     implementation(project(":lib_route_annotation"))

@@ -13,13 +13,15 @@ import com.campaign.common.constants.RoutePath.PAGE_HOME
 import com.campaign.common.constants.RoutePath.PAGE_INDEX
 import com.campaign.common.constants.RoutePath.PAGE_MINE
 import com.campaign.common.constants.RoutePath.PAGE_ORDER
+import com.campaign.common.listener.MainTabController
 import com.marky.route.annotation.Route
 import com.marky.route.api.NRoute
 import com.rhys.main.R
 import com.rhys.main.databinding.FragmentHomeBinding
 
 @Route(path = PAGE_HOME, startPage = true)
-class HomeFragment : BaseBindFragment<FragmentHomeBinding>(FragmentHomeBinding::inflate) {
+class HomeFragment : BaseBindFragment<FragmentHomeBinding>(FragmentHomeBinding::inflate),
+    MainTabController {
 
     /**
      * 配置tab图标
@@ -72,5 +74,12 @@ class HomeFragment : BaseBindFragment<FragmentHomeBinding>(FragmentHomeBinding::
 
     override fun initData(binding: FragmentHomeBinding) {
 
+    }
+
+    override fun switchTab(index: Int) {
+        if (view == null) return
+        if (index in mTab.indices) {
+            binding.vp.setCurrentItem(index, false)
+        }
     }
 }

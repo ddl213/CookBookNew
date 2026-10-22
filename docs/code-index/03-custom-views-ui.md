@@ -1,6 +1,6 @@
 # 03 · 自定义 View 与 UI 组件
 
-> 本类盘点状态：已盘点。已核对 `lib_android_common`、`lib_photo_view`、`lib_cookbook`、`lib_index` 的自定义 View、Adapter、刷新、弹窗与图片查看入口；未证实调用或仅定义的组件已在子表注明。因内容接近 12 KiB，按功能拆为下面三个子表。
+> 本类盘点状态：已盘点。已核对 `lib_android_common`、`lib_photo_view`、`lib_cookbook`、`lib_index` 的自定义 View、Adapter、刷新、弹窗与图片查看入口；未证实调用或仅定义的组件已在子表注明。因内容接近 12 KiB，按功能拆为下面三个子表。2026-10-22 `P01-T02` 增量：登录/注册与“我的”页复用既有 `TitleBar`、`GEditText`、`GImageView`，本次未新增自定义 View/Adapter。
 
 **收录范围：**自定义 View、复合 View、通用 Adapter/Delegate、刷新列表、Dialog、标题栏、图片查看、进度组件。
 

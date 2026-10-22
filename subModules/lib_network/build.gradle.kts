@@ -37,4 +37,12 @@ android {
 dependencies {
 
     implementation(project(":lib_android_common"))
+
+    // 网络请求
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
+    implementation(libs.okhttp)
+    implementation(libs.com.google.code.gson)
+
+    testImplementation(libs.junit)
 }

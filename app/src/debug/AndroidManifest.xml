@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- 仅 debug 允许访问本地明文 HTTP 后端；release 保持系统默认（禁止明文）。 -->
+    <application android:usesCleartextTraffic="true" />
+
+</manifest>

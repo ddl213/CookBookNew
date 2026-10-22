@@ -3,7 +3,7 @@
 - 本阶段需求源：`docs/phases/P01-app-shell-auth/01-requirements.md`
 - 用户阶段验收：未接受
 - 验收依据：未提供
-- 下一动作：按 P01-T01 范围实施“登录入口端到端基线”；实施完成后再安排 P01-T02 独立验证。
+- 下一动作：等待用户对 P01 做手动 UI 验收；用户明确接受前不进入 P02。
 
 ## 用户决策（2026-10-22）
 
@@ -16,8 +16,9 @@
 
 | 任务 ID | 目标 / 范围 | 执行职责 | 状态 | 证据/下一动作 |
 | --- | --- | --- | --- | --- |
-| P01-T01 | 登录入口端到端基线（网络层、认证会话、登录/注册页、未登录态与回跳） | standard-executor（待分配） | Ready | 范围见下；确认已解除，可实施 |
-| P01-T02 | P01 独立验证与代码索引增量更新 | verifier / code-auditor（待分配） | Pending | 独立构建 + 手动 UI 验收 + 索引增量更新 |
+| P01-T01 | 登录入口端到端基线（网络层、认证会话、登录/注册页、未登录态与回跳） | deep-executor | Verified（技术） | 构建/单测/接口/模拟器烟测通过；UI 运行态待用户手测 |
+| P01-T02 | 按实际改动增量更新代码能力索引 | code-auditor | Verified | 新增 22 条、全库 73 条；`code_index_check.py check` PASS；模块计数修正为 13 个 `lib_*` |
+| P01-T03 | P01 独立构建、接口与安全回归验证 | verifier | Verified（UI 未重跑） | 18 项单测 0 失败；APK 9,663,995 bytes；`_navauth` 解密、debug/release 清单、后端契约、无密码/token 日志均通过；验证时无在线设备，UI 未重跑 |
 
 ### P01-T01 实施范围
 
@@ -43,7 +44,28 @@
 
 ## 实施结果、验证与 Gate
 
-- 已确认方案与范围，尚未开始实现。
+- 模块/接线：`lib_network` 新增 Retrofit/OkHttp、AuthApi、DTO、AuthRepository、SessionStore/SessionManager/AuthState、错误映射、`resolveMediaUrl`；新增 `lib_auth` 登录/注册页与 `AuthValidator`；`lib_campaign_common` 新增 `MainTabController` 与 `PAGE_LOGIN/PAGE_REGISTER`；`lib_mine` 未登录/已登录态；`app` MMKV 初始化、启动恢复会话、debug 明文 HTTP、`HomeFragment` 实现切 tab。
+- 构建/单测：`:app:assembleDebug --max-workers=2` BUILD SUCCESSFUL；`:lib_auth:testDebugUnitTest` 12/12；`:lib_network:testDebugUnitTest` 6/6；独立验证合并 18/0。
+- 后端契约：register 201、重复 409 USERNAME_TAKEN、错密 401、短用户名 400、login 200、me 200、无 token 401；字段与 `UserDto` 一致。
+- 路由/清单：`_navauth` 解密为 `action://8001 LoginFragment`、`action://8002 RegisterFragment`；debug 含 `usesCleartextTraffic="true"`，release 不含；INTERNET 保留；五导航名称/顺序未变。
+- UI 烟测：实现阶段在 API35 模拟器完成未登录/已登录、校验、401/断网、登录回跳、杀进程恢复、退出、浏览应用、注册自动登录；**头像 URL 修复后未重跑 UI**。
+- 安全/回归：新增代码无密码/token 日志；token 仅存 MMKV；新增布局无 FrameLayout；长昵称/用户名 ellipsize；无无关页面修改。
+
+## 手动验收步骤（供用户）
+
+1. 启动后端：`cd D:/CookBookService && npm start`（默认 127.0.0.1:3000；模拟器经 10.0.2.2 访问）。
+2. 构建安装：`cd D:/projects/CookBook && ./gradlew :app:assembleDebug --max-workers=2`，安装 `app/build/outputs/apk/debug/app-debug.apk`。
+3. 打开“我的”：应显示“登录/注册”和“浏览应用”。
+4. 进入登录页：空表单提交应提示；错误密码应提示“用户名或密码错误”；正确登录后回到“我的”并显示昵称、@username、简介/头像占位。
+5. 后端运行时杀进程重开：应恢复登录态。
+6. 退出登录：应回到未登录态；“浏览应用”应切到首页。
+7. 注册新用户：应自动登录并回到登录前的页面，资料显示正确。
+8. 关闭后端再登录：应提示“无法连接服务器，请确认后端已启动”。
+9. 小屏/大字体：登录/注册可滚动，昵称/用户名不溢出、不遮挡。
+
+## 已知风险
+
+- token 明文存 MMKV，未额外加密；真机需改 `NetworkConfig.baseUrl` 并让后端 `HOST=0.0.0.0`；release 禁止明文 HTTP；400 字段详情可能为英文；头像修复后 UI 未重跑。
 
 ## 问题 / 修复历史及归档引用
 
