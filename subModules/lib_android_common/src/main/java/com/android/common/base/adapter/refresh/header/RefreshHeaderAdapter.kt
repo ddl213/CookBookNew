@@ -4,7 +4,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.android.common.base.adapter.refresh.header.listener.IRefreshHeader
 
-class RefreshHeaderAdapter(private val header: IRefreshHeader) :
+class RefreshHeaderAdapter(internal val header: IRefreshHeader) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {

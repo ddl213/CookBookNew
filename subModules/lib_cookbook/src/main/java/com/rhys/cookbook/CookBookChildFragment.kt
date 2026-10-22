@@ -11,6 +11,7 @@ import com.android.common.ext.buildRefreshAdapter
 import com.android.common.ext.dp
 import com.android.common.ext.liner
 import com.android.common.ext.load
+import com.android.common.ext.submitList
 import com.android.common.utils.LogUtils
 import com.android.common.utils.RvDecoration
 import com.campaign.common.constants.RoutePath
@@ -44,7 +45,7 @@ class CookBookChildFragment :
             4
         ),
         Recipe(
-            "1",
+            "2",
             "Test",
             "菜谱2",
             "https://avatars.githubusercontent.com/u/26372905?v=4",
@@ -55,7 +56,7 @@ class CookBookChildFragment :
             4
         ),
         Recipe(
-            "1",
+            "3",
             "Test",
             "菜谱3",
             "https://avatars.githubusercontent.com/u/26372905?v=4",
@@ -66,7 +67,7 @@ class CookBookChildFragment :
             4
         ),
         Recipe(
-            "1",
+            "4",
             "Test",
             "菜谱4",
             "https://avatars.githubusercontent.com/u/26372905?v=4",
@@ -77,7 +78,7 @@ class CookBookChildFragment :
             4
         ),
         Recipe(
-            "1",
+            "5",
             "Test",
             "菜谱5",
             "https://avatars.githubusercontent.com/u/26372905?v=4",
@@ -88,7 +89,7 @@ class CookBookChildFragment :
             4
         ),
         Recipe(
-            "1",
+            "6",
             "Test",
             "菜谱6",
             "https://avatars.githubusercontent.com/u/26372905?v=4",
@@ -124,7 +125,6 @@ class CookBookChildFragment :
             rv.liner().buildRefreshAdapter<Recipe>(true) {
                 setDiff(areItemsSame = { old, new -> old.id == new.id}, areContentsSame = { old, new -> old == new})
                 setLayout(CookbookLayoutChildBinding::class.java)
-                setList(list)
                 bind<CookbookLayoutChildBinding> { holder, position, item,_ ->
                     holder.binding.apply {
                         ivRecipePic.load(item.imageUrl)
@@ -145,9 +145,14 @@ class CookBookChildFragment :
             rv.setOnRefreshListener {
                 // 模拟刷新操作
                 rv.postDelayed({
-                    rv.refreshComplete()
+                    rv.submitList(list) {
+                        rv.refreshComplete()
+                    }
                 }, 2000)
             }
+
+            // 初始化 Adapter 后，直接通过控件提交完整列表。
+            rv.submitList(list)
         }
     }
 

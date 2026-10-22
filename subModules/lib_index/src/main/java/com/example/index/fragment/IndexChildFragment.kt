@@ -55,7 +55,7 @@ class IndexChildFragment : BaseBindFragment<IndexFragmentIndexChildBinding>(Inde
                 0
             ),
             Recipe(
-                "1",
+                "2",
                 "Test",
                 "菜谱2",
                 "https://avatars.githubusercontent.com/u/26372905?v=4",
@@ -77,7 +77,7 @@ class IndexChildFragment : BaseBindFragment<IndexFragmentIndexChildBinding>(Inde
                 0
             ),
             Recipe(
-                "1",
+                "3",
                 "Test",
                 "菜谱3",
                 "https://avatars.githubusercontent.com/u/26372905?v=4",
@@ -99,7 +99,7 @@ class IndexChildFragment : BaseBindFragment<IndexFragmentIndexChildBinding>(Inde
                 0
             ),
             Recipe(
-                "1",
+                "4",
                 "Test",
                 "菜谱4",
                 "https://avatars.githubusercontent.com/u/26372905?v=4",
@@ -121,7 +121,7 @@ class IndexChildFragment : BaseBindFragment<IndexFragmentIndexChildBinding>(Inde
                 0
             ),
             Recipe(
-                "1",
+                "5",
                 "Test",
                 "菜谱5",
                 "https://avatars.githubusercontent.com/u/26372905?v=4",
@@ -143,7 +143,7 @@ class IndexChildFragment : BaseBindFragment<IndexFragmentIndexChildBinding>(Inde
                 0
             ),
             Recipe(
-                "1",
+                "6",
                 "Test",
                 "菜谱6",
                 "https://avatars.githubusercontent.com/u/26372905?v=4",
@@ -158,8 +158,8 @@ class IndexChildFragment : BaseBindFragment<IndexFragmentIndexChildBinding>(Inde
 
     override fun initView(binding: IndexFragmentIndexChildBinding) {
         //初始化rvVertical
-        val adapter = binding.rvVertical.liner().buildAdapter <HomeFeedItem>{
-            setDiff(areItemsSame = { old, new -> old.user.id == new.user.id} ,
+        binding.rvVertical.liner().buildAdapter <HomeFeedItem>{
+            setDiff(areItemsSame = { old, new -> old.recipe.id == new.recipe.id} ,
                 areContentsSame = { old, new -> old == new})
             setLayout(0,IndexLayoutIndexChildHorizontalItemBinding::class.java)
             setLayout(1,IndexLayoutIndexChildVerticalItemBinding::class.java)
@@ -171,7 +171,7 @@ class IndexChildFragment : BaseBindFragment<IndexFragmentIndexChildBinding>(Inde
                 }
             }
             bindMulti { holder, _, item,_ ->
-                when(holder.itemViewType){
+                when(holder.localViewType){
                     0 ->{
                         holder.withBinding<IndexLayoutIndexChildHorizontalItemBinding>{
                             ivPicture.load(item.recipe.imageUrl)
@@ -198,7 +198,7 @@ class IndexChildFragment : BaseBindFragment<IndexFragmentIndexChildBinding>(Inde
 
         binding.rvHorizontal.addItemDecoration(RvDecoration.Builder().setHorizontal(10).setTop(14).build())
         binding.rvHorizontal.liner(RecyclerView.HORIZONTAL).buildAdapter <HomeFeedItem>{
-            setDiff(areItemsSame = { old, new -> old.user.id == new.user.id },
+            setDiff(areItemsSame = { old, new -> old.recipe.id == new.recipe.id },
                 areContentsSame = { old, new -> old == new})
             setLayout(IndexLayoutIndexChildHorizontalItemBinding::class.java)
             bind<IndexLayoutIndexChildHorizontalItemBinding>{ holder, _, _,_ ->

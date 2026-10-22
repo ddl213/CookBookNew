@@ -22,7 +22,7 @@ abstract class SingleAdapter<T, VB : ViewBinding>(
             parent,
             false
         ) as ViewBinding
-        val holder = BaseViewHolder(binding, initViewHolder)
+        val holder = BaseViewHolder(binding, initViewHolder, localViewType = viewType)
         bindViewClickListener(holder)
         return holder
     }
@@ -34,21 +34,16 @@ abstract class SingleAdapter<T, VB : ViewBinding>(
     }
 
     override fun onBindViewHolder(holder: BaseViewHolder<ViewBinding>, position: Int, payloads: MutableList<Any>) {
+        if (payloads.isEmpty()) {
+            onBindViewHolder(holder, position)
+            return
+        }
         val item = getItem(position)
         @Suppress("UNCHECKED_CAST")
         setData(holder as BaseViewHolder<VB>, position, item,payloads)
     }
 
-    // 绑定数据的方法，由子类实现
+    // null 表示全量绑定，非空 payloads 表示局部更新；离屏后仍可能需要全量绑定。
     abstract fun setData(holder: BaseViewHolder<VB>, position: Int, item: T, payloads: List<Any>? = null)
-
-    // 这里的setData方法是用于子类实现的
-//    abstract fun setData(holder: BaseViewHolder<VB>, position: Int, item: T?)
-//
-//    // 重写父类的setData方法，强制转换
-//    override fun setData(holder: BaseViewHolder<ViewBinding>, position: Int, item: T?) {
-//        @Suppress("UNCHECKED_CAST")
-//        setData(holder as BaseViewHolder<VB>, position, item)
-//    }
 }
 

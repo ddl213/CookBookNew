@@ -35,6 +35,14 @@ android {
     buildFeatures {
         viewBinding = true
     }
+
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
+        unitTests.all {
+            // 与项目依赖使用同一镜像，避免 Robolectric 运行时绕过仓库配置。
+            it.systemProperty("robolectric.dependency.repo.url", "https://maven.aliyun.com/repository/public")
+        }
+    }
 }
 
 dependencies {
@@ -58,4 +66,7 @@ dependencies {
 
     //导航栏
     api(libs.com.github.magicIndicator)
+
+    testImplementation(libs.junit)
+    testImplementation(libs.robolectric)
 }
