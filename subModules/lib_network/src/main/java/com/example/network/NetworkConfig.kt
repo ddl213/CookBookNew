@@ -3,14 +3,17 @@ package com.example.network
 /**
  * 后端地址配置。
  *
- * 默认值用于 Android 模拟器访问宿主机。
- * 真机调试时请改为开发机局域网 IP（例如 http://192.168.1.10:3000/api/v1/），
- * 并让 CookBookService 以 HOST=0.0.0.0 启动，确保手机可以访问。
+ * 构建时可通过 Gradle 属性覆盖（写入 BuildConfig.API_BASE_URL）：
+ * - 默认值 http://10.0.2.2:3000/api/v1/ 仅适用于 Android 模拟器访问宿主机。
+ * - 真机 USB 调试：执行 adb reverse tcp:3000 tcp:3000，
+ *   并以 -PapiBaseUrl=http://127.0.0.1:3000/api/v1/ 构建。
+ * - 真机局域网调试：使用开发机 IP（例如 http://192.168.1.10:3000/api/v1/），
+ *   并让 CookBookService 以 HOST=0.0.0.0 启动，确保手机可以访问。
  *
  * 该值需要在首次发起网络请求前设置；ApiClient 首次使用时创建并缓存 Retrofit 实例。
  */
 object NetworkConfig {
-    var baseUrl: String = "http://10.0.2.2:3000/api/v1/"
+    var baseUrl: String = BuildConfig.API_BASE_URL
 
     /**
      * 将后端返回的媒体地址解析为可直接加载的 URL。

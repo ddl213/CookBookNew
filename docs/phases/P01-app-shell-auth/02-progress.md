@@ -19,6 +19,7 @@
 | P01-T01 | 登录入口端到端基线（网络层、认证会话、登录/注册页、未登录态与回跳） | deep-executor | Verified（技术） | 构建/单测/接口/模拟器烟测通过；UI 运行态待用户手测 |
 | P01-T02 | 按实际改动增量更新代码能力索引 | code-auditor | Verified | 新增 22 条、全库 73 条；`code_index_check.py check` PASS；模块计数修正为 13 个 `lib_*` |
 | P01-T03 | P01 独立构建、接口与安全回归验证 | verifier | Verified（UI 未重跑） | 18 项单测 0 失败；APK 9,663,995 bytes；`_navauth` 解密、debug/release 清单、后端契约、无密码/token 日志均通过；验证时无在线设备，UI 未重跑 |
+| P01-T05 | 后端地址支持构建时配置（BuildConfig + -PapiBaseUrl） | routine-executor | Verified | 真实机 USB 调试地址修复；单测与带属性/默认值构建均通过；默认仍为 10.0.2.2 |
 
 ### P01-T01 实施范围
 
@@ -50,6 +51,7 @@
 - 路由/清单：`_navauth` 解密为 `action://8001 LoginFragment`、`action://8002 RegisterFragment`；debug 含 `usesCleartextTraffic="true"`，release 不含；INTERNET 保留；五导航名称/顺序未变。
 - UI 烟测：实现阶段在 API35 模拟器完成未登录/已登录、校验、401/断网、登录回跳、杀进程恢复、退出、浏览应用、注册自动登录；**头像 URL 修复后未重跑 UI**。
 - 安全/回归：新增代码无密码/token 日志；token 仅存 MMKV；新增布局无 FrameLayout；长昵称/用户名 ellipsize；无无关页面修改。
+- P01-T05：`NetworkConfig.baseUrl` 读取 `BuildConfig.API_BASE_URL`；Gradle 属性 `apiBaseUrl` 默认 `http://10.0.2.2:3000/api/v1/`；真机 USB 用 `adb reverse tcp:3000 tcp:3000` + `-PapiBaseUrl=http://127.0.0.1:3000/api/v1/`；局域网用开发机 IP 且后端 `HOST=0.0.0.0`。已核实根因：真机与电脑不同网段，原 10.0.2.2 不可达；服务日志无请求。
 
 ## 手动验收步骤（供用户）
 
