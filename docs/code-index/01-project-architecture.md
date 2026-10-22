@@ -1,14 +1,18 @@
 # 01 · 项目结构与架构约定
 
-> 本类盘点状态：未盘点。**此文件当前只是空索引模板**，尚未读取实际项目；请由 `code-auditor` 根据源码填写后再调整状态为 `已盘点` 或 `部分完成`。
+> 本类盘点状态：已盘点。已读取应用入口、各模块 Gradle、Manifest、路由生成器与页面基类；以下为可复用架构入口，不代表页面业务已完成。
 
-**收录范围：**真实模块与 sourceSet、公共基类、导航入口、已有架构与生命周期约定。
+**收录范围：**真实模块与 sourceSet、应用入口、导航容器、公共基类、路由与页面路径约定。
 
-**索引原则：**只索引有助于定位/复用的项目级入口；记录真实模块边界，不凭想象规定技术栈。
+**索引原则：**只索引有助于定位/复用的项目级入口；页面是否存在以源码与调用为准，不把路由常量当作已实现页面。
 
 | ID | 类 / API / 资源入口 | 用途与优先复用场景 | 调用方式、前提和限制 | 定义文件（项目相对路径） | 真实调用位置 / 核查证据 |
 | --- | --- | --- | --- | --- | --- |
-
-> 填表时使用本类编号 `ARCH-001`、`ARCH-002`……；一个条目对应一个可复用能力，源码路径使用反引号，例如 `app/src/.../ActualClass.kt`（这里只是路径格式示意，不是存在性声明）。无法确认可用性时明确标记“未证实”，不得当作已验证。
->
-> 增长到约 12 KiB 后在 `docs/code-index/01-project-architecture/` 创建 `01-*.md`、`02-*.md` 等子分类页；本页转为子页导航，保留能定位到每项能力的链接，单个 Markdown 不能超过 16 KiB。
+| ARCH-001 | `MainActivity`、`MyApplication`、NavHostFragment | 应用单 Activity 入口；初始化 Application、NavHost 与路由表。 | `MainActivity` 继承 `BaseBindActivity`，在 `initView` 调用 `NRoute.init(this, navController)`；`MyApplication` 只调用 `AppHelper.init`。Manifest 固定 `portrait`、`singleTask`；启动页由 `@Route(startPage = true)` 决定为 `HomeFragment`。路由资源缺失时无法建图。 | `app/src/main/java/com/rhys/main/MainActivity.kt` | `app/src/main/AndroidManifest.xml`、`app/src/main/res/layout/activity_main.xml`、`app/src/main/java/com/rhys/main/MyApplication.kt`；`HomeFragment` 的 `@Route(PAGE_HOME, startPage = true)`。 |
+| ARCH-002 | `HomeFragment` 五标签导航容器 | 固定底部五入口：首页、菜谱、消息、订单、我的；ViewPager2 承载页面，MagicIndicator 显示底部栏。 | 标签名称、顺序和图标在 `HomeFragment` 硬编码；`vp.isUserInputEnabled = false`，只允许点击切换；`offscreenPageLimit = 5`。新增、替换或重命名入口会改变产品固定导航，须产品授权。 | `app/src/main/java/com/rhys/main/home/HomeFragment.kt` | `app/src/main/res/layout/fragment_home.xml`、`app/src/main/java/com/rhys/main/home/BottomBarItem.kt`、`app/src/main/res/layout/layout_bottom_bar_item.xml`；五个一级页面均以 `@Route` 注册。 |
+| ARCH-003 | Gradle 模块自动 include 与 app 聚合 | 新增 `subModules/lib_*` 目录后自动成为 Gradle 模块并被 app 依赖，减少手工改 settings。 | `settings.gradle.kts` 遍历 `subModules` 目录并 `include`；`app/build.gradle.kts` 对名称以 `lib_` 开头且不含 `compiler` 的模块逐个 `implementation`。模块名、Gradle 路径与 namespace 不一定相同；`lib_route_compiler` 只通过 KSP 接入。 | `settings.gradle.kts` | `app/build.gradle.kts`、`gradle/libs.versions.toml` 以及各模块 `build.gradle.kts`。 |
+| ARCH-004 | `BaseBindFragment<V : ViewBinding>` | 统一 Fragment 的 ViewBinding 生命周期、沉浸式状态栏和初始化顺序。 | 子类实现 `initView`、`initData`；可选覆写 `initListener`、`initObserver`、`onViewDestroy`、`initTitleBar`、`getStatusBarColor`、`getStartBarDarkFont`。`onDestroyView` 会清空 binding，异步回调不得在销毁后继续访问。 | `subModules/lib_android_common/src/main/java/com/android/common/base/BaseBindFragment.kt` | `HomeFragment`、`CookBookFragment`、`CookBookChildFragment`、`IndexFragment`、`MineFragment`、`ChatFragment`、`OrderFragment`、`AddRecipesFragment` 均继承。 |
+| ARCH-005 | `BaseBindActivity<V : ViewBinding>` | 统一 Activity 的 ViewBinding、沉浸式状态栏与初始化顺序。 | `onCreate` 中先 inflate binding，再依次调用 `initView`、`initListener`、`initData`；默认 `immersionBarDarkFont = true`；`onDestroy` 清空 binding。布局被额外包进竖向 `LinearLayout`，标题栏占位 View 高度为 0。 | `subModules/lib_android_common/src/main/java/com/android/common/base/BaseBindActivity.kt` | `app/src/main/java/com/rhys/main/MainActivity.kt` 继承；`activity_main.xml` 为实际内容布局。 |
+| ARCH-006 | `BaseViewModel.launch` | 在 ViewModel 内启动协程，统一记录调用类/方法并捕获异常。 | 使用 `viewModelScope`；异常被 `LogUtils.e` 捕获后不再抛出，业务需自行暴露错误状态；仅适用于 ViewModel 生命周期。当前未见实际 `launch` 调用，`CookBookChildVM` 仅继承未使用。 | `subModules/lib_android_common/src/main/java/com/android/common/base/viewmodel/BaseViewModel.kt` | `subModules/lib_cookbook/src/main/java/com/rhys/cookbook/viewmodel/CookBookChildVM.kt`；全仓检索无 `launch {` 业务调用。 |
+| ARCH-007 | `NRoute`、`@Route`、KSP 路由表 | 以注解声明 Fragment/Activity/Dialog 路由，启动时读取加密 nav 资源并动态构建 NavGraph。 | 页面类需标注 `@Route(path)`；Fragment 必须有无参构造；必须先执行 `NRoute.init` 再调用 `NRoute.getFragment`；nav 资源由 `lib_route_compiler` 写入 `app/src/main/assets/nav`，新页面需先构建；`startPage` 决定起始页。跳转使用 `NRoute.withNavController(...).deepLink(path).args(bundle).go()`。 | `subModules/lib_route_api/src/main/java/com/marky/route/api/NRoute.kt` | `subModules/lib_route_annotation/src/main/java/com/marky/route/annotation/Route.kt`、`subModules/lib_route_compiler/src/main/java/com/marky/route/compiler/processor/RouteProcessor.kt`；`HomeFragment` 与 `CookBookFragment` 的 `@Route` 及 `deepLink().go()`；`app/src/main/assets/nav/_nav*` 已存在。 |
+| ARCH-008 | `RoutePath` 页面路径常量 | 集中声明页面路由字符串，避免页面间硬编码。 | 常量存在不代表页面已实现。`PAGE_NEAR_COOK_BOOK`、`PAGE_USER_COOK_BOOK`、`PAGE_COOK_BOOK_DETAIL`、`PAGE_ORDER_INFO`、`PAGE_CHAT_DETAIL`、`PAGE_ORDER_DETAIL`、`PAGE_SETTING`、`PAGE_ADDRESS_INFO`、`PAGE_ADD_ADDRESS`、`PAGE_MINE_INFO` 目前无实现类引用；`PAGE_INDEX_CHILD` 仅有 `@Route` 声明，未被导航调用。 | `subModules/lib_campaign_common/src/main/java/com/campaign/common/constants/RoutePath.kt` | 全仓检索结果：仅 `PAGE_HOME`、`PAGE_INDEX`、`PAGE_COOK_BOOK`、`PAGE_CHAT`、`PAGE_ORDER`、`PAGE_MINE`、`PAGE_COOK_BOOK_CHILD`、`PAGE_COOK_BOOK_ADD` 有实际 `@Route` 或跳转调用。 |

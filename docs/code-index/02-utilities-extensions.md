@@ -1,14 +1,18 @@
 # 02 · 通用工具类与扩展方法
 
-> 本类盘点状态：未盘点。**此文件当前只是空索引模板**，尚未读取实际项目；请由 `code-auditor` 根据源码填写后再调整状态为 `已盘点` 或 `部分完成`。
+> 本类盘点状态：已盘点。已核对 `lib_android_common` 的工具、扩展与调用点；以下方法均有真实源码入口，未证实使用的项已注明。
 
-**收录范围：**通用 Utils、top-level/extension 方法、日期/字符串/集合/图片/权限/文件处理。
+**收录范围：**通用日志、键值存储、密度转换、View 可见性、图片加载、RecyclerView 布局与 MagicIndicator 绑定、Application 持有。
 
 **索引原则：**记录真实可调用方法及入参/返回值和线程/Context 限制；不同模块同名方法以路径区分。
 
 | ID | 类 / API / 资源入口 | 用途与优先复用场景 | 调用方式、前提和限制 | 定义文件（项目相对路径） | 真实调用位置 / 核查证据 |
 | --- | --- | --- | --- | --- | --- |
-
-> 填表时使用本类编号 `UTIL-001`、`UTIL-002`……；一个条目对应一个可复用能力，源码路径使用反引号，例如 `app/src/.../ActualClass.kt`（这里只是路径格式示意，不是存在性声明）。无法确认可用性时明确标记“未证实”，不得当作已验证。
->
-> 增长到约 12 KiB 后在 `docs/code-index/02-utilities-extensions/` 创建 `01-*.md`、`02-*.md` 等子分类页；本页转为子页导航，保留能定位到每项能力的链接，单个 Markdown 不能超过 16 KiB。
+| UTIL-001 | `LogUtils`（`v/d/i/w/e`、级别、Tag 过滤、计数限制） | 统一日志输出；自动补充调用类/方法、文件与行号，支持全局级别和 Tag 过滤。 | Kotlin `object`；默认级别 `DEBUG`、基础 Tag `myLog`；`getCallerInfo` 会遍历堆栈并额外打印 `Log.e` 调试点，日志量较大。可在发布包调高 `setLogLevel`。参数重载较多，注意不要误用 `d(vararg args)` 与 `d(msg, tag)`。 | `subModules/lib_android_common/src/main/java/com/android/common/utils/LogUtils.kt` | `HomeFragment`、`CookBookFragment`、`IndexFragment`、`RefreshHeaderView`、`BaseViewModel` 等直接调用。 |
+| UTIL-002 | `MMKVUtils` 键值存储 | 保存 int/long/float/double/boolean/String/Parcelable，并支持删除与清空。 | 单例懒加载 `MMKV.defaultMMKV()`；首次使用前应由 Application 调用 `MMKV.initialize(context)`。当前 `MyApplication` 未初始化 MMKV，且全仓未见 `MMKVUtils` 调用，属于已定义未接线能力。Key 需自行保证全局唯一。 | `subModules/lib_android_common/src/main/java/com/android/common/utils/MMKVUtils.kt` | 全仓检索仅定义，无业务调用；`MyApplication` 只初始化 `AppHelper`。 |
+| UTIL-003 | `DensityUtil`、`Int.dp()`、`Int.sp()`、`Float.dp()`、`Float.sp()` | dp/sp 与 px 互转，供代码中动态尺寸、圆角、间距使用。 | 使用 `Resources.getSystem().displayMetrics`，不依赖当前 Activity/Context；系统字体缩放会影响 `sp()`；返回 `Float`，需要整数像素时调用 `.toInt()`。 | `subModules/lib_android_common/src/main/java/com/android/common/ext/DenisyExt.kt` | `RefreshHeaderView`、`RvDecoration`、`ExpandableFlowLayout`、`CookBookFragment`、`CookBookChildFragment` 使用。 |
+| UTIL-004 | `View.visible()`、`View.gone()`、`Fragment.finish()` | 幂等地切换可见性；在 Fragment 中返回上一页。 | `visible/gone` 只在状态不同时赋值；`Fragment.finish()` 使用 `findNavController().popBackStack()`，要求 Fragment 已附着 NavController，不能替代 Activity 的 `finish()`。 | `subModules/lib_android_common/src/main/java/com/android/common/ext/KT.kt` | `CookBookTitleView`、`IndexTitleView`、`IndexFragment`、`TitleBar` 使用可见性扩展。 |
+| UTIL-005 | `ImageView.load(url: String/Uri/Int)` | 用 Glide 加载网络、Uri 或资源图片；统一空图和失败日志入口。 | 主线程调用；Glide 生命周期绑定当前 View。`Int` 重载会设置错误色 `color_0a80ed` 并打印加载失败日志，但未设置占位图。网络加载需 Manifest `INTERNET` 权限；当前已声明。 | `subModules/lib_android_common/src/main/java/com/android/common/ext/ViewExt.kt` | `CookBookChildFragment` 加载 `Recipe.imageUrl`；`IndexChildFragment` 加载菜谱图和 `R.drawable.img_home_top`。 |
+| UTIL-006 | `RecyclerView.liner()/grid()`、`RefreshRecyclerView.liner()/grid()` | 一行代码设置线性/网格 LayoutManager，支持方向与 reverse。 | 会替换当前 `layoutManager`；默认竖向、`reverse = false`；网格默认 2 列。设置后若已有 Adapter，`RefreshRecyclerView` 会重新同步刷新头 SpanSizeLookup。 | `subModules/lib_android_common/src/main/java/com/android/common/ext/RecyclerViewExt.kt` | `IndexFragment`、`IndexChildFragment`、`CookBookChildFragment` 使用；配套列表提交扩展同文件。 |
+| UTIL-007 | `MagicIndicator.setNavigator(...)`、`ViewPager2.attach(indicator)` | 快速绑定 MagicIndicator 与 ViewPager2，统一页面切换回调。 | `setNavigator` 使用 `CommonNavigator`，默认 `isAdjustMode = true`，不提供指示器（`getIndicator` 返回 null），标题 View 由调用方创建；`attach` 会注册一个无法注销的 `OnPageChangeCallback`，重复调用会重复注册。 | `subModules/lib_android_common/src/main/java/com/android/common/ext/KT.kt` | `HomeFragment` 绑定五导航；`CookBookFragment` 绑定已发布/草稿标签。 |
+| UTIL-008 | `AppHelper` | 持有全局 `Application` 实例，供无 Context 场景取应用上下文。 | 必须在 `Application.onCreate` 调用 `AppHelper.init(this)`；`lateinit` 未初始化时访问会抛异常。当前仅在 `MyApplication` 初始化，未见业务读取。 | `subModules/lib_android_common/src/main/java/com/android/common/helper/AppHelper.kt` | `app/src/main/java/com/rhys/main/MyApplication.kt` 调用 `AppHelper.init(this)`；全仓无 `AppHelper.application` 读取。 |
