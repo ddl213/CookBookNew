@@ -43,6 +43,14 @@ object RoutePath {
     const val PAGE_REGISTER = "action://8002"
 
     /**
+     * 好友关系与用户主页
+     */
+    const val PAGE_FRIENDS = "action://8101"
+    const val PAGE_FRIEND_SEARCH = "action://8102"
+    const val PAGE_FRIEND_REQUESTS = "action://8103"
+    const val PAGE_USER_PROFILE = "action://8104"
+
+    /**
      * 聊天详情
      */
     const val PAGE_CHAT_DETAIL = "action://5001"

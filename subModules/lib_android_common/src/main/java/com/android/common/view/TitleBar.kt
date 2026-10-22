@@ -51,6 +51,9 @@ class TitleBar @JvmOverloads constructor(
                 tvRight.text = typedArray.getString(R.styleable.TitleBar_right_text)
                 tvRight.visibility = VISIBLE
                 tvRight.setTextColor(textColor)
+                tvRight.setOnClickListener {
+                    mRightClickCallback?.invoke()
+                }
             }
 
             ivLeft.setOnClickListener {
@@ -72,6 +75,10 @@ class TitleBar @JvmOverloads constructor(
     fun setRightText(text: String) {
         mBinding.tvRight.text = text
         mBinding.tvRight.visible()
+        // 通过代码设置右侧文字时同步绑定点击，避免出现可见但不可点的入口。
+        mBinding.tvRight.setOnClickListener {
+            mRightClickCallback?.invoke()
+        }
     }
 
     fun setTitle(text: String){

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 标题 -->
+    <string name="relation_title_friends">我的好友</string>
+    <string name="relation_title_search">添加好友</string>
+    <string name="relation_title_requests">好友申请</string>
+    <string name="relation_title_profile">用户主页</string>
+
+    <!-- 好友列表 -->
+    <string name="relation_search_entry">搜索用户</string>
+    <string name="relation_requests_entry">好友申请</string>
+    <string name="relation_friend_empty">还没有好友，去添加好友吧</string>
+    <string name="relation_friend_count">%1$d 位好友</string>
+
+    <!-- 用户搜索 -->
+    <string name="relation_search_hint">输入昵称或用户名</string>
+    <string name="relation_search_button">搜索</string>
+    <string name="relation_search_initial">输入昵称或用户名搜索用户</string>
+    <string name="relation_search_empty">没有找到相关用户</string>
+    <string name="relation_relation_friend">已是好友</string>
+    <string name="relation_relation_not_friend">非好友</string>
+
+    <!-- 好友申请 -->
+    <string name="relation_tab_incoming">收到的</string>
+    <string name="relation_tab_outgoing">发出的</string>
+    <string name="relation_request_empty_incoming">暂无收到的好友申请</string>
+    <string name="relation_request_empty_outgoing">暂无发出的好友申请</string>
+    <string name="relation_status_pending">待处理</string>
+    <string name="relation_status_accepted">已接受</string>
+    <string name="relation_status_rejected">已拒绝</string>
+    <string name="relation_status_unknown">未知状态</string>
+    <string name="relation_action_accept">接受</string>
+    <string name="relation_action_reject">拒绝</string>
+    <string name="relation_request_not_pending">该申请已处理，请刷新列表</string>
+
+    <!-- 用户主页 -->
+    <string name="relation_stats_friends">好友 %1$d</string>
+    <string name="relation_stats_recipes">菜谱 %1$d</string>
+    <string name="relation_section_recipes">菜谱</string>
+    <string name="relation_action_add_friend">添加好友</string>
+    <string name="relation_action_requested">已申请</string>
+    <string name="relation_action_message">发消息</string>
+    <string name="relation_action_unfriend">解除好友</string>
+    <string name="relation_pending_hint">已提交好友申请，请等待对方处理</string>
+    <string name="relation_recipe_empty">暂无可查看的菜谱</string>
+
+    <!-- 解除好友确认 -->
+    <string name="relation_unfriend_title">解除好友</string>
+    <string name="relation_unfriend_message">解除后无法查看对方好友可见菜谱和发起预订；历史聊天仍可查看，但不能发送新消息</string>
+    <string name="relation_unfriend_confirm">解除</string>
+    <string name="relation_unfriend_cancel">取消</string>
+    <string name="relation_unfriend_success">已解除好友关系</string>
+
+    <!-- 后续阶段占位 -->
+    <string name="relation_message_placeholder">聊天将在后续阶段开放</string>
+    <string name="relation_recipe_placeholder">菜谱详情将在后续阶段开放</string>
+
+    <!-- 登录与状态 -->
+    <string name="relation_login_required_title">登录后查看</string>
+    <string name="relation_login_required_desc">好友与用户主页需要登录后访问</string>
+    <string name="relation_login_button">登录 / 注册</string>
+    <string name="relation_login_failed">暂时无法打开登录页，请稍后重试</string>
+    <string name="relation_loading">加载中…</string>
+    <string name="relation_load_more">加载更多</string>
+    <string name="relation_retry">重试</string>
+    <string name="relation_error_default">加载失败，请稍后重试</string>
+    <string name="relation_user_not_found">用户不存在或已删除</string>
+    <string name="relation_friend_arrow">›</string>
+</resources>

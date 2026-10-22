@@ -1,6 +1,8 @@
 package com.example.network
 
 import com.example.network.api.AuthApi
+import com.example.network.api.FriendApi
+import com.example.network.api.UserApi
 import com.example.network.session.SessionStore
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -36,12 +38,17 @@ object ApiClient {
             .build()
     }
 
-    val authApi: AuthApi by lazy {
+    private val retrofit: Retrofit by lazy {
         Retrofit.Builder()
             .baseUrl(NetworkConfig.baseUrl)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-            .create(AuthApi::class.java)
     }
+
+    val authApi: AuthApi by lazy { retrofit.create(AuthApi::class.java) }
+
+    val userApi: UserApi by lazy { retrofit.create(UserApi::class.java) }
+
+    val friendApi: FriendApi by lazy { retrofit.create(FriendApi::class.java) }
 }

@@ -1,25 +1,20 @@
 # 05 · 网络、存储与异步能力
 
-> 本类盘点状态：已盘点。已核对 `lib_network`、`lib_cookbook` 的 Room 依赖与 `lib_android_common` 的存储工具。2026-10-22 `P01-T02` 增量新增 Retrofit/OkHttp 认证客户端、认证 Repository、MMKV 会话存储与媒体 URL 解析；当前只覆盖认证接口，菜谱/订单等后端接口尚未实现，Room 仍为骨架。
+> 本类盘点状态：已盘点。已核对 `lib_network`、`lib_cookbook` 的 Room 依赖与 `lib_android_common` 的存储工具。`P01-T02` 增量新增 Retrofit/OkHttp 认证客户端、认证 Repository、MMKV 会话存储与媒体 URL 解析；`P02-T01` 增量新增用户/好友接口、关系 DTO、分页、关系 Repository 与错误映射。因内容增长，本分类拆为两个子表。
 
 **收录范围：**API/网络包装、Repository、Room/本地数据、缓存、协程/异步共用封装。
 
 **索引原则：**记录权限、异常/重试、线程和数据安全边界，不擅自推断真实接口；骨架与未接线能力必须注明。
 
-| ID | 类 / API / 资源入口 | 用途与优先复用场景 | 调用方式、前提和限制 | 定义文件（项目相对路径） | 真实调用位置 / 核查证据 |
-| --- | --- | --- | --- | --- | --- |
-| DATA-001 | 数据模型 `Recipe`、`User`、`HomeFeedItem`、`Following` | 页面展示用的菜谱、用户、好友动态、关注关系数据载体；可作为后续接口 DTO 的起点。 | 纯 Kotlin `data class`，无序列化注解、无网络字段映射；`Recipe` 包含 id/userId/name/imageUrl/desc/publishDate/likes/collections/commentsCount；`User` 包含 bio/fans/followingCount/recipesCount/isFollowing。当前仅被本地假数据构造，不能据此认定已对接后端；认证链路使用独立的 `UserDto`（DATA-007），不要与本地展示模型 `User` 混用。 | `subModules/lib_network/src/main/java/com/example/network/bean/Recipe.kt` | `CookBookChildFragment`、`IndexChildFragment` 用硬编码列表构造 `Recipe`、`User`、`HomeFeedItem`；`Following` 仅定义，无调用。同目录 `User.kt`、`HomeFeedItem.kt`、`Following.kt`。 |
-| DATA-002 | `CookBookDB` Room 数据库骨架 | 预留给菜谱本地持久化；当前不是可用数据库。 | 仅 `abstract class CookBookDB : RoomDatabase()`，没有 `@Database`、entities、DAO、`Room.databaseBuilder` 或迁移；模块虽引入 Room runtime/ktx/compiler，但无实际建库入口。新增持久化前需先定义实体、DAO、版本与迁移策略，并确认产品允许的本地数据范围。 | `subModules/lib_cookbook/src/main/java/com/rhys/cookbook/room/CookBookDB.kt` | 全仓检索无 `Room.databaseBuilder`、`@Database`、`@Dao`、`@Entity` 或 `CookBookDB` 调用；`lib_cookbook/build.gradle.kts` 仅声明依赖与 KSP。 |
-| DATA-003 | `NetworkConfig.baseUrl`、`resolveMediaUrl(value: String?)` | 配置后端基址；把后端返回的 `/uploads/...` 等媒体路径解析成可加载 URL，供头像、图片复用。 | `baseUrl` 初始值来自 `lib_network` 的 `BuildConfig.API_BASE_URL`：`apiBaseUrl` Gradle 属性在构建时写入，未指定时默认 `http://10.0.2.2:3000/api/v1/`（仅适用于模拟器访问宿主机）。真机 USB 调试先执行 `adb reverse tcp:3000 tcp:3000`，再用 `-PapiBaseUrl=http://127.0.0.1:3000/api/v1/` 构建；局域网调试用开发机 IP（如 `http://192.168.1.10:3000/api/v1/`）并让后端监听 `0.0.0.0`。属性在构建期固化，改值需重新构建对应变体；运行时仍可改 `baseUrl`，但必须在首次访问 `ApiClient.authApi` 前设置，Retrofit 首次创建后不再读取新值。`resolveMediaUrl`：null/空白→null；`http://`/`https://` 原样返回；以 `/` 开头→拼接 baseUrl 的 scheme+host+port（丢弃 `/api/v1/` 等路径）；其他相对值原样返回；baseUrl 解析失败时回退原值，不抛异常。非线程安全配置项，应在启动阶段一次性设置。 | `subModules/lib_network/src/main/java/com/example/network/NetworkConfig.kt` | `ApiClient.authApi` 使用 `baseUrl`；`MineFragment.bindUser()` 用 `resolveMediaUrl(user.avatar)`；`NetworkConfigTest` 5 例（TEST-006）。 |
-| DATA-004 | `ApiClient.authApi` | 全局唯一的 OkHttp/Retrofit 客户端，统一超时、鉴权头与 JSON 转换；新增后端接口应复用同一客户端。 | Kotlin `object` + `lazy`；OkHttp 连接/读/写超时均 15 秒；每次请求从 `SessionStore.token()` 读取 token，非空才追加 `Authorization: Bearer <token>`；未接入 HttpLoggingInterceptor，避免密码/token 进入日志；无重试、无证书固定。`NetworkConfig.baseUrl` 在首次访问 `authApi` 时固化，之后修改无效；当前只暴露 `AuthApi`。 | `subModules/lib_network/src/main/java/com/example/network/ApiClient.kt` | `AuthRepository` 全部调用 `ApiClient.authApi`；`SessionStore.token()` 为拦截器提供 token；见 DATA-010、DATA-011。 |
-| DATA-005 | `AuthApi.register/login/me`（suspend） | 认证接口定义：注册、登录、获取当前用户。 | Retrofit `suspend` 函数，必须在协程中调用；baseUrl 已含 `/api/v1/`，接口使用 `auth/register`、`auth/login`、`auth/me` 相对路径。非 2xx 抛 `HttpException`，由 DATA-009 统一转换；`me()` 依赖 DATA-004 自动附加 token，未登录会得到 401。不要在 UI 直接调用，走 DATA-010。 | `subModules/lib_network/src/main/java/com/example/network/api/AuthApi.kt` | `AuthRepository.login/register/me` 调用三个方法。 |
-| DATA-006 | 认证请求 DTO `LoginRequest`、`RegisterRequest` | 登录/注册 JSON 请求体，字段与 CookBookService 对齐。 | `LoginRequest(username, password)`；`RegisterRequest(username, password, nickname: String? = null)`，昵称为空时由后端回退用户名。无序列化注解，依赖 Gson 字段同名；此处不做校验，UI 预校验见 BIZ-003（`AuthValidator`），后端仍是最终校验方。 | `subModules/lib_network/src/main/java/com/example/network/bean/LoginRequest.kt` | `AuthRepository.login/register` 构造；同目录 `RegisterRequest.kt`；`RegisterFragment` 只传 trim 后的非空昵称。 |
-| DATA-007 | 认证响应 DTO `AuthResponse`、`UserDto` | 登录/注册成功返回 token 与公开用户资料；`UserDto` 是当前用户展示与会话缓存的规范模型。 | `AuthResponse(token: String, user: UserDto)`；`UserDto(id: Long, username, nickname, avatar?, bio?, createdAt?)`，`avatar/bio/createdAt` 可空，`displayName` 在昵称为空时回退 `username`。不要与本地展示模型 `User`（DATA-001）混用；字段名变化需同步后端。 | `subModules/lib_network/src/main/java/com/example/network/bean/AuthResponse.kt` | `AuthRepository` 返回并保存；`SessionStore` 以 JSON 缓存；`SessionManager` 更新 `AuthState.LoggedIn`；`MineFragment` 读取 `displayName/username/bio/avatar`。同目录 `UserDto.kt`。 |
-| DATA-008 | 错误响应 DTO `ApiErrorResponse`、`ApiError`、`ApiErrorDetail` | 解析后端统一错误结构 `{ error: { code, message, details? } }`，供错误映射使用。 | 字段全部可空以容忍后端差异；`details` 用于 400 字段校验错误（`path`、`message`、`code`）。只在 DATA-009 内部解析，不建议 UI 直接消费。 | `subModules/lib_network/src/main/java/com/example/network/bean/ApiErrorResponse.kt` | `AuthErrorMapper.parseError/validationMessage` 使用；见 DATA-009。 |
-| DATA-009 | `AuthException`、`AuthErrorMapper` | 把网络/HTTP 异常转换为可展示的认证异常；统一 401、用户名占用、400 校验、429 与网络断开文案。 | `AuthException(code, message, httpStatus?, cause?)` 的 `message` 已是用户可读文案，不含堆栈或服务端内部细节；`isUnauthorized` 判断 HTTP 401。`AuthErrorMapper` 是 `internal object`，只能在 `lib_network` 内使用，不能跨模块调用；它不记录请求体、密码或 token。映射规则：401 使用调用方传入文案；`USERNAME_TAKEN`；400 优先拼接 `details`；429；其余用服务端 message 或 `HTTP_<status>`；`IOException` → 无法连接服务器；其他 → 通用失败。 | `subModules/lib_network/src/main/java/com/example/network/AuthException.kt` | `AuthRepository.call` 统一映射并重新抛出 `CancellationException`；`SessionManager.restore` 依赖 `isUnauthorized` 清理失效会话；同目录 `AuthErrorMapper.kt`。 |
-| DATA-010 | `AuthRepository` | 认证数据访问层：封装接口调用、错误映射与会话读写，不含 UI。 | `suspend login/register/me` 必须在协程调用；成功不自动保存，需显式 `saveSession(AuthResponse)`；`clearSession()`、`cachedUser()`、`currentToken()` 同步读取 MMKV。取消异常原样抛出；其他异常转成 DATA-009。无内置重试、无请求去重，重复提交需 UI 防抖（登录/注册页已有 `submitting`）。 | `subModules/lib_network/src/main/java/com/example/network/repository/AuthRepository.kt` | `SessionManager` 持有唯一实例并调用 login/register/me/saveSession/clearSession/cachedUser/currentToken（见 BIZ-001）。 |
-| DATA-011 | `SessionStore`（MMKV） | 持久化登录 token 与用户公开资料 JSON，供启动恢复与鉴权拦截器读取。 | Kotlin `object`；Key 固定 `auth_token`、`auth_user`；依赖 `MMKVUtils` 与 `MyApplication` 的 `MMKV.initialize`。`token()` 对空白返回 null；`user()` 对空值/损坏 JSON 返回 null；`clear()` 删除两个 Key。当前**不额外加密** token，注意不要写入日志或导出；不要绕过本类直接拼 Key。 | `subModules/lib_network/src/main/java/com/example/network/session/SessionStore.kt` | `ApiClient` 拦截器读 token；`AuthRepository.saveSession/clearSession/cachedUser/currentToken`；`SessionManager.restore/login/register/logout`；存储工具见 UTIL-002。 |
+## 子表导航
 
-> 跨分类引用：全局登录态 `SessionManager` 与 `AuthState` 见 BIZ-001、BIZ-002；表单预校验 `AuthValidator` 见 BIZ-003。
->
-> 未发现项：菜谱、订单、好友等后端接口尚未定义；没有统一重试/请求去重/离线缓存封装；Room 仍只有空骨架（DATA-002）。
+| 子表 | 主要内容 | 条目 |
+| --- | --- | --- |
+| [01 数据模型、认证与存储](05-network-storage/01-foundation-auth.md) | 本地模型、Room 骨架、NetworkConfig、ApiClient、AuthApi/DTO、认证错误映射、AuthRepository、SessionStore | DATA-001～DATA-011 |
+| [02 用户、好友关系与分页](05-network-storage/02-relation.md) | UserApi/FriendApi、关系 DTO、PageResponse、RelationErrorMapper、RelationApiCall/requireSuccessful、UserRepository/FriendRepository | DATA-012～DATA-021 |
+
+## 覆盖与缺口
+
+- 已覆盖 `lib_network` 当前全部接口、DTO、Repository、错误映射与会话存储源码；认证与关系链路共享 DATA-004 的 Retrofit/OkHttp 实例和鉴权拦截器。
+- 菜谱、订单、聊天等后端接口尚未定义；没有统一重试、请求去重、离线缓存或乐观更新封装。Room 仍只有空骨架（DATA-002）。
+- 好友关系、用户可见菜谱与预订资格均由后端判定；索引中的 `isFriend`、`visibility`、`canReserve` 只是展示字段，不能作为客户端授权依据。

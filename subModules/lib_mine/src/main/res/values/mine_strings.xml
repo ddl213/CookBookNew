@@ -17,4 +17,5 @@
     <string name="mine_placeholder_toast">该功能将在后续阶段开放</string>
     <string name="mine_browse_failed">请点击底部“首页”浏览应用</string>
     <string name="mine_login_failed">暂时无法打开登录页，请稍后重试</string>
+    <string name="mine_friends_failed">暂时无法打开好友列表，请稍后重试</string>
 </resources>

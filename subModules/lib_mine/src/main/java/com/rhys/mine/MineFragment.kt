@@ -11,6 +11,7 @@ import com.android.common.ext.load
 import com.android.common.ext.visible
 import com.android.common.utils.LogUtils
 import com.android.common.view.TitleBar
+import com.campaign.common.constants.RoutePath.PAGE_FRIENDS
 import com.campaign.common.constants.RoutePath.PAGE_LOGIN
 import com.campaign.common.constants.RoutePath.PAGE_MINE
 import com.campaign.common.listener.MainTabController
@@ -55,7 +56,7 @@ class MineFragment : BaseBindFragment<MineFragmentMineBinding>(MineFragmentMineB
             SessionManager.logout()
         }
         binding.rowCollections.setOnClickListener { showPlaceholder() }
-        binding.rowFriends.setOnClickListener { showPlaceholder() }
+        binding.rowFriends.setOnClickListener { openFriends() }
         binding.rowOrders.setOnClickListener { showPlaceholder() }
         binding.rowSettings.setOnClickListener { showPlaceholder() }
     }
@@ -132,6 +133,16 @@ class MineFragment : BaseBindFragment<MineFragmentMineBinding>(MineFragmentMineB
                 .go()
         }.onFailure {
             toast(R.string.mine_login_failed)
+        }
+    }
+
+    private fun openFriends() {
+        runCatching {
+            NRoute.withNavController(findNavController())
+                .deepLink(PAGE_FRIENDS)
+                .go()
+        }.onFailure {
+            toast(R.string.mine_friends_failed)
         }
     }
 
