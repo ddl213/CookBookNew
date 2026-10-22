@@ -6,7 +6,9 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.view.View
 import androidx.annotation.Keep
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.android.common.base.adapter.refresh.header.RefreshHeaderAdapter
 import com.android.common.ext.dp
 
 /**
@@ -27,9 +29,11 @@ class RvDecoration private constructor(private val builder: Builder) : RecyclerV
         val type = parent.layoutManager
 
         val position = parent.getChildAdapterPosition(view)
-        if (position == RecyclerView.NO_POSITION) {
+        if (position == RecyclerView.NO_POSITION ||
+            parent.getChildViewHolder(view).bindingAdapter is RefreshHeaderAdapter) {
             return
         }
+        val firstContentPosition = firstContentPosition(parent.adapter)
         val spacingConfig = builder.getSpacingConfig()
         val left = spacingConfig.leftPx
         val right = spacingConfig.rightPx
@@ -39,11 +43,15 @@ class RvDecoration private constructor(private val builder: Builder) : RecyclerV
         when (type) {
             is androidx.recyclerview.widget.GridLayoutManager -> {
                 val spanCount = type.spanCount // 列数
-                val column = position % spanCount // 当前列
-                outRect.left = column * left / spanCount // 列的左间距
-                outRect.right = right - (column + 1) * right / spanCount // 列的右间距
+                val spanLookup = type.spanSizeLookup
+                val spanIndex = spanLookup.getSpanIndex(position, spanCount)
+                val spanSize = spanLookup.getSpanSize(position)
+                outRect.left = spanIndex * left / spanCount
+                outRect.right = right - (spanIndex + spanSize) * right / spanCount
                 //只有第一排才显示顶部间距
-                if (position < spanCount) {
+                if (firstContentPosition != RecyclerView.NO_POSITION &&
+                    spanLookup.getSpanGroupIndex(position, spanCount) ==
+                    spanLookup.getSpanGroupIndex(firstContentPosition, spanCount)) {
                     outRect.top = top
                 }
                 outRect.bottom = bottom
@@ -56,14 +64,14 @@ class RvDecoration private constructor(private val builder: Builder) : RecyclerV
                 if (isVertical){
                     //垂直排列
                     //只有当第一项时才显示顶部间距
-                    if (position == 0) {
+                    if (position == firstContentPosition) {
                         outRect.top = top
                     }
                     outRect.left = left
                 }else{
                     //水平排列
                     //只有第一项时才显示左侧间距
-                    if (position == 0) {
+                    if (position == firstContentPosition) {
                         outRect.left = left
                     }
                     outRect.top = top
@@ -73,6 +81,21 @@ class RvDecoration private constructor(private val builder: Builder) : RecyclerV
                 outRect.bottom = bottom
             }
         }
+    }
+
+    /** 刷新头仍保留在 ConcatAdapter 中，但不参与内容的首项/首行间距。 */
+    private fun firstContentPosition(adapter: RecyclerView.Adapter<*>?): Int {
+        if (adapter == null || adapter is RefreshHeaderAdapter) return RecyclerView.NO_POSITION
+        if (adapter !is ConcatAdapter) {
+            return if (adapter.itemCount > 0) 0 else RecyclerView.NO_POSITION
+        }
+        var offset = 0
+        for (child in adapter.adapters) {
+            val position = firstContentPosition(child)
+            if (position != RecyclerView.NO_POSITION) return offset + position
+            offset += child.itemCount
+        }
+        return RecyclerView.NO_POSITION
     }
 
     /**
@@ -100,7 +123,8 @@ class RvDecoration private constructor(private val builder: Builder) : RecyclerV
             for (i in 1 until childCount) {
                 val child = parent.getChildAt(i)
                 val position = parent.getChildAdapterPosition(child)
-                if (position == RecyclerView.NO_POSITION) continue
+                if (position == RecyclerView.NO_POSITION ||
+                    parent.getChildViewHolder(child).bindingAdapter is RefreshHeaderAdapter) continue
 
                 val params = child.layoutParams as RecyclerView.LayoutParams
 

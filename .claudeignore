@@ -1,0 +1,22 @@
+# Build outputs
+**/build/
+
+# Gradle
+.gradle/
+gradle/wrapper/gradle-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+local.properties
+
+# Native libs
+**/*.so
+**/*.jnilib
+
+# Keystore
+*.jks
+*.keystore
+
+# Generated
+**/generated/
