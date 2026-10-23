@@ -52,6 +52,8 @@ class FriendRequestsFragment :
     private var loading = false
     private var loaded = false
     private var loggedIn = false
+    private var currentUserId = 0L
+    private var requestGeneration = 0
     private var processingRequestId: Long? = null
 
     override fun initTitleBar(): TitleBar = binding.titleBar
@@ -154,31 +156,52 @@ class FriendRequestsFragment :
         }
     }
 
+    override fun onViewDestroy() {
+        // View 的协程会被取消；保留已完成的数据，但不保留在途操作的锁。
+        requestGeneration++
+        loading = false
+        if (processingRequestId != null) loaded = false
+        processingRequestId = null
+    }
+
     private fun renderAuthState(state: AuthState) {
         if (view == null) return
         when (state) {
             AuthState.Unknown -> showLoading()
             AuthState.LoggedOut -> {
                 loggedIn = false
-                loaded = false
-                items.clear()
+                currentUserId = 0L
+                resetContent()
                 showLoginRequired()
             }
 
             is AuthState.LoggedIn -> {
+                if (currentUserId != state.user.id) {
+                    currentUserId = state.user.id
+                    resetContent()
+                }
                 loggedIn = true
-                if (!loaded && !loading) loadFirst()
+                if (loaded) renderContent() else if (!loading) loadFirst()
             }
         }
+    }
+
+    private fun resetContent() {
+        requestGeneration++
+        loading = false
+        loaded = false
+        processingRequestId = null
+        page = 1
+        hasMore = true
+        items.clear()
+        binding.rvRequests.submitList(emptyList())
     }
 
     private fun switchDirection(newDirection: FriendRequestDirection) {
         if (direction == newDirection) return
         direction = newDirection
         renderTabs()
-        items.clear()
-        loaded = false
-        if (view != null) binding.rvRequests.submitList(emptyList())
+        resetContent()
         loadFirst()
     }
 
@@ -214,6 +237,7 @@ class FriendRequestsFragment :
     private fun loadPage(reset: Boolean) {
         if (!loggedIn || loading) return
         loading = true
+        val generation = requestGeneration
         if (reset) showLoading() else binding.llError.gone()
         viewLifecycleOwner.lifecycleScope.launch {
             try {
@@ -222,16 +246,17 @@ class FriendRequestsFragment :
                     status = FriendRepository.STATUS_ALL,
                     page = page
                 )
+                if (!isCurrent(generation)) return@launch
                 if (reset) items.clear()
                 items.addAll(result.items)
                 hasMore = result.hasMore
                 page = result.page + 1
                 loaded = true
-                binding.rvRequests.submitList(items.toList())
                 renderContent()
             } catch (e: CancellationException) {
                 throw e
             } catch (e: AuthException) {
+                if (!isCurrent(generation)) return@launch
                 if (e.isUnauthorized) {
                     SessionManager.logout()
                     showLoginRequired()
@@ -241,9 +266,10 @@ class FriendRequestsFragment :
                     toast(e.message ?: getString(R.string.relation_error_default))
                 }
             } catch (e: Exception) {
+                if (!isCurrent(generation)) return@launch
                 if (reset) showError(getString(R.string.relation_error_default))
             } finally {
-                loading = false
+                if (generation == requestGeneration) loading = false
             }
         }
     }
@@ -256,6 +282,7 @@ class FriendRequestsFragment :
             return
         }
         processingRequestId = request.id
+        val generation = requestGeneration
         disableRowButtons(clickedView)
         viewLifecycleOwner.lifecycleScope.launch {
             try {
@@ -264,11 +291,13 @@ class FriendRequestsFragment :
                 } else {
                     repository.rejectRequest(request.id)
                 }
+                if (!isCurrent(generation)) return@launch
                 processingRequestId = null
                 loadFirst()
             } catch (e: CancellationException) {
                 throw e
             } catch (e: AuthException) {
+                if (!isCurrent(generation)) return@launch
                 processingRequestId = null
                 if (e.isUnauthorized) {
                     SessionManager.logout()
@@ -279,10 +308,16 @@ class FriendRequestsFragment :
                     loadFirst()
                 }
             } catch (e: Exception) {
+                if (!isCurrent(generation)) return@launch
                 processingRequestId = null
                 toast(R.string.relation_error_default)
             }
         }
+    }
+
+    private fun isCurrent(generation: Int): Boolean {
+        val state = SessionManager.state.value as? AuthState.LoggedIn
+        return view != null && loggedIn && generation == requestGeneration && state?.user?.id == currentUserId
     }
 
     private fun disableRowButtons(clickedView: android.view.View) {
@@ -301,6 +336,8 @@ class FriendRequestsFragment :
 
     private fun renderContent() {
         if (view == null) return
+        // Fragment 保留数据，返回时 Adapter 属于新 View，需重新提交快照。
+        binding.rvRequests.submitList(items.toList())
         binding.pbLoading.gone()
         binding.llLoginRequired.gone()
         binding.llError.gone()

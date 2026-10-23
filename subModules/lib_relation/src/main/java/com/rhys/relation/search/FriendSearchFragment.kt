@@ -50,6 +50,8 @@ class FriendSearchFragment :
     private var loading = false
     private var loaded = false
     private var loggedIn = false
+    private var currentUserId = 0L
+    private var requestGeneration = 0
 
     override fun initTitleBar(): TitleBar = binding.titleBar
 
@@ -131,28 +133,53 @@ class FriendSearchFragment :
         }
     }
 
+    override fun onViewDestroy() {
+        requestGeneration++
+        loading = false
+    }
+
     private fun renderAuthState(state: AuthState) {
         if (view == null) return
         when (state) {
             AuthState.Unknown -> showLoading()
             AuthState.LoggedOut -> {
                 loggedIn = false
-                loaded = false
-                items.clear()
+                currentUserId = 0L
+                resetContent()
                 showLoginRequired()
             }
 
             is AuthState.LoggedIn -> {
+                if (currentUserId != state.user.id) {
+                    currentUserId = state.user.id
+                    resetContent()
+                }
                 loggedIn = true
-                if (!loaded && !loading) showInitial()
+                if (loaded) {
+                    renderContent()
+                } else if (!loading) {
+                    if (keyword.isBlank()) showInitial() else searchFirstPage()
+                }
             }
         }
     }
 
+    private fun resetContent() {
+        requestGeneration++
+        loading = false
+        loaded = false
+        page = 1
+        hasMore = true
+        items.clear()
+        binding.rvUsers.submitList(emptyList())
+    }
+
     private fun submitSearch() {
+        if (loading) return
         val newKeyword = binding.etKeyword.text?.toString()?.trim().orEmpty()
         if (newKeyword.isEmpty()) {
             keyword = ""
+            resetContent()
             showInitial()
             toast(R.string.relation_search_hint)
             return
@@ -185,20 +212,22 @@ class FriendSearchFragment :
     private fun loadPage(reset: Boolean) {
         if (!loggedIn || loading || keyword.isBlank()) return
         loading = true
+        val generation = requestGeneration
         if (reset) showLoading() else binding.llError.gone()
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val result = repository.search(keyword = keyword, page = page)
+                if (!isCurrent(generation)) return@launch
                 if (reset) items.clear()
                 items.addAll(result.items)
                 hasMore = result.hasMore
                 page = result.page + 1
                 loaded = true
-                binding.rvUsers.submitList(items.toList())
                 renderContent()
             } catch (e: CancellationException) {
                 throw e
             } catch (e: AuthException) {
+                if (!isCurrent(generation)) return@launch
                 if (e.isUnauthorized) {
                     SessionManager.logout()
                     showLoginRequired()
@@ -208,15 +237,23 @@ class FriendSearchFragment :
                     toast(e.message ?: getString(R.string.relation_error_default))
                 }
             } catch (e: Exception) {
+                if (!isCurrent(generation)) return@launch
                 if (reset) showError(getString(R.string.relation_error_default))
             } finally {
-                loading = false
+                if (generation == requestGeneration) loading = false
             }
         }
     }
 
+    private fun isCurrent(generation: Int): Boolean {
+        val state = SessionManager.state.value as? AuthState.LoggedIn
+        return view != null && loggedIn && generation == requestGeneration && state?.user?.id == currentUserId
+    }
+
     private fun renderContent() {
         if (view == null) return
+        // 同一账号的已完成搜索在 View 重建后恢复，包括空结果与分页状态。
+        binding.rvUsers.submitList(items.toList())
         binding.pbLoading.gone()
         binding.llLoginRequired.gone()
         binding.llError.gone()

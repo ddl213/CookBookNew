@@ -36,6 +36,13 @@ android {
         viewBinding = true
     }
 
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
+        unitTests.all {
+            it.systemProperty("robolectric.dependency.repo.url", "https://maven.aliyun.com/repository/public")
+        }
+    }
+
     ksp {
         arg("MODULE_NAME", "relation")
         arg("ROOT_DIR", rootDir.toPath().toString())
@@ -55,4 +62,5 @@ dependencies {
     ksp(project(":lib_route_compiler"))
 
     testImplementation(libs.junit)
+    testImplementation(libs.robolectric)
 }
