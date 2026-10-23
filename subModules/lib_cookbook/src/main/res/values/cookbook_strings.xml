@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 我的菜谱列表 -->
+    <string name="cookbook_empty_published">还没有已发布的菜谱，点击右上角 + 创建</string>
+    <string name="cookbook_empty_draft">还没有草稿，点击右上角 + 创建</string>
+    <string name="cookbook_loading">加载中…</string>
+    <string name="cookbook_retry">重试</string>
+    <string name="cookbook_error_default">加载失败，请稍后重试</string>
+    <string name="cookbook_login_required_title">登录后查看我的菜谱</string>
+    <string name="cookbook_login_required_desc">菜谱发布与管理需要登录后使用</string>
+    <string name="cookbook_login_button">登录 / 注册</string>
+    <string name="cookbook_login_failed">暂时无法打开登录页，请稍后重试</string>
+    <string name="cookbook_detail_placeholder">菜谱详情将在后续阶段开放</string>
+    <string name="cookbook_menu_edit">编辑</string>
+    <string name="cookbook_menu_delete">删除</string>
+    <string name="cookbook_more_actions">更多操作</string>
+    <string name="cookbook_more_symbol" translatable="false">⋯</string>
+    <string name="cookbook_delete_title">删除菜谱</string>
+    <string name="cookbook_delete_message">确定删除“%1$s”吗？删除后无法恢复。</string>
+    <string name="cookbook_delete_confirm">删除</string>
+    <string name="cookbook_delete_cancel">取消</string>
+    <string name="cookbook_delete_success">菜谱已删除</string>
+    <string name="cookbook_status_draft">草稿</string>
+    <string name="cookbook_status_published">已发布</string>
+    <string name="cookbook_visibility_friends">好友可见</string>
+    <string name="cookbook_visibility_public">所有人可见</string>
+    <string name="cookbook_meta_format">%1$s · %2$s</string>
+    <string name="cookbook_author_format">作者：%1$s</string>
+    <string name="cookbook_my_name">我</string>
+
+    <!-- 添加 / 编辑菜谱 -->
+    <string name="cookbook_add_title">添加菜谱</string>
+    <string name="cookbook_edit_title">编辑菜谱</string>
+    <string name="cookbook_form_image_label">菜品图片（可选）</string>
+    <string name="cookbook_form_image_hint">点击选择图片\n支持 JPG / PNG / WebP，不超过 5MB</string>
+    <string name="cookbook_form_image_remove">移除图片</string>
+    <string name="cookbook_form_name_label">名称</string>
+    <string name="cookbook_form_name_hint">给菜谱起个名字</string>
+    <string name="cookbook_form_category_label">分类</string>
+    <string name="cookbook_form_category_hint">输入分类，或点击下方常用分类</string>
+    <string name="cookbook_form_description_label">简介（可选）</string>
+    <string name="cookbook_form_description_hint">简单介绍这道菜</string>
+    <string name="cookbook_form_visibility_label">可见性</string>
+    <string name="cookbook_form_visibility_friends">好友可见</string>
+    <string name="cookbook_form_visibility_public">所有人可见</string>
+    <string name="cookbook_form_status_label">状态</string>
+    <string name="cookbook_form_status_draft">草稿</string>
+    <string name="cookbook_form_status_published">已发布</string>
+    <string name="cookbook_category_home">家常菜</string>
+    <string name="cookbook_category_breakfast">早餐</string>
+    <string name="cookbook_category_dessert">甜品</string>
+    <string name="cookbook_form_ingredients_label">食材</string>
+    <string name="cookbook_form_ingredients_hint">每行一种食材，例如：鸡蛋 2 个</string>
+    <string name="cookbook_form_steps_label">步骤</string>
+    <string name="cookbook_form_steps_hint">每行一个步骤</string>
+    <string name="cookbook_form_save">保存</string>
+    <string name="cookbook_form_saving">保存中…</string>
+    <string name="cookbook_form_saved">已保存</string>
+    <string name="cookbook_form_load_failed">菜谱加载失败</string>
+    <string name="cookbook_form_retry">重试</string>
+    <string name="cookbook_form_image_invalid_type">请选择 JPG、PNG 或 WebP 图片</string>
+    <string name="cookbook_form_image_too_large">图片不能超过 5MB</string>
+    <string name="cookbook_form_image_read_failed">无法读取所选图片，请重新选择</string>
+    <string name="cookbook_form_image_upload_failed">图片上传失败，请重试或移除图片</string>
+    <string name="cookbook_form_image_upload_pending">图片尚未上传成功，请重试或移除图片</string>
+    <string name="cookbook_form_uploading">上传中…</string>
+    <string name="cookbook_form_not_found">菜谱不存在或已删除</string>
+    <string name="cookbook_form_session_expired">登录已失效，请重新登录</string>
+    <string name="cookbook_form_error_default">操作失败，请稍后重试</string>
+</resources>

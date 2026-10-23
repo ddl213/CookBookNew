@@ -3,7 +3,7 @@
 - 本阶段需求源：`docs/phases/P03-recipe-management/01-requirements.md`
 - 用户阶段验收：未接受
 - 验收依据：未提供
-- 下一动作：实施 P03-T01。
+- 下一动作：等待用户对 P03 做手动 UI 验收；用户明确接受前不进入 P04。
 
 ## 用户决策（2026-10-23）
 
@@ -28,8 +28,9 @@
 
 | 任务 ID | 目标 / 范围 | 执行职责 | 状态 | 证据/下一动作 |
 | --- | --- | --- | --- | --- |
-| P03-T01 | 个人菜谱列表、创建/编辑/删除、图片上传与草稿/可见性 | deep-executor（待分配） | Ready | 决策已确认，范围见下；可实施 |
-| P03-T02 | P03 独立验证与代码索引增量更新 | verifier / code-auditor（待分配） | Pending | 构建 + 定向验证 + 索引增量更新 |
+| P03-T01 | 个人菜谱列表、创建/编辑/删除、图片上传与草稿/可见性 | deep-executor | Verified | `lib_network` RecipeApi/UploadApi/RecipeRepository/RecipeMediaRules、`lib_cookbook` 真实列表/表单/系统图片选择与上传/草稿 Tab/编辑删除；`lib_network` 17 例 + `lib_cookbook` 11 例 = 28 例 0 失败；`:app:assembleDebug -PapiBaseUrl=http://127.0.0.1:3000/api/v1/` 成功 |
+| P03-T02 | 按实际改动增量更新代码能力索引 | code-auditor | Verified | 新增 14 条、全库 107 条；01/05 已拆分；`code_index_check` PASS |
+| P03-T03 | P03 独立构建、后端、真机与安全回归验证 | verifier | Verified | 后端 67/67；草稿 API 与可见性；真机 12 步 PASS；图片运行时上传 `/uploads/395d6bae-1315-48b8-a991-bbc9197f0f21.png`；截图 35 张（`C:\Users\Admin\AppData\Local\Temp\p03-qa\`） |
 
 ### P03-T01 实施范围
 
@@ -43,12 +44,34 @@ CookBookService 草稿接口；实现后需重启 3000 端口服务供真机联�
 
 ## 当前阻塞与待决事项
 
-- P03 前置决策已解除，等待实施。
+- P03 前置决策已解除；实施与独立验证完成，等待用户验收。
 - 后续产品待确认项引用 P00 记录，不在 P03 重复展开。
 
 ## 实施结果、验证与 Gate
 
-- 已确认方案与范围，尚未开始实现。
+- 后端 67/67；草稿 API 与可见性、状态流转、迁移测试通过。
+- Android：`lib_network` 17 例 + `lib_cookbook` 11 例 = 28 例 0 失败；debug 构建成功。
+- 真机 12 步 PASS；图片运行时上传；截图 35 张见 `C:\Users\Admin\AppData\Local\Temp\p03-qa\`。
+- 测试数据（运行时新建）：A `qaP03A162128`、B `qaP03B162128`；菜谱 id5 draft、id6 public、id7 friends、id8 已删除。
+
+### 手动验收步骤（供用户）
+
+1. 后端运行、`adb reverse tcp:3000 tcp:3000`、安装最新 debug APK。
+2. 登录 → 菜谱页：已发布/草稿 Tab、登录态、空态。
+3. “+”空保存：名称/分类/食材/步骤逐字段提示，不发请求。
+4. 新建草稿（固定+自定义分类、食材/步骤多行）：只出现在草稿 Tab，显示“草稿·好友可见”。
+5. 编辑草稿：系统照片选择器选图→上传→保存；卡片显示真实图片。
+6. 改为已发布+所有人可见：草稿 Tab 消失、已发布 Tab 出现。
+7. 编辑改名/简介/好友可见；移除已保存图片并保存→卡片无图，重新编辑 imageUrl 为空。
+8. 新建无图已发布菜谱，确认图片可选。
+9. 删除→确认→列表消失，GET 详情 404。
+10. B 查看 A 主页：draft 始终不出现；published 按 visibility；解除好友后 friends 菜谱消失。
+11. 退出登录：菜谱页显示登录提示，无私有数据。
+12. 卡片正文点击仅提示详情占位（P04）。
+
+### 已知风险
+
+- 单设备 1080x2400，未测小屏/大字体；作者仍可对自己的草稿评论/收藏（UI 不展示，P08/后续可收紧）；菜谱详情 P04；开发库保留 QA 数据。
 
 ## 问题 / 修复历史及归档引用
 

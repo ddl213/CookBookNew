@@ -51,6 +51,8 @@ dependencies {
     implementation(project(":lib_photo_view"))
     //网络模块
     implementation(project(":lib_network"))
+    //系统照片选择器 PickVisualMedia
+    implementation(libs.androidx.activity.ktx)
 
     //room
     implementation(libs.androidx.room.runtime)
