@@ -2,17 +2,21 @@ package com.example.network.repository
 
 import com.example.network.ApiClient
 import com.example.network.RecipeMediaRules
+import com.example.network.bean.CommentCreateBody
+import com.example.network.bean.CommentDto
 import com.example.network.bean.PageResponse
 import com.example.network.bean.RecipeDto
 import com.example.network.bean.RecipeWriteBody
+import com.example.network.bean.ShareBody
+import com.example.network.bean.ShareResultDto
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 
 /**
- * 菜谱数据访问层：我的菜谱、详情、创建/更新/删除与图片上传。
+ * 菜谱数据访问层：我的菜谱、详情、创建/更新/删除、图片上传与详情互动。
  *
- * 只做参数归一化、上传约束和异常转换；权限与草稿可见性由后端最终判定。
+ * 只做参数归一化、上传约束和异常转换；权限、草稿可见性与收藏/分享资格由后端最终判定。
  * 删除是 204 空响应，必须通过 requireSuccessful 校验，不能把失败当成成功。
  */
 class RecipeRepository {
@@ -79,12 +83,65 @@ class RecipeRepository {
         }
     }
 
+    suspend fun listComments(
+        recipeId: Long,
+        page: Int = 1,
+        pageSize: Int = DEFAULT_PAGE_SIZE
+    ): PageResponse<CommentDto> {
+        require(recipeId > 0) { "recipe id must be positive" }
+        val safePage = normalizedPage(page)
+        val safePageSize = normalizedPageSize(pageSize)
+        return callRelationApi {
+            ApiClient.socialApi.listComments(recipeId, safePage, safePageSize)
+        }
+    }
+
+    /** 客户端先 trim 并校验 1..1000，后端仍是最终校验方。 */
+    suspend fun createComment(recipeId: Long, content: String): CommentDto {
+        require(recipeId > 0) { "recipe id must be positive" }
+        val safeContent = content.trim()
+        require(safeContent.isNotEmpty()) { "comment content must not be blank" }
+        require(safeContent.length <= MAX_COMMENT_LENGTH) {
+            "comment content must not exceed $MAX_COMMENT_LENGTH characters"
+        }
+        return callRelationApi {
+            ApiClient.socialApi.createComment(recipeId, CommentCreateBody(safeContent))
+        }
+    }
+
+    /** 返回后端确认的收藏状态；调用方据此更新按钮，不能自行假定成功。 */
+    suspend fun setCollected(recipeId: Long, collected: Boolean): Boolean {
+        require(recipeId > 0) { "recipe id must be positive" }
+        return callRelationApi {
+            val state = if (collected) {
+                ApiClient.socialApi.addCollection(recipeId)
+            } else {
+                ApiClient.socialApi.removeCollection(recipeId)
+            }
+            state.collected
+        }
+    }
+
+    suspend fun share(recipeId: Long, toUserId: Long): ShareResultDto {
+        require(recipeId > 0) { "recipe id must be positive" }
+        require(toUserId > 0) { "toUserId must be positive" }
+        return callRelationApi {
+            ApiClient.socialApi.share(recipeId, ShareBody(toUserId))
+        }
+    }
+
     companion object {
         const val DEFAULT_PAGE_SIZE = 20
         const val MAX_PAGE_SIZE = 50
+        const val MAX_COMMENT_LENGTH = 1000
         const val STATUS_PUBLISHED = "published"
         const val STATUS_DRAFT = "draft"
         const val STATUS_ALL = "all"
         private val ALLOWED_STATUSES = setOf(STATUS_PUBLISHED, STATUS_DRAFT, STATUS_ALL)
+
+        /** 分页参数归一化独立暴露，便于纯 JVM 单测覆盖边界。 */
+        internal fun normalizedPage(page: Int): Int = page.coerceAtLeast(1)
+
+        internal fun normalizedPageSize(pageSize: Int): Int = pageSize.coerceIn(1, MAX_PAGE_SIZE)
     }
 }

@@ -1,6 +1,6 @@
 # 01 · 项目结构与架构约定
 
-> 本类盘点状态：已盘点。已读取应用入口、各模块 Gradle、Manifest、路由生成器与页面基类；`P03-T01` 增量更新菜谱列表/表单路由与参数，并因条目增长拆为两个子表。以下为可复用架构入口，不代表页面业务已完成。
+> 本类盘点状态：已盘点。已读取应用入口、各模块 Gradle、Manifest、路由生成器与页面基类；`P03-T01` 增量更新菜谱列表/表单路由与参数，并因条目增长拆为两个子表；`P04-T02` 更新 `PAGE_COOK_BOOK_DETAIL` 为已实现，并补充详情页/分享弹窗与用户主页菜谱跳转。以下为可复用架构入口，不代表页面业务已完成。
 
 **收录范围：**真实模块与 sourceSet、应用入口、导航容器、公共基类、路由与页面路径约定。
 
@@ -16,5 +16,5 @@
 ## 覆盖与缺口
 
 - 已覆盖 `app` 与 `subModules` 模块边界、Gradle 自动 include、应用入口、基类、路由框架和当前已实现的页面路由。
-- `RoutePath` 中 `PAGE_NEAR_COOK_BOOK`、`PAGE_USER_COOK_BOOK`、`PAGE_COOK_BOOK_DETAIL`、`PAGE_ORDER_INFO`、`PAGE_CHAT_DETAIL`、`PAGE_ORDER_DETAIL`、`PAGE_SETTING`、`PAGE_ADDRESS_INFO`、`PAGE_ADD_ADDRESS`、`PAGE_MINE_INFO` 仍无实现类；`PAGE_INDEX_CHILD` 只有 `@Route`，未被导航调用。
+- `RoutePath` 中 `PAGE_NEAR_COOK_BOOK`、`PAGE_USER_COOK_BOOK`、`PAGE_ORDER_INFO`、`PAGE_CHAT_DETAIL`、`PAGE_ORDER_DETAIL`、`PAGE_SETTING`、`PAGE_ADDRESS_INFO`、`PAGE_ADD_ADDRESS`、`PAGE_MINE_INFO` 仍无实现类；`PAGE_INDEX_CHILD` 只有 `@Route`，未被导航调用；`PAGE_COOK_BOOK_DETAIL` 已由 `CookBookDetailFragment` 实现并接入列表/用户主页入口（ARCH-008、ARCH-013）。
 - `BaseViewModel.launch` 仍无业务调用；页面协程目前直接使用 `lifecycleScope`，见各页面源码。

@@ -10,7 +10,6 @@
     <string name="cookbook_login_required_desc">菜谱发布与管理需要登录后使用</string>
     <string name="cookbook_login_button">登录 / 注册</string>
     <string name="cookbook_login_failed">暂时无法打开登录页，请稍后重试</string>
-    <string name="cookbook_detail_placeholder">菜谱详情将在后续阶段开放</string>
     <string name="cookbook_menu_edit">编辑</string>
     <string name="cookbook_menu_delete">删除</string>
     <string name="cookbook_more_actions">更多操作</string>
@@ -67,4 +66,53 @@
     <string name="cookbook_form_not_found">菜谱不存在或已删除</string>
     <string name="cookbook_form_session_expired">登录已失效，请重新登录</string>
     <string name="cookbook_form_error_default">操作失败，请稍后重试</string>
+
+    <!-- 菜谱详情 -->
+    <string name="cookbook_detail_title">菜谱详情</string>
+    <string name="cookbook_detail_not_found">菜谱不存在或无权查看，可能已被删除</string>
+    <string name="cookbook_detail_back">返回</string>
+    <string name="cookbook_detail_retry">重试</string>
+    <string name="cookbook_detail_error">加载失败，请稍后重试</string>
+    <string name="cookbook_session_expired">登录已失效，请重新登录</string>
+    <string name="cookbook_action_collect">收藏</string>
+    <string name="cookbook_action_collected">已收藏</string>
+    <string name="cookbook_action_share">分享</string>
+    <string name="cookbook_action_reserve">加入购物车（预订）</string>
+    <string name="cookbook_reserve_unavailable">预订功能将在后续阶段开放</string>
+    <string name="cookbook_author_profile_hint">查看作者主页</string>
+    <string name="cookbook_author_arrow" translatable="false">›</string>
+    <string name="cookbook_section_ingredients">食材</string>
+    <string name="cookbook_section_steps">制作步骤</string>
+    <string name="cookbook_ingredient_format">• %1$s</string>
+    <string name="cookbook_step_format">%1$d. %2$s</string>
+
+    <!-- 评论 -->
+    <string name="cookbook_comments_title">评论</string>
+    <string name="cookbook_comments_title_count">评论 %1$d</string>
+    <string name="cookbook_comments_login_hint">登录后查看和发表评论</string>
+    <string name="cookbook_comments_login">登录 / 注册</string>
+    <string name="cookbook_comments_empty">还没有评论，来说两句吧</string>
+    <string name="cookbook_comments_load_more">加载更多</string>
+    <string name="cookbook_comments_loading_more">加载中…</string>
+    <string name="cookbook_comments_no_more">没有更多评论</string>
+    <string name="cookbook_comments_retry">重试</string>
+    <string name="cookbook_comments_error">评论加载失败，请稍后重试</string>
+    <string name="cookbook_comment_hint">说点什么…</string>
+    <string name="cookbook_comment_send">发送</string>
+    <string name="cookbook_comment_sending">发送中…</string>
+    <string name="cookbook_comment_empty">评论内容不能为空</string>
+    <string name="cookbook_comment_too_long">评论不能超过 1000 字</string>
+    <string name="cookbook_comment_success">评论已发表</string>
+    <string name="cookbook_comment_error_default">评论发表失败，请稍后重试</string>
+
+    <!-- 分享好友 -->
+    <string name="cookbook_share_title">分享给好友</string>
+    <string name="cookbook_share_cancel">取消</string>
+    <string name="cookbook_share_empty">还没有好友，无法分享</string>
+    <string name="cookbook_share_retry">重试</string>
+    <string name="cookbook_share_error">好友加载失败，请稍后重试</string>
+    <string name="cookbook_share_success">已分享给 %1$s</string>
+    <string name="cookbook_share_failed">分享失败，请稍后重试</string>
+    <string name="cookbook_share_submitting">分享中…</string>
+    <string name="cookbook_share_action">分享</string>
 </resources>

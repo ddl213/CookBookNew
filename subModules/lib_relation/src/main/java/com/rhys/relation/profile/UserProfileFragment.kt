@@ -2,6 +2,7 @@ package com.rhys.relation.profile
 
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -17,6 +18,8 @@ import com.android.common.ext.submitList
 import com.android.common.ext.visible
 import com.android.common.utils.RvDecoration
 import com.android.common.view.TitleBar
+import com.campaign.common.constants.Constants.KEY_BUNDLE_RECIPE_ID
+import com.campaign.common.constants.RoutePath.PAGE_COOK_BOOK_DETAIL
 import com.campaign.common.constants.RoutePath.PAGE_USER_PROFILE
 import com.example.network.AuthException
 import com.example.network.NetworkConfig
@@ -27,6 +30,7 @@ import com.example.network.repository.UserRepository
 import com.example.network.session.AuthState
 import com.example.network.session.SessionManager
 import com.marky.route.annotation.Route
+import com.marky.route.api.NRoute
 import com.rhys.relation.R
 import com.rhys.relation.bindRelationAvatar
 import com.rhys.relation.databinding.RelationFragmentUserProfileBinding
@@ -92,8 +96,9 @@ class UserProfileFragment :
                     itemBinding.ivImage.load(imageUrl)
                 }
             }
-            setOnItemClickListener { _, _, _ ->
-                toast(R.string.relation_recipe_placeholder)
+            setOnItemClickListener { _, _, position ->
+                val item = recipes.getOrNull(position) ?: return@setOnItemClickListener
+                openRecipeDetail(item)
             }
         }
         binding.rvRecipes.addItemDecoration(RvDecoration.Builder().setVertical(2).build())
@@ -155,12 +160,30 @@ class UserProfileFragment :
             }
 
             is AuthState.LoggedIn -> {
+                val previousUserId = currentUserId
+                val accountChanged =
+                    previousUserId != 0L && previousUserId != state.user.id
                 loggedIn = true
                 currentUserId = state.user.id
-                if (userId <= 0L) {
-                    showError(getString(R.string.relation_user_not_found))
-                } else if (profile == null && !loading) {
-                    loadProfileFirstPage()
+                if (accountChanged) {
+                    // 账号切换后旧资料与可见菜谱均失效，清空后按新账号重新拉取。
+                    profile = null
+                    recipes.clear()
+                    loaded = false
+                    page = 1
+                    hasMore = true
+                    pendingRequested = false
+                }
+                when {
+                    userId <= 0L -> showError(getString(R.string.relation_user_not_found))
+                    accountChanged -> loadProfileFirstPage()
+                    profile == null && !loading -> loadProfileFirstPage()
+                    profile != null -> {
+                        // View 重建后 Adapter 是新的，必须用缓存状态重新绑定并提交列表。
+                        renderProfile(profile!!)
+                        binding.rvRecipes.submitList(recipes.toList())
+                        renderRecipeContent()
+                    }
                 }
             }
         }
@@ -393,6 +416,18 @@ class UserProfileFragment :
                     }
                 }
             }
+        }
+    }
+
+    private fun openRecipeDetail(item: RecipeDto) {
+        if (item.id <= 0L) return
+        runCatching {
+            NRoute.withNavController(findNavController())
+                .deepLink(PAGE_COOK_BOOK_DETAIL)
+                .args(bundleOf(KEY_BUNDLE_RECIPE_ID to item.id))
+                .go()
+        }.onFailure {
+            toast(R.string.relation_error_default)
         }
     }
 

@@ -53,7 +53,6 @@
 
     <!-- 后续阶段占位 -->
     <string name="relation_message_placeholder">聊天将在后续阶段开放</string>
-    <string name="relation_recipe_placeholder">菜谱详情将在后续阶段开放</string>
 
     <!-- 登录与状态 -->
     <string name="relation_login_required_title">登录后查看</string>

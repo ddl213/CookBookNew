@@ -23,6 +23,7 @@ import com.android.common.utils.RvDecoration
 import com.campaign.common.constants.Constants.KEY_BUNDLE_RECIPE_ID
 import com.campaign.common.constants.RoutePath.PAGE_COOK_BOOK_ADD
 import com.campaign.common.constants.RoutePath.PAGE_COOK_BOOK_CHILD
+import com.campaign.common.constants.RoutePath.PAGE_COOK_BOOK_DETAIL
 import com.campaign.common.constants.RoutePath.PAGE_LOGIN
 import com.example.network.AuthException
 import com.example.network.NetworkConfig
@@ -42,7 +43,7 @@ import kotlinx.coroutines.launch
  * “我的菜谱”列表：按当前 Tab 只请求已发布或草稿。
  *
  * 草稿只在作者自己的列表中出现，是否可见由后端判定；本页面不扩大任何可见范围。
- * 卡片正文点击仍为详情占位，编辑与删除走“更多”菜单。
+ * 卡片正文点击进入详情，编辑与删除走“更多”菜单。
  */
 @Route(PAGE_COOK_BOOK_CHILD)
 class CookBookChildFragment :
@@ -176,9 +177,8 @@ class CookBookChildFragment :
                 itemBinding.tvMore.setOnClickListener { showItemMenu(it, item) }
             }
             setOnItemClickListener { _, _, position ->
-                if (position in recipes.indices) {
-                    toast(R.string.cookbook_detail_placeholder)
-                }
+                val item = recipes.getOrNull(position) ?: return@setOnItemClickListener
+                openDetail(item)
             }
         }
         binding.rv.setOnRefreshListener { loadFirstPage() }
@@ -356,6 +356,18 @@ class CookBookChildFragment :
         runCatching {
             NRoute.withNavController(findNavController())
                 .deepLink(PAGE_COOK_BOOK_ADD)
+                .args(bundleOf(KEY_BUNDLE_RECIPE_ID to item.id))
+                .go()
+        }.onFailure {
+            toast(R.string.cookbook_error_default)
+        }
+    }
+
+    private fun openDetail(item: RecipeDto) {
+        if (item.id <= 0L) return
+        runCatching {
+            NRoute.withNavController(findNavController())
+                .deepLink(PAGE_COOK_BOOK_DETAIL)
                 .args(bundleOf(KEY_BUNDLE_RECIPE_ID to item.id))
                 .go()
         }.onFailure {

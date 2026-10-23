@@ -3,6 +3,7 @@ package com.example.network
 import com.example.network.api.AuthApi
 import com.example.network.api.FriendApi
 import com.example.network.api.RecipeApi
+import com.example.network.api.SocialApi
 import com.example.network.api.UploadApi
 import com.example.network.api.UserApi
 import com.example.network.session.SessionStore
@@ -57,4 +58,6 @@ object ApiClient {
     val recipeApi: RecipeApi by lazy { retrofit.create(RecipeApi::class.java) }
 
     val uploadApi: UploadApi by lazy { retrofit.create(UploadApi::class.java) }
+
+    val socialApi: SocialApi by lazy { retrofit.create(SocialApi::class.java) }
 }

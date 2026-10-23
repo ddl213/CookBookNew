@@ -1,6 +1,6 @@
 # 06 · 公共业务组件
 
-> 本类盘点状态：已盘点。`P01-T02` 增量登记跨页面登录态与认证表单校验能力；`P02-T01` 增量登记用户主页操作决策、好友申请状态与 `lib_relation` 内部 UI 复用工具；`P03-T01` 增量登记菜谱表单校验与固定选项映射，并更正 `lib_cookbook` 的旧 mock 描述。已核对其真实调用页面。
+> 本类盘点状态：已盘点。`P01-T02` 增量登记跨页面登录态与认证表单校验能力；`P02-T01` 增量登记用户主页操作决策、好友申请状态与 `lib_relation` 内部 UI 复用工具；`P03-T01` 增量登记菜谱表单校验与固定选项映射，并更正 `lib_cookbook` 的旧 mock 描述；`P04-T02` 登记 `lib_cookbook` 详情页/分享弹窗共用的模块内 UI 工具，并更新详情页核实结论。已核对其真实调用页面。
 
 **收录范围：**跨页面复用的登录、好友、菜谱、聊天、订单业务组件与状态展示。
 
@@ -8,11 +8,12 @@
 
 **核实结论：**
 
-- 菜谱页不再是硬编码 mock：`CookBookFragment` 的“已发布/草稿”Tab 通过 `KEY_BUNDLE_PAGE_ID` 创建 `CookBookChildFragment`，后者按状态请求 `/recipes/mine?status`，具备分页、下拉刷新、空/加载/错误/登录态，卡片“更多”菜单可编辑或删除；正文点击仍是详情占位。
+- 菜谱页不再是硬编码 mock：`CookBookFragment` 的“已发布/草稿”Tab 通过 `KEY_BUNDLE_PAGE_ID` 创建 `CookBookChildFragment`，后者按状态请求 `/recipes/mine?status`，具备分页、下拉刷新、空/加载/错误/登录态，卡片“更多”菜单可编辑或删除；卡片正文点击进入 `CookBookDetailFragment`（`PAGE_COOK_BOOK_DETAIL`）。
 - 新建/编辑由 `AddRecipesFragment` 实现：支持 `PickVisualMedia` 选图、上传/移除、固定+自定义分类、可见性、草稿/已发布、食材/步骤多行解析与逐字段校验；保存失败/加载失败有独立反馈。
+- 菜谱详情由 `CookBookDetailFragment` 实现：展示封面/作者/标签/食材/步骤，登录后可收藏、作者可分享、评论分页与发表；匿名只读公开内容，草稿隐藏评论与收藏/预订按钮，404 统一显示“不存在或无权查看”；`ShareFriendDialog` 负责好友列表与选择，分享请求由详情页发起。
 - 首页 `IndexFragment` 的标签、分类、今日上新、热门推荐四个 RecyclerView 仍填入同一组占位字符串；`IndexChildFragment` 有列表实现但未被页面导航调用。
 - 消息、订单页面仍只有 `TitleBar` 占位；“我的”页已按 `AuthState` 渲染未登录/已登录区块，登录、退出已接线，“我的好友”入口跳转 `PAGE_FRIENDS`，收藏、订单、设置仍只提示后续开放。
-- 登录/注册、好友列表/搜索/申请/主页、个人菜谱发布/管理均已接线；菜谱详情页、预订/购物车、订单状态机、聊天组件仍未实现。
+- 登录/注册、好友列表/搜索/申请/主页、个人菜谱发布/管理与菜谱详情（含评论/收藏/分享）均已接线；预订/购物车仅详情页占位提示，订单状态机、聊天组件仍未实现。
 
 | ID | 类 / API / 资源入口 | 用途与优先复用场景 | 调用方式、前提和限制 | 定义文件（项目相对路径） | 真实调用位置 / 核查证据 |
 | --- | --- | --- | --- | --- | --- |
@@ -23,4 +24,5 @@
 | BIZ-005 | `FriendRequestStatus.fromRaw`、`isPending` | 把后端 `pending/accepted/rejected` 转为可操作状态，避免把未知状态误判为可处理。 | `enum class` 含 `UNKNOWN`；`fromRaw` 忽略大小写，未知/null/空白归为 `UNKNOWN`；只有 `PENDING` 的 `isPending` 为 true。页面仅在“收到且 pending”时显示接受/拒绝；状态文案由页面映射，不能凭 raw 字符串自行扩展业务状态。 | `subModules/lib_relation/src/main/java/com/rhys/relation/model/FriendRequestStatus.kt` | `FriendRequestsFragment.bind` 决定按钮显隐与可操作性，`statusText()` 映射文案；`FriendRequestStatusTest` 3 例（TEST-008）。 |
 | BIZ-006 | `RelationUiSupport`（`bindRelationAvatar`、`firstCharacter`、`openUserProfile`、`openLoginPage`、`readUserIdArgument`） | `lib_relation` 内复用头像占位、昵称首字、用户主页/登录页跳转与 `userId` 参数读取，减少四个页面的重复逻辑。 | 全部为 `internal`，只在 `lib_relation` 模块内可见，不能跨模块复用；头像加载见 UTIL-005、URL 解析见 DATA-003；`openUserProfile` 需要有效 `NavController`，`userId <= 0` 时 no-op；`readUserIdArgument` 兼容 Bundle 与 deep link query，非法值返回 0，页面需显示用户不存在。参数契约见 ARCH-012。 | `subModules/lib_relation/src/main/java/com/rhys/relation/RelationUiSupport.kt` | `FriendsFragment`、`FriendSearchFragment`、`FriendRequestsFragment`、`UserProfileFragment` 调用；`readUserIdArgument` 供 `UserProfileFragment.userId` 使用。 |
 | BIZ-007 | `RecipeFormValidator.validate/parseLines`、`RecipeFormInput`、`RecipeFormErrors` | 菜谱表单的纯 Kotlin 校验与多行解析：名称/分类/食材/步骤必填，返回逐字段错误；后续编辑入口可复用同一规则。 | `validate` 先 trim 名称/分类，食材/步骤按行 trim 并丢弃空行，至少各 1 项；必填规则对草稿与已发布一致；简介/图片不在此校验。`RecipeFormErrors.isValid` 要求四字段均无错误，`firstMessage` 按 name→category→ingredients→steps 顺序返回。规则变化需同步后端与 TEST-011。 | `subModules/lib_cookbook/src/main/java/com/rhys/cookbook/form/RecipeFormValidator.kt` | `AddRecipesFragment.saveRecipe()` 调用 `validate` 与 `parseLines`，并据 `RecipeFormErrors` 就地显示字段错误、聚焦首个错误；`RecipeFormValidatorTest` 10 例（TEST-011）。 |
-| BIZ-008 | `RecipeFormOptions`（默认分类、visibility/status 映射） | 菜谱表单固定分类与 visibility/status 字符串映射；列表标签复用同一映射，避免页面各自解释后端值。 | `DEFAULT_CATEGORIES` 固定为家常菜/早餐/甜品，同时允许自定义分类，提交最终字符串；`visibilityOf` 仅 `public` 保留，其余回退 `friends`；`statusOf` 仅 `draft` 保留，其余回退 `published`。未知值只回退产品默认，不自行扩展业务状态；权限仍由后端判定。 | `subModules/lib_cookbook/src/main/java/com/rhys/cookbook/form/RecipeFormOptions.kt` | `AddRecipesFragment` 表单选项与状态；`CookBookChildFragment.statusLabel/visibilityLabel` 复用；`RecipeFormValidatorTest` 覆盖回退行为（TEST-011）。 |
+| BIZ-008 | `RecipeFormOptions`（默认分类、visibility/status 映射） | 菜谱表单固定分类与 visibility/status 字符串映射；列表标签复用同一映射，避免页面各自解释后端值。 | `DEFAULT_CATEGORIES` 固定为家常菜/早餐/甜品，同时允许自定义分类，提交最终字符串；`visibilityOf` 仅 `public` 保留，其余回退 `friends`；`statusOf` 仅 `draft` 保留，其余回退 `published`。未知值只回退产品默认，不自行扩展业务状态；权限仍由后端判定。 | `subModules/lib_cookbook/src/main/java/com/rhys/cookbook/form/RecipeFormOptions.kt` | `AddRecipesFragment` 表单选项与状态；`CookBookChildFragment.statusLabel/visibilityLabel`、`CookBookDetailFragment.renderBadges/isDraft` 复用；`RecipeFormValidatorTest` 覆盖回退行为（TEST-011）。 |
+| BIZ-009 | `DetailUiSupport`（`bindDetailAvatar`、`firstCharacter`、`formatCommentTime`） | `lib_cookbook` 详情页与分享弹窗共用的头像占位/首字/评论时间展示，避免两个页面重复实现。 | 全部为 `internal`，**仅 `lib_cookbook` 模块内可见**，不能跨模块复用；`bindDetailAvatar` 先经 DATA-003 `resolveMediaUrl`，无 URL 时显示主色圆底 + 首字，有头像时用 UTIL-005 加载；`firstCharacter` 处理 emoji 代理对；`formatCommentTime` 只截取 ISO 字符串前 16 位并替换 `T`，不解析时区/本地化。`lib_cookbook` 不依赖 `lib_relation`，因此未直接复用 BIZ-006。 | `subModules/lib_cookbook/src/main/java/com/rhys/cookbook/detail/DetailUiSupport.kt` | `CookBookDetailFragment` 渲染作者/评论头像与评论时间；`ShareFriendDialog` 渲染好友头像；无独立单测，复用模式与 BIZ-006 相同。 |
