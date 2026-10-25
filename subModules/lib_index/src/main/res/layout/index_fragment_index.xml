@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--协调子View之间的滚动和动画-->
+<!-- 首页：可折叠头部 + 分类标签 + 公开/好友菜谱列表。 -->
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/color_f0f0f0">
 
-    <!--可折叠的头部，响应滚动事件-->
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@color/white">
-        <!--负责折叠事件-->
+        android:background="@color/white"
+        android:orientation="vertical">
+
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_scrollFlags="snap|scroll|exitUntilCollapsed">
+
             <LinearLayout
-                android:id="@+id/ll_parallax"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -28,25 +27,28 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="美食家园"
                     android:layout_gravity="center_horizontal"
-                    android:textSize="28sp"
-                    android:textStyle="bold"
                     android:layout_marginTop="16dp"
-                    android:textColor="@color/textTitle" />
+                    android:text="@string/index_title_home"
+                    android:textColor="@color/textTitle"
+                    android:textSize="28sp"
+                    android:textStyle="bold" />
 
                 <com.android.common.view.base.GTextView
                     android:id="@+id/tv_search"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
                     android:layout_marginTop="20dp"
-                    android:layout_marginHorizontal="16dp"
-                    android:padding="16dp"
+                    android:layout_marginEnd="16dp"
                     android:background="@color/color_e8edf2"
-                    android:gravity="center_vertical"
+                    android:clickable="true"
                     android:drawableStart="@drawable/index_img_search_gray"
                     android:drawablePadding="8dp"
-                    android:hint="搜索菜谱或好友"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:hint="@string/index_search_hint"
+                    android:padding="16dp"
                     android:textColorHint="@color/color_999999"
                     android:textSize="14sp"
                     app:radius="12dp" />
@@ -56,51 +58,159 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp">
+            android:paddingStart="16dp"
+            android:paddingTop="4dp"
+            android:paddingEnd="4dp"
+            android:paddingBottom="4dp">
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_tags"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="parent"/>
+                android:layout_marginEnd="48dp"
+                android:clipToPadding="false"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/iv_search"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:srcCompat="@drawable/index_img_search"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:alpha="0"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/index_search_icon_desc"
+                android:padding="12dp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@id/rv_tags"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/rv_tags"
-                app:layout_constraintBottom_toBottomOf="@+id/rv_tags"/>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_featured_categories"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@+id/rv_tags"
-                android:layout_marginTop="8dp"/>
-
-            <TextView
-                android:id="@+id/tv_discover"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="今日上新"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="@color/textTitle"
-                app:layout_constraintTop_toBottomOf="@+id/rv_featured_categories"
-                app:layout_constraintStart_toStartOf="parent"/>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_discover"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@+id/tv_discover" />
-
+                app:layout_constraintTop_toTopOf="@id/rv_tags"
+                app:srcCompat="@drawable/index_img_search" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_popular"
+        android:id="@+id/rv_feed"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+        android:clipToPadding="false"
+        android:paddingStart="12dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="16dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+    <ProgressBar
+        android:id="@+id/pb_loading"
+        style="?android:attr/progressBarStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminateTint="@color/color_primary"
+        android:visibility="gone"
+        app:layout_anchor="@id/rv_feed"
+        app:layout_anchorGravity="center" />
+
+    <LinearLayout
+        android:id="@+id/ll_empty"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingStart="32dp"
+        android:paddingEnd="32dp"
+        android:visibility="gone"
+        app:layout_anchor="@id/rv_feed"
+        app:layout_anchorGravity="center">
+
+        <TextView
+            android:id="@+id/tv_empty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/index_empty"
+            android:textColor="@color/textNormal"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_error"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingStart="32dp"
+        android:paddingEnd="32dp"
+        android:visibility="gone"
+        app:layout_anchor="@id/rv_feed"
+        app:layout_anchorGravity="center">
+
+        <TextView
+            android:id="@+id/tv_error"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/index_error_default"
+            android:textColor="@color/red"
+            android:textSize="14sp" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_retry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/index_bg_secondary_button"
+            android:minHeight="40dp"
+            android:minWidth="96dp"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:text="@string/index_retry"
+            android:textAllCaps="false"
+            android:textColor="@color/textTitle"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_login_required"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingStart="32dp"
+        android:paddingEnd="32dp"
+        android:visibility="gone"
+        app:layout_anchor="@id/rv_feed"
+        app:layout_anchorGravity="center">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/index_login_required_title"
+            android:textColor="@color/textTitle"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:text="@string/index_login_required_desc"
+            android:textColor="@color/textNormal"
+            android:textSize="14sp" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_login"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/index_bg_primary_button"
+            android:minHeight="48dp"
+            android:text="@string/index_login_button"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="16sp" />
+    </LinearLayout>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

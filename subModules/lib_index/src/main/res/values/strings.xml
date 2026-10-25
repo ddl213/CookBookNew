@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 首页 -->
+    <string name="index_title_home">美食家园</string>
+    <string name="index_search_hint">搜索菜谱或好友</string>
+    <string name="index_search_icon_desc">搜索</string>
+    <string name="index_tab_recommend">推荐</string>
+    <string name="index_tab_feed">好友动态</string>
+    <string name="index_tab_popular">热门</string>
+    <string name="index_tab_home_cooking">家常菜</string>
+    <string name="index_tab_breakfast">早餐</string>
+    <string name="index_tab_dessert">甜品</string>
+    <string name="index_empty">暂无内容</string>
+    <string name="index_empty_feed">好友还没有发布菜谱</string>
+    <string name="index_error_default">加载失败，请重试</string>
+    <string name="index_retry">重试</string>
+    <string name="index_login_required_title">登录后查看好友动态</string>
+    <string name="index_login_required_desc">登录后可查看好友动态</string>
+    <string name="index_login_button">登录 / 注册</string>
+    <string name="index_login_failed">暂时无法打开登录页，请稍后重试</string>
+    <string name="index_open_failed">页面打开失败，请稍后重试</string>
+    <string name="index_author_fallback_desc">作者头像</string>
+    <string name="index_recipe_image_desc">菜品图片</string>
+
+    <!-- 搜索页 -->
+    <string name="index_title_search">搜索</string>
+    <string name="index_search_input">输入关键词搜索菜谱或用户</string>
+    <string name="index_search_button">搜索</string>
+    <string name="index_mode_recipe">菜谱</string>
+    <string name="index_mode_user">用户</string>
+    <string name="index_search_initial">输入关键词搜索菜谱或用户</string>
+    <string name="index_search_empty_recipes">没有找到相关菜谱</string>
+    <string name="index_search_empty_users">没有找到相关用户</string>
+    <string name="index_search_error">搜索失败，请重试</string>
+    <string name="index_username_format">@%1$s</string>
+    <string name="index_user_login_required">用户搜索需要登录</string>
+    <string name="index_user_login_desc">登录后可搜索用户并查看资料</string>
+    <string name="index_go_login">去登录</string>
+</resources>

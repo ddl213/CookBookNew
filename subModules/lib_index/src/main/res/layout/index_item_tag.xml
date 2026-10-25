@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/tv_tag"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/index_selector_tag_bg"
+    android:gravity="center"
+    android:minHeight="40dp"
+    android:paddingStart="14dp"
+    android:paddingEnd="14dp"
+    android:textColor="@color/index_selector_tag_text"
+    android:textSize="14sp"
+    tools:text="推荐" />

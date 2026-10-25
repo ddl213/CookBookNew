@@ -27,6 +27,25 @@ interface RecipeApi {
         @Query("pageSize") pageSize: Int
     ): PageResponse<RecipeDto>
 
+    /**
+     * 公开菜谱列表：匿名可读，仅返回 public + published。
+     * category / q 为 null 时 Retrofit 不拼接该查询参数。
+     */
+    @GET("recipes/public")
+    suspend fun listPublic(
+        @Query("category") category: String?,
+        @Query("q") q: String?,
+        @Query("page") page: Int,
+        @Query("pageSize") pageSize: Int
+    ): PageResponse<RecipeDto>
+
+    /** 好友动态：需要登录，返回好友的 public/friends 且已发布菜谱。 */
+    @GET("feed")
+    suspend fun listFeed(
+        @Query("page") page: Int,
+        @Query("pageSize") pageSize: Int
+    ): PageResponse<RecipeDto>
+
     @GET("recipes/{id}")
     suspend fun get(@Path("id") id: Long): RecipeDto
 

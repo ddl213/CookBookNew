@@ -34,6 +34,40 @@ class RecipeRepository {
         }
     }
 
+    /**
+     * 公开菜谱列表（匿名可读）。category/query 会先 trim，空白转为 null。
+     * 推荐/热门等“最新排序”口径由后端默认排序决定，客户端不自行实现推荐算法。
+     */
+    suspend fun listPublic(
+        category: String? = null,
+        query: String? = null,
+        page: Int = 1,
+        pageSize: Int = DEFAULT_PAGE_SIZE
+    ): PageResponse<RecipeDto> {
+        val safePage = normalizedPage(page)
+        val safePageSize = normalizedPageSize(pageSize)
+        return callRelationApi {
+            ApiClient.recipeApi.listPublic(
+                category = normalizedFilter(category),
+                q = normalizedFilter(query),
+                page = safePage,
+                pageSize = safePageSize
+            )
+        }
+    }
+
+    /** 好友动态：需要登录；未登录时由页面阻止请求，这里不吞掉 401。 */
+    suspend fun listFeed(
+        page: Int = 1,
+        pageSize: Int = DEFAULT_PAGE_SIZE
+    ): PageResponse<RecipeDto> {
+        val safePage = normalizedPage(page)
+        val safePageSize = normalizedPageSize(pageSize)
+        return callRelationApi {
+            ApiClient.recipeApi.listFeed(safePage, safePageSize)
+        }
+    }
+
     suspend fun get(id: Long): RecipeDto {
         require(id > 0) { "recipe id must be positive" }
         return callRelationApi { ApiClient.recipeApi.get(id) }
@@ -143,5 +177,9 @@ class RecipeRepository {
         internal fun normalizedPage(page: Int): Int = page.coerceAtLeast(1)
 
         internal fun normalizedPageSize(pageSize: Int): Int = pageSize.coerceIn(1, MAX_PAGE_SIZE)
+
+        /** 查询过滤值归一化：null/空白转 null，其余去掉首尾空格。 */
+        internal fun normalizedFilter(value: String?): String? =
+            value?.trim()?.takeIf { it.isNotEmpty() }
     }
 }

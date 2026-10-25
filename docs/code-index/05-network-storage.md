@@ -1,6 +1,6 @@
 # 05 · 网络、存储与异步能力
 
-> 本类盘点状态：已盘点。已核对 `lib_network`、`lib_cookbook` 的 Room 依赖与 `lib_android_common` 的存储工具。`P01-T02` 增量新增 Retrofit/OkHttp 认证客户端、认证 Repository、MMKV 会话存储与媒体 URL 解析；`P02-T01` 增量新增用户/好友接口、关系 DTO、分页、关系 Repository 与错误映射；`P03-T01` 增量新增菜谱接口、图片上传、菜谱写请求/Repository、媒体规则与菜谱错误码；`P04-T02` 增量新增社交接口（评论/收藏/分享）、DTO 与错误码。因内容增长，本分类拆为三个子表。
+> 本类盘点状态：已盘点。已核对 `lib_network`、`lib_cookbook` 的 Room 依赖与 `lib_android_common` 的存储工具。`P01-T02` 增量新增 Retrofit/OkHttp 认证客户端、认证 Repository、MMKV 会话存储与媒体 URL 解析；`P02-T01` 增量新增用户/好友接口、关系 DTO、分页、关系 Repository 与错误映射；`P03-T01` 增量新增菜谱接口、图片上传、菜谱写请求/Repository、媒体规则与菜谱错误码；`P04-T02` 增量新增社交接口（评论/收藏/分享）、DTO 与错误码；`P05-T02` 增量新增公开菜谱/好友动态接口与查询参数归一化。因内容增长，本分类拆为三个子表。
 
 **收录范围：**API/网络包装、Repository、Room/本地数据、缓存、协程/异步共用封装。
 
@@ -12,7 +12,7 @@
 | --- | --- | --- |
 | [01 数据模型、认证与存储](05-network-storage/01-foundation-auth.md) | 本地模型、Room 骨架、NetworkConfig、ApiClient、AuthApi/DTO、认证错误映射、AuthRepository、SessionStore | DATA-001～DATA-011 |
 | [02 用户、好友关系与分页](05-network-storage/02-relation.md) | UserApi/FriendApi、关系 DTO、PageResponse、RelationErrorMapper、RelationApiCall/requireSuccessful、UserRepository/FriendRepository | DATA-012～DATA-021 |
-| [03 菜谱发布、上传与写操作](05-network-storage/03-recipes.md) | RecipeApi、UploadApi、SocialApi、RecipeRepository、RecipeMediaRules、菜谱写请求/上传响应/社交 DTO、删除 204 校验与上传约束 | DATA-022～DATA-028 |
+| [03 菜谱发布、上传与写操作](05-network-storage/03-recipes.md) | RecipeApi（含公开/feed）、UploadApi、SocialApi、RecipeRepository、RecipeMediaRules、菜谱写请求/上传响应/社交 DTO、删除 204 校验与上传约束 | DATA-022～DATA-028 |
 
 ## 覆盖与缺口
 

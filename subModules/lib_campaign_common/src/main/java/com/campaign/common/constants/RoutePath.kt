@@ -28,6 +28,8 @@ object RoutePath {
     const val PAGE_COOK_BOOK_DETAIL = "action://3004"
     //点单页
     const val PAGE_ORDER_INFO = "action://3005"
+    //首页搜索页
+    const val PAGE_INDEX_SEARCH = "action://3006"
 
 
     /**

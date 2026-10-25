@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.android.common.view.base.GConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:padding="12dp"
+    app:radius="12dp">
+
+    <com.android.common.view.base.GImageView
+        android:id="@+id/iv_recipe_image"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:background="@drawable/index_bg_image_placeholder"
+        android:contentDescription="@string/index_recipe_image_desc"
+        android:scaleType="centerCrop"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:radius="10dp" />
+
+    <TextView
+        android:id="@+id/tv_recipe_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/textTitle"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/iv_recipe_image"
+        app:layout_constraintTop_toTopOf="@id/iv_recipe_image"
+        tools:text="番茄炒蛋" />
+
+    <TextView
+        android:id="@+id/tv_recipe_desc"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:textColor="@color/textNormal"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/tv_recipe_name"
+        app:layout_constraintTop_toBottomOf="@id/tv_recipe_name"
+        tools:text="酸甜开胃的家常做法，十分钟就能上桌" />
+
+    <LinearLayout
+        android:id="@+id/ll_meta"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/tv_recipe_name"
+        app:layout_constraintTop_toBottomOf="@id/tv_recipe_desc">
+
+        <TextView
+            android:id="@+id/tv_recipe_category"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/color_primary"
+            android:textSize="12sp"
+            tools:text="家常菜" />
+
+        <LinearLayout
+            android:id="@+id/ll_author"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
+            android:gravity="center_vertical"
+            android:minHeight="32dp"
+            android:orientation="horizontal"
+            android:paddingTop="4dp"
+            android:paddingEnd="4dp"
+            android:paddingBottom="4dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="24dp"
+                android:layout_height="24dp">
+
+                <com.android.common.view.base.GImageView
+                    android:id="@+id/iv_author_avatar"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:background="@drawable/index_bg_image_placeholder"
+                    android:contentDescription="@string/index_author_fallback_desc"
+                    android:scaleType="centerCrop"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:radius="12dp" />
+
+                <TextView
+                    android:id="@+id/tv_author_fallback"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:background="@drawable/index_bg_avatar_placeholder"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                android:id="@+id/tv_author_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/textNormal"
+                android:textSize="12sp"
+                tools:text="小厨" />
+        </LinearLayout>
+    </LinearLayout>
+
+</com.android.common.view.base.GConstraintLayout>
