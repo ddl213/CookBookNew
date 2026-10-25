@@ -11,3 +11,4 @@
 | [01 路由常量与页面参数](02-routes-pages.md) | RoutePath、用户主页/菜谱/首页/创作者路由参数 | ARCH-008、ARCH-012、ARCH-014～ARCH-016 |
 | [02 功能模块入口](03-module-entries.md) | `lib_auth`、`lib_relation`、`lib_cookbook` 模块边界与页面注册 | ARCH-009、ARCH-011、ARCH-013 |
 | [03 聊天页面与路由参数](04-chat-pages.md) | `lib_chat` 消息/通知/聊天详情页面组、聊天路由参数与好友发消息入口 | ARCH-017、ARCH-018 |
+| [04 预订与订单页面组](05-order-pages.md) | `lib_order` 3.9 预订页、订单列表/详情、订单参数与动作边界 | ARCH-019、ARCH-020 |

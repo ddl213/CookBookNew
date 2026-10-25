@@ -57,7 +57,7 @@ class MineFragment : BaseBindFragment<MineFragmentMineBinding>(MineFragmentMineB
         }
         binding.rowCollections.setOnClickListener { showPlaceholder() }
         binding.rowFriends.setOnClickListener { openFriends() }
-        binding.rowOrders.setOnClickListener { showPlaceholder() }
+        binding.rowOrders.setOnClickListener { openOrders() }
         binding.rowSettings.setOnClickListener { showPlaceholder() }
     }
 
@@ -144,6 +144,17 @@ class MineFragment : BaseBindFragment<MineFragmentMineBinding>(MineFragmentMineB
         }.onFailure {
             toast(R.string.mine_friends_failed)
         }
+    }
+
+    /** 切到固定下标 3 的订单 Tab；宿主未实现 MainTabController 时提示，不新开重复页面。 */
+    private fun openOrders() {
+        val controller = parentFragment as? MainTabController
+            ?: activity as? MainTabController
+        if (controller == null) {
+            toast(R.string.mine_orders_failed)
+            return
+        }
+        controller.switchTab(3)
     }
 
     private fun browseApp() {

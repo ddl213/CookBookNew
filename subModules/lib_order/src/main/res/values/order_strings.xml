@@ -61,4 +61,62 @@
     <string name="order_info_login_failed">暂时无法打开登录页，请稍后重试</string>
     <string name="order_info_navigation_failed">暂时无法打开页面，请稍后重试</string>
     <string name="order_info_category_unknown">未分类</string>
+
+    <!-- 订单列表 -->
+    <string name="order_title">订单</string>
+    <string name="order_tab_buyer">我的订单</string>
+    <string name="order_tab_seller">我的销售</string>
+    <string name="order_filter_all">全部</string>
+    <string name="order_filter_pending">待接受</string>
+    <string name="order_filter_accepted">备货中</string>
+    <string name="order_filter_waiting_pickup">待取货</string>
+    <string name="order_filter_completed">已完成</string>
+    <string name="order_filter_rejected">已拒绝</string>
+    <string name="order_filter_cancelled">已取消</string>
+    <string name="order_filter_closed">已关闭</string>
+    <string name="order_demo_banner">演示模式，不会同步到服务器</string>
+    <string name="order_empty_orders">暂无订单</string>
+    <string name="order_empty_sales">暂无销售</string>
+    <string name="order_unknown_user">未知用户</string>
+    <string name="order_dish_unknown">菜品信息待更新</string>
+    <string name="order_created_at">创建于 %1$s</string>
+    <string name="order_load_failed">加载失败，请稍后重试</string>
+    <string name="order_retry">重试</string>
+    <string name="order_login_failed">暂时无法打开登录页，请稍后重试</string>
+    <string name="order_navigation_failed">暂时无法打开页面，请稍后重试</string>
+    <string name="order_login_title">登录后查看订单</string>
+    <string name="order_login_desc">登录后可查看你发起的预订和收到的预订</string>
+    <string name="order_login_button">登录 / 注册</string>
+    <string name="order_list_image_desc">菜品图片</string>
+
+    <!-- 订单详情 -->
+    <string name="order_detail_title">订单详情</string>
+    <string name="order_detail_buyer_label">预订方</string>
+    <string name="order_detail_seller_label">提供方</string>
+    <string name="order_detail_username">\@%1$s</string>
+    <string name="order_detail_note_label">整单备注</string>
+    <string name="order_detail_items">菜品明细</string>
+    <string name="order_detail_quantity">x%1$d</string>
+    <string name="order_detail_created">创建时间：%1$s</string>
+    <string name="order_detail_updated">更新时间：%1$s</string>
+    <string name="order_detail_cancel_all">取消整单</string>
+    <string name="order_detail_invalid_params">订单参数不合法，请返回后重试</string>
+    <string name="order_detail_not_found">订单不存在或无权查看</string>
+    <string name="order_detail_load_failed">加载失败，请稍后重试</string>
+    <string name="order_detail_action_failed">操作失败，请稍后重试</string>
+    <string name="order_detail_login_failed">暂时无法打开登录页，请稍后重试</string>
+    <string name="order_detail_dismiss">再想想</string>
+    <string name="order_detail_action_reject">拒单</string>
+    <string name="order_detail_action_cancel">取消</string>
+    <string name="order_detail_action_complete">确认取货</string>
+    <string name="order_detail_action_cancel_all">取消整单</string>
+    <string name="order_detail_confirm_reject_title">确认拒单</string>
+    <string name="order_detail_confirm_reject_message">拒单后该菜品不可恢复，需要重新预订。</string>
+    <string name="order_detail_confirm_cancel_title">确认取消</string>
+    <string name="order_detail_confirm_cancel_message">取消后该菜品不可恢复，需要重新预订。</string>
+    <string name="order_detail_confirm_complete_title">确认取货</string>
+    <string name="order_detail_confirm_complete_message">确认取货后该菜品将标记为已完成，不可撤销。</string>
+    <string name="order_detail_confirm_cancel_all_title">确认取消整单</string>
+    <string name="order_detail_confirm_cancel_all_message">整单取消后所有明细都会取消且不可恢复。</string>
+    <string name="order_detail_image_desc">菜品图片</string>
 </resources>

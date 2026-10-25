@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/order_bg_card"
+    android:minHeight="96dp"
+    android:padding="12dp">
+
+    <com.android.common.view.base.GImageView
+        android:id="@+id/iv_dish_image"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:background="@drawable/order_bg_image_placeholder"
+        android:contentDescription="@string/order_list_image_desc"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:radius="10dp" />
+
+    <TextView
+        android:id="@+id/tv_counterpart_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="8dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/textTitle"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@id/tv_status"
+        app:layout_constraintStart_toEndOf="@id/iv_dish_image"
+        app:layout_constraintTop_toTopOf="@id/iv_dish_image"
+        tools:text="小厨" />
+
+    <TextView
+        android:id="@+id/tv_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/order_bg_badge"
+        android:paddingStart="8dp"
+        android:paddingTop="3dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="3dp"
+        android:textColor="@color/color_primary"
+        android:textSize="11sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tv_counterpart_name"
+        tools:text="待接受" />
+
+    <TextView
+        android:id="@+id/tv_counterpart_role"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/textNormal"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/tv_counterpart_name"
+        app:layout_constraintTop_toBottomOf="@id/tv_counterpart_name"
+        tools:text="提供方" />
+
+    <TextView
+        android:id="@+id/tv_dish_summary"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:textColor="@color/textNormal"
+        android:textSize="13sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/tv_counterpart_name"
+        app:layout_constraintTop_toBottomOf="@id/tv_counterpart_role"
+        tools:text="番茄炒蛋、红烧肉 等" />
+
+    <TextView
+        android:id="@+id/tv_counts"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/textTitle"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/tv_counterpart_name"
+        app:layout_constraintTop_toBottomOf="@id/tv_dish_summary"
+        tools:text="2 道菜 · 共 3 份 · 待接受 1" />
+
+    <TextView
+        android:id="@+id/tv_created_at"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/color_999999"
+        android:textSize="11sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/tv_counterpart_name"
+        app:layout_constraintTop_toBottomOf="@id/tv_counts"
+        tools:text="创建于 2026-10-25 10:30" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

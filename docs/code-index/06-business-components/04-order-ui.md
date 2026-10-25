@@ -1,0 +1,11 @@
+# 06-04 · 订单页面共享 UI 与纯逻辑
+
+> 返回分类首页：[06-business-components.md](../06-business-components.md)。登录态与关系操作见 [01-auth-relation.md](01-auth-relation.md)，菜谱/首页展示见 [02-recipes-index.md](02-recipes-index.md)，聊天共享 UI 见 [03-chat-ui.md](03-chat-ui.md)。订单页面结构见 ARCH-020，数据层见 DATA-063。
+
+**收录范围：**`lib_order` 订单列表与详情共用的状态/动作文案、`allowedActions` 过滤、计数摘要、列表去重、对方角色与时间格式化纯逻辑。
+
+**索引原则：**只登记真实调用且有复用价值的纯函数；不把服务端 `allowedActions` 当作可自行扩展的权限，不推断未知状态/动作。
+
+| ID | 类 / API / 资源入口 | 用途与优先复用场景 | 调用方式、前提和限制 | 定义文件（项目相对路径） | 真实调用位置 / 核查证据 |
+| --- | --- | --- | --- | --- | --- |
+| BIZ-015 | `OrderUiSupport`（`FILTERS`、`ITEM_ACTION_ORDER`、`orderStatusLabel`、`itemStatusLabel`、`actionLabel`、`knownItemActions`、`canCancelAll`、`isPrimaryAction`、`countSummary`、`statusCountSummary`、`dishSummary`、`counterpart`、`counterpartLabel`、`mergeOrders`、`formatTime`）、`OrderFilter` | 订单列表/详情共用的状态与动作中文文案、筛选顺序、服务端 `allowedActions` 过滤、主/次按钮判定、菜品/数量/状态计数摘要、买家卖家视角对方信息、分页去重与本地时间格式化。新增订单页面或修改订单文案时优先复用，避免两页各写一套映射。 | 纯 Kotlin `object`/`data class`，不访问 Android 控件、网络或 Session；未知状态返回“未知状态”，未知动作返回“未知操作”，不推断可操作。`FILTERS`/`OrderFilter` 固定“全部 + 待接受/备货中/待取货/已完成/已拒绝/已取消/已关闭”，标签为硬编码中文；**当前页面筛选 chip 与顺序由布局和 `updateFilterUi()` 硬编码，未读取 `FILTERS`**，该列表目前仅由单测校验，接入时需页面主动读取，改文案需同步布局、页面与测试。`knownItemActions` 只保留服务端返回且属于 `ITEM_ACTION_ORDER` 的五个明细动作，**丢弃 `cancelAll`、未知值与其他角色动作**；`canCancelAll` 只在服务端明确返回 `cancelAll` 时为 true；服务端仍会再次校验权限。`isPrimaryAction` 仅 ACCEPT/READY/COMPLETE 为主按钮，REJECT/CANCEL 为次按钮。`countSummary` 对负值归零，无明细时退化为“共 N 份”或“暂无菜品”；`statusCountSummary` 只列非零状态，全零返回 null；`dishSummary` 最多两个菜名并追加“等”，空名称返回 null。`counterpart` 在 seller 视角取 buyer，否则取 seller；`counterpartLabel` 对应“预订方/提供方”。`mergeOrders` 仅保留 id>0，同 id 后到覆盖旧值但保持首次出现位置。`formatTime` 解析 UTC `Z`/`±HH:MM`/`±HHMM` 与可选毫秒，输出本地 `yyyy-MM-dd HH:mm`，空/非法返回 null（页面隐藏时间）；`zone` 仅供测试固定时区，不解析本地化格式。 | `subModules/lib_order/src/main/java/com/rhys/order/ui/OrderUiSupport.kt` | `OrderFragment` 的 `updateFilterUi()/selectStatus()` 维护筛选状态（chip 与顺序当前由布局/页面硬编码，未读取 `FILTERS`），列表绑定/`loadFirstPage`/`loadMore` 使用状态文案、摘要、计数、对方信息与 `mergeOrders`；`OrderDetailFragment.renderOrder/renderItems/createActionButton/requestCancelAll` 使用状态/明细文案、计数、`knownItemActions`、`canCancelAll`、`isPrimaryAction`、`actionLabel` 与 `formatTime`；列表/详情 UI 见 VIEW-019/VIEW-020，单测 `OrderUiSupportTest` 16 例（TEST-037）。 |

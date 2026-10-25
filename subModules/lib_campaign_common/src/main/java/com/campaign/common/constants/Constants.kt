@@ -38,4 +38,11 @@ object Constants {
      * 缺省或加密不可用时应使用首字占位，不得把占位文案当作 URL 加载。
      */
     const val KEY_BUNDLE_PEER_AVATAR = "key_peer_avatar"
+
+    /**
+     * 订单详情路由参数：订单 ID（Long）。
+     * 缺失、非数字或 <= 0 表示参数非法，详情页不得据此请求他人订单。
+     * 订单列表、通知入口与后续销售管理页复用同一 key。
+     */
+    const val KEY_BUNDLE_ORDER_ID = "key_order_id"
 }
