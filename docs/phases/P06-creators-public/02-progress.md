@@ -1,9 +1,9 @@
 # P06 · 美食创作者发现与公共菜谱 · 执行记录
 
 - 本阶段需求源：`docs/phases/P06-creators-public/01-requirements.md`
-- 用户阶段验收：未接受
-- 验收依据：未提供
-- 下一动作：用户手动真机验收并决定阶段 Gate；验收后按 id 清理 P06 临时夹具。
+- 用户阶段验收：已接受
+- 验收依据：2026-10-25 用户明确接受 P06。真机 6 步主路径 PASS（10CECU0CFF001RY / vivo V2361A）；匿名公开接口 total=9/3 作者/好友专属未混入；CreatorAggregatorTest 4/4；:app:assembleDebug、code_index_check、phase_flow check 通过；用户确认推荐大师保留本人、匿名点击创作者接受既有登录引导；夹具 10 条菜谱已清理、公开列表 total=0。
+- 下一动作：已切换 P07（仅准备任务索引）；等待用户明确授权启动 P07 实现。
 
 ## 任务表
 
@@ -13,6 +13,7 @@
 | P06-T02 | 同步代码能力索引（新增/更新业务、架构、测试条目并按预算拆表） | code-auditor | Verified | 新增 ARCH-016、BIZ-011、TEST-017，更新 ARCH-008、DATA-022/024、BIZ-010 及分类 01/03/06/08、00-INDEX；`code_index_check.py check` exit 0（条目 119）、`phase_flow.py check` exit 0 |
 | P06-T03 | 对 P06-T01/T02 做独立验证（边界、单测、构建、路由/入口、静态行为、文档一致性） | verifier | Verified（UI smoke 由 P06-T04 补跑通过） | 变更边界、单测、构建、路由/入口、静态行为、文档一致性均 PASS；`adb devices -l` 无设备，UI 未运行；匿名接口 200 但 total=0 |
 | P06-T04 | 创建 UI 验收夹具并执行真机主路径烟测 | verifier | Verified | 3 用户/9 公开菜谱/1 好友专属；匿名接口 total=9、3 作者、author 字段齐全、好友专属未混入；真机 UI 6 步 PASS；夹具待用户验收后清理 |
+| P06-T05 | 清理 P06 UI 验收夹具 | verifier | Verified | 按 id 删除 10 条菜谱均 204；匿名公开列表 total=0；fixtures.json 已删除；3 个夹具用户因无安全删除接口保留；证据在仓库外 cookbook-p06-fixtures |
 
 ## 实施口径（2026-10-25，用户确认）
 
@@ -28,7 +29,7 @@
 
 - “附近创作者/定位距离”本期不实现（用户 2026-10-25 确认），不申请定位权限；后续若需要须先确认定位来源与后端接口。
 - UI 烟测已完成：P06-T04 真机主路径 6 步 PASS（详见下方证据）。
-- 临时夹具保留中，阶段验收后按 id 清理；凭据仅在仓库外临时文件。
+- 临时夹具已清理（P06-T05）：10 条菜谱按 id 删除、公开列表 total=0；3 个夹具用户因无安全删除接口保留；`fixtures.json` 已删除，截图/校验 JSON 证据保留在仓库外。
 - 匿名点击创作者进入既有 `UserProfileFragment` 登录引导：用户 2026-10-25 已确认接受该既有权限边界。
 - “推荐大师”保留当前登录用户自身：用户 2026-10-25 已确认该口径，不做过滤，无需代码改动。
 - 推荐大师连续 5 页无有效作者且 `hasMore` 时，可能出现“暂无创作者且无法滚动续拉”的低概率边界，待观察。
@@ -40,7 +41,7 @@
 - P06-T02 证据：Root 与 agent 复跑 `python scripts/code_index_check.py check` exit 0（真实条目 119）、`python scripts/phase_flow.py check` exit 0；分类 01/06 按预算拆表且历史条目逐字迁移。
 - P06-T03 证据：变更边界、单测、构建、路由/入口、静态行为、文档一致性均 PASS；匿名 HTTP 200 但 total=0；`adb devices -l` 无设备，UI smoke = NOT RUN（不得写成通过）。
 - P06-T04 证据（2026-10-25 真机 `10CECU0CFF001RY` / vivo V2361A）：仓库外夹具前缀 `p06u20261025115016`，3 个临时用户 A/B/C、公开菜谱 id 65/66/67/69/70/71/72/73/74（9 条）、好友专属 id 68（1 条）；匿名 `GET /api/v1/recipes/public?page=1&pageSize=50` → HTTP 200、total=9、唯一作者 3、每条含 `author.id/nickname/avatar`（avatar null）、好友专属 id 68 未出现；真机 UI 6 步 PASS：首页“发现”→推荐大师 3 位作者→公开菜谱 9 条且无好友专属→创作者点击进入登录引导（既有匿名权限）→公开菜谱进入详情→返回正常；截图与 UI XML 位于仓库外 `C:\Users\Admin\AppData\Local\Temp\cookbook-p06-fixtures\`。夹具尚未清理，保留供用户手动验收。
-- Gate：技术验证已完成，用户阶段验收未接受；本次不标记阶段完成。
+- Gate：用户 2026-10-25 明确接受 P06；阶段切换至 P07，未开始 P07 实现。
 
 ## 问题 / 修复历史及归档引用
 
