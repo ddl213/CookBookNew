@@ -22,6 +22,17 @@ android {
             .replace("\n", "\\n")
             .replace("\r", "\\r")
         buildConfigField("String", "API_BASE_URL", "\"$escapedApiBaseUrl\"")
+
+        // 订单数据源：默认 remote（debug/release 相同）；-PorderDataSource=mock 显式启用演示模式。
+        // 非法值由 OrderDataSourceConfig 回退 remote，并由 OrderDataSourceFactory 记录 warning。
+        val orderDataSource = providers.gradleProperty("orderDataSource")
+            .getOrElse("remote")
+        val escapedOrderDataSource = orderDataSource
+            .replace("\\", "\\\\")
+            .replace("\"", "\\\"")
+            .replace("\n", "\\n")
+            .replace("\r", "\\r")
+        buildConfigField("String", "ORDER_DATA_SOURCE", "\"$escapedOrderDataSource\"")
     }
 
     buildFeatures {

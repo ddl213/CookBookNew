@@ -48,6 +48,8 @@ dependencies {
     implementation(project(":lib_android_common"))
     //当前项目公共模块
     implementation(project(":lib_campaign_common"))
+    //订单网络、会话与共享订单配置（复用统一 ApiClient/AuthException/DTO）
+    implementation(project(":lib_network"))
     //路由模块
     implementation(project(":lib_route_api"))
     implementation(project(":lib_route_annotation"))
