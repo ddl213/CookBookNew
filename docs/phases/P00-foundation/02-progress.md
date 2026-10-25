@@ -12,7 +12,9 @@
 | P00-T01 | 首次全仓只读源码盘点 + 代码能力索引基线 | code-auditor | Verified | `docs/code-index/00-INDEX.md` 及 01–08 分类；`code_index_check.py check` PASS（已盘点、真实条目 51）；`--require-baseline` PASS；`phase_flow.py check` PASS（11 阶段、0 错误、当前 P00） |
 | P00-T02 | 将已核实的基线核对与盘点结果登记到本进度文件 | progress-maintainer | Verified | 本文件记录；仅文档变更，不推进阶段。Root 已审核文件内容与两项结构校验结果（2026-10-22） |
 | P00-T03 | 按 01-requirements 逐项复核并补齐待决事项阶段映射、登录认证前置与验证边界 | progress-maintainer | Verified | 本文件更新；Root 已审核；`phase_flow.py check` 与 `code_index_check.py check` 均 PASS（2026-10-22） |
-| P00-T04 | 提交 P00 基线与能力盘点文档 | progress-maintainer | Implemented | 仅受控本地提交；待 Root 确认提交范围与校验结果 |
+| P00-T04 | 提交 P00 基线与能力盘点文档 | progress-maintainer | Verified | 仅受控本地提交；Root 已确认提交范围与校验结果（2026-10-22）；提交 `67163e4`（2026-10-22）；P00 已于 2026-10-22 被用户接受。 |
+
+- 2026-10-25 状态勘误：P00-T04 原记 Implemented，实际受控提交 `67163e4` 已完成且 P00 已被用户接受，状态更正为 Verified；原记录保留。
 
 ## 当前阻塞与待决事项
 
