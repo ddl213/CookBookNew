@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 预订确认弹窗 -->
+    <string name="order_reserve_title">确认预订</string>
+    <string name="order_reserve_subtitle">向 %1$s 预订</string>
+    <string name="order_reserve_seller_fallback">好友%1$d</string>
+    <string name="order_reserve_cancel">取消</string>
+    <string name="order_reserve_mock_banner">演示模式，不会同步到服务器</string>
+    <string name="order_reserve_current_unavailable">当前菜品已不可预订，请返回后重试</string>
+    <string name="order_reserve_empty">暂无可预订菜品</string>
+    <string name="order_reserve_error">菜品加载失败，请稍后重试</string>
+    <string name="order_reserve_retry">重试</string>
+    <string name="order_reserve_note_label">整单备注（选填）</string>
+    <string name="order_reserve_note_hint">口味、取餐时间等，最多 500 字</string>
+    <string name="order_reserve_note_count">%1$d/%2$d</string>
+    <string name="order_reserve_submit">提交预订</string>
+    <string name="order_reserve_submit_count">提交预订（%1$d 道）</string>
+    <string name="order_reserve_submitting">提交中…</string>
+    <string name="order_reserve_success">预订成功，可在我的订单查看</string>
+    <string name="order_reserve_failed">预订失败，请稍后重试</string>
+    <string name="order_reserve_session_expired">登录已失效，请重新登录</string>
+    <string name="order_reserve_select_dish">选择菜品</string>
+    <string name="order_reserve_delete_dish">删除</string>
+    <string name="order_reserve_quantity_minus">减少数量</string>
+    <string name="order_reserve_quantity_plus">增加数量</string>
+    <string name="order_reserve_quantity_max">数量已达上限</string>
+    <string name="order_reserve_quantity_format">x%1$d</string>
+    <string name="order_reserve_total_count">已选 %1$d 道 · 共 %2$d 份</string>
+    <string name="order_reserve_minus_symbol" translatable="false">−</string>
+    <string name="order_reserve_plus_symbol" translatable="false">+</string>
+
+    <!-- 结果待确认 -->
+    <string name="order_pending_title">结果待确认</string>
+    <string name="order_pending_message">预订结果尚未确认，请重试确认或放弃本次</string>
+    <string name="order_pending_unreadable">上一笔预订请求无法读取，请放弃后重新提交</string>
+    <string name="order_pending_missing_recipes">无法恢复上一笔预订的菜品信息，请放弃后重新提交</string>
+    <string name="order_pending_retry">重试确认</string>
+    <string name="order_pending_discard">放弃本次</string>
+    <string name="order_pending_still_unknown">仍未确认，请稍后重试确认</string>
+    <string name="order_pending_discarded">已放弃本次待确认预订</string>
+    <string name="order_pending_not_found">没有待确认的预订请求</string>
+    <string name="order_pending_conflict">上一笔预订结果待确认，请先确认或放弃</string>
+
+    <!-- 3.9 菜品预订详情页 -->
+    <string name="order_info_title">菜品预订</string>
+    <string name="order_info_rating">评分：暂无</string>
+    <string name="order_info_delivery">预计送达：暂无</string>
+    <string name="order_info_stats_friends">好友 %1$d</string>
+    <string name="order_info_stats_recipes">菜谱 %1$d</string>
+    <string name="order_info_section_dishes">可预订菜品</string>
+    <string name="order_info_add_to_cart">加入购物车（预订）</string>
+    <string name="order_info_empty">暂无可预订菜品</string>
+    <string name="order_info_not_friend">仅好友可预订</string>
+    <string name="order_info_self">不能预订自己的菜品</string>
+    <string name="order_info_not_found">用户不存在或已删除</string>
+    <string name="order_info_load_failed">加载失败，请稍后重试</string>
+    <string name="order_info_retry">重试</string>
+    <string name="order_info_login_title">登录后预订</string>
+    <string name="order_info_login_desc">好友的菜品需要登录后查看和预订</string>
+    <string name="order_info_login_button">登录 / 注册</string>
+    <string name="order_info_login_failed">暂时无法打开登录页，请稍后重试</string>
+    <string name="order_info_navigation_failed">暂时无法打开页面，请稍后重试</string>
+    <string name="order_info_category_unknown">未分类</string>
+</resources>

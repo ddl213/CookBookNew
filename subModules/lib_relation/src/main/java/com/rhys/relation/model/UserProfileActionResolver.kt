@@ -28,4 +28,14 @@ object UserProfileActionResolver {
             else -> UserProfileAction.ADD_FRIEND
         }
     }
+
+    /**
+     * 好友主页是否展示“预订菜品”入口。
+     *
+     * 仅在已登录、非本人且双方为好友时展示；是否有可预订菜品仍由后端
+     * `canReserve` 与 3.9 页面数据决定，本函数只做 UI 入口决策。
+     */
+    fun canReserveDishes(isLoggedIn: Boolean, isSelf: Boolean, isFriend: Boolean): Boolean {
+        return isLoggedIn && !isSelf && isFriend
+    }
 }

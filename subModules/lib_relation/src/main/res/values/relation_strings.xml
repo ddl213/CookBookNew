@@ -40,6 +40,7 @@
     <string name="relation_action_add_friend">添加好友</string>
     <string name="relation_action_requested">已申请</string>
     <string name="relation_action_message">发消息</string>
+    <string name="relation_action_reserve_dishes">预订菜品</string>
     <string name="relation_action_unfriend">解除好友</string>
     <string name="relation_pending_hint">已提交好友申请，请等待对方处理</string>
     <string name="relation_recipe_empty">暂无可查看的菜谱</string>
@@ -59,6 +60,7 @@
     <string name="relation_login_required_desc">好友与用户主页需要登录后访问</string>
     <string name="relation_login_button">登录 / 注册</string>
     <string name="relation_login_failed">暂时无法打开登录页，请稍后重试</string>
+    <string name="relation_navigation_failed">暂时无法打开预订页面，请稍后重试</string>
     <string name="relation_loading">加载中…</string>
     <string name="relation_load_more">加载更多</string>
     <string name="relation_retry">重试</string>

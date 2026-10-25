@@ -17,6 +17,6 @@
 
 - 已覆盖 `gradle/libs.versions.toml`、根与各模块 `build.gradle.kts`、wrapper 与 `gradle.properties`、`AndroidManifest` 明文配置、`scripts/` 下校验脚本；依赖版本均可在仓库文件核对。
 - `lib_network` 的 Retrofit 依赖为 `implementation`，不向业务模块传递；业务模块需要接口时依赖 `:lib_network`，不要重复引入。`ORDER_DATA_SOURCE` 与 `apiBaseUrl` 均为构建期常量，默认订单 remote、聊天 debug mock/release remote，两者可在同一次构建中通过不同 Gradle 属性分别覆盖。
-- `lib_order` 当前只有数据层与纯 JVM 测试，没有 Fragment/UI、Robolectric 或仪器测试配置；若后续增加订单页面，沿用 ARCH-003 的自动聚合与本表 DEP-014 的模块边界，不新建重复工具库。
+- `lib_order` 自 `P08-T03` 起包含预订弹层与 3.9 页面 UI，但仍只有纯 JVM 测试，没有 Robolectric 或仪器测试配置；后续订单页面沿用 ARCH-003 的自动聚合与 DEP-014 的模块边界，不新建重复工具库。`lib_cookbook → lib_order` 为单向依赖（DEP-012/DEP-014），新增依赖前先确认不会反向依赖业务模块。
 - `lib_cookbook` 的 Room 仍是空骨架（DEP-003），不要把 `lib_chat`/`lib_order` 的本地存储能力视为全仓通用 Room 方案；`lib_order` 目前使用 MMKV 保存加密 pending，不引入 Room。
 - Gradle 仓库存在带前导单引号的 URL（DEP-007），本机 JDK 路径为绝对路径；换机器或 CI 前需核对。

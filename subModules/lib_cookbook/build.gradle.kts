@@ -51,6 +51,8 @@ dependencies {
     implementation(project(":lib_photo_view"))
     //网络模块
     implementation(project(":lib_network"))
+    //预订确认弹窗与订单提交（lib_order 不反向依赖 lib_cookbook，无循环）
+    implementation(project(":lib_order"))
     //系统照片选择器 PickVisualMedia
     implementation(libs.androidx.activity.ktx)
 

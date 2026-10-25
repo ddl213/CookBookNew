@@ -42,6 +42,7 @@ import com.rhys.cookbook.R
 import com.rhys.cookbook.databinding.CookbookFragmentDetailBinding
 import com.rhys.cookbook.databinding.CookbookItemCommentBinding
 import com.rhys.cookbook.form.RecipeFormOptions
+import com.rhys.order.ui.ReservationConfirmDialog
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
@@ -81,6 +82,7 @@ class CookBookDetailFragment :
     private var sharing = false
     private var sendingComment = false
     private var shareDialog: ShareFriendDialog? = null
+    private var reservationDialog: ReservationConfirmDialog? = null
 
     override fun initTitleBar(): TitleBar = binding.titleBar
 
@@ -90,7 +92,7 @@ class CookBookDetailFragment :
         binding.btnRetry.setOnClickListener { loadDetail(force = true) }
         binding.btnCollect.setOnClickListener { toggleCollection() }
         binding.btnShare.setOnClickListener { openShareDialog() }
-        binding.btnReserve.setOnClickListener { toast(R.string.cookbook_reserve_unavailable) }
+        binding.btnReserve.setOnClickListener { openReservationDialog() }
         binding.btnCommentLogin.setOnClickListener { openLogin() }
         binding.btnCommentsRetry.setOnClickListener { loadComments(reset = true) }
         binding.btnSendComment.setOnClickListener { submitComment() }
@@ -134,6 +136,8 @@ class CookBookDetailFragment :
     override fun onViewDestroy() {
         shareDialog?.dismissDialog()
         shareDialog = null
+        reservationDialog?.dismissDialog()
+        reservationDialog = null
         // Fragment 实例可能留在返回栈，View 重建时必须丢弃旧页面状态并重新加载。
         detailGeneration++
         detailLoading = false
@@ -464,6 +468,44 @@ class CookBookDetailFragment :
                 if (view != null) binding.btnCollect.isEnabled = detailLoaded
             }
         }
+    }
+
+    /**
+     * 预订入口：仅登录用户、非本人、后端判定 canReserve 的已发布菜谱可打开确认弹窗。
+     * 不把公开菜谱默认视为可预订，资格仍以服务端返回为准。
+     */
+    private fun openReservationDialog() {
+        val current = recipe ?: return
+        if (isDraft(current)) return
+        if (!loggedIn) {
+            openLogin()
+            return
+        }
+        val author = current.author
+        if (author == null || author.id <= 0L) {
+            toast(R.string.cookbook_reserve_author_missing)
+            return
+        }
+        if (author.id == currentUserId) {
+            toast(R.string.cookbook_reserve_self)
+            return
+        }
+        if (!current.canReserve) {
+            toast(R.string.cookbook_reserve_not_friend)
+            return
+        }
+        reservationDialog?.dismissDialog()
+        val dialog = ReservationConfirmDialog(
+            context = requireContext(),
+            sellerId = author.id,
+            sellerName = author.displayName,
+            currentRecipe = current
+        )
+        reservationDialog = dialog
+        dialog.setOnDismissListener {
+            if (reservationDialog === dialog) reservationDialog = null
+        }
+        dialog.show()
     }
 
     private fun openShareDialog() {

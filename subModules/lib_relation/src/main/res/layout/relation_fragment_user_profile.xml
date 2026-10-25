@@ -133,51 +133,71 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:orientation="horizontal">
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/ll_relation_buttons"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btn_add_friend"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/relation_bg_primary_button"
+                    android:minHeight="42dp"
+                    android:minWidth="104dp"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
+                    android:text="@string/relation_action_add_friend"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:visibility="gone" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btn_message"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/relation_bg_primary_button"
+                    android:minHeight="42dp"
+                    android:minWidth="96dp"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
+                    android:text="@string/relation_action_message"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:visibility="gone" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btn_unfriend"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:background="@drawable/relation_bg_secondary_button"
+                    android:minHeight="42dp"
+                    android:minWidth="104dp"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
+                    android:text="@string/relation_action_unfriend"
+                    android:textAllCaps="false"
+                    android:textColor="@color/textTitle"
+                    android:textSize="14sp"
+                    android:visibility="gone" />
+            </LinearLayout>
 
             <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btn_add_friend"
-                android:layout_width="wrap_content"
+                android:id="@+id/btn_reserve_dishes"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
                 android:background="@drawable/relation_bg_primary_button"
                 android:minHeight="42dp"
-                android:minWidth="104dp"
-                android:paddingStart="18dp"
-                android:paddingEnd="18dp"
-                android:text="@string/relation_action_add_friend"
+                android:text="@string/relation_action_reserve_dishes"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
-                android:textSize="14sp"
-                android:visibility="gone" />
-
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btn_message"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/relation_bg_primary_button"
-                android:minHeight="42dp"
-                android:minWidth="96dp"
-                android:paddingStart="18dp"
-                android:paddingEnd="18dp"
-                android:text="@string/relation_action_message"
-                android:textAllCaps="false"
-                android:textColor="@color/white"
-                android:textSize="14sp"
-                android:visibility="gone" />
-
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btn_unfriend"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:background="@drawable/relation_bg_secondary_button"
-                android:minHeight="42dp"
-                android:minWidth="104dp"
-                android:paddingStart="18dp"
-                android:paddingEnd="18dp"
-                android:text="@string/relation_action_unfriend"
-                android:textAllCaps="false"
-                android:textColor="@color/textTitle"
                 android:textSize="14sp"
                 android:visibility="gone" />
         </LinearLayout>

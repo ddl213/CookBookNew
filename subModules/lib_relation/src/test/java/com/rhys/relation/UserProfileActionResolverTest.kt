@@ -3,6 +3,8 @@ package com.rhys.relation
 import com.rhys.relation.model.UserProfileAction
 import com.rhys.relation.model.UserProfileActionResolver
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class UserProfileActionResolverTest {
@@ -40,6 +42,38 @@ class UserProfileActionResolverTest {
         assertEquals(
             UserProfileAction.ADD_FRIEND,
             UserProfileActionResolver.resolve(isLoggedIn = true, isSelf = false, isFriend = false)
+        )
+    }
+
+    @Test
+    fun `reserve dishes only visible for logged in non-self friend`() {
+        assertTrue(
+            UserProfileActionResolver.canReserveDishes(
+                isLoggedIn = true,
+                isSelf = false,
+                isFriend = true
+            )
+        )
+        assertFalse(
+            UserProfileActionResolver.canReserveDishes(
+                isLoggedIn = false,
+                isSelf = false,
+                isFriend = true
+            )
+        )
+        assertFalse(
+            UserProfileActionResolver.canReserveDishes(
+                isLoggedIn = true,
+                isSelf = true,
+                isFriend = true
+            )
+        )
+        assertFalse(
+            UserProfileActionResolver.canReserveDishes(
+                isLoggedIn = true,
+                isSelf = false,
+                isFriend = false
+            )
         )
     }
 }

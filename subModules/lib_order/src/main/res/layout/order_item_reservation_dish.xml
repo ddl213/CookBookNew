@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?android:attr/selectableItemBackground"
+    android:paddingStart="4dp"
+    android:paddingTop="8dp"
+    android:paddingEnd="4dp"
+    android:paddingBottom="8dp">
+
+    <com.android.common.view.base.GImageView
+        android:id="@+id/iv_dish_image"
+        android:layout_width="80dp"
+        android:layout_height="0dp"
+        android:background="@drawable/order_bg_image_placeholder"
+        android:scaleType="centerCrop"
+        app:layout_constraintDimensionRatio="4:3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:radius="10dp" />
+
+    <TextView
+        android:id="@+id/tv_dish_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:ellipsize="end"
+        android:maxLines="3"
+        android:textColor="@color/textTitle"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@id/cb_dish_selected"
+        app:layout_constraintStart_toEndOf="@id/iv_dish_image"
+        app:layout_constraintTop_toTopOf="@id/iv_dish_image"
+        tools:text="番茄炒蛋" />
+
+    <TextView
+        android:id="@+id/tv_dish_meta"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/textNormal"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toStartOf="@id/cb_dish_selected"
+        app:layout_constraintStart_toStartOf="@id/tv_dish_name"
+        app:layout_constraintTop_toBottomOf="@id/tv_dish_name"
+        tools:text="家常菜 · 酸甜开胃" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrier_dialog_content_bottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="iv_dish_image,tv_dish_meta" />
+
+    <CheckBox
+        android:id="@+id/cb_dish_selected"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="false"
+        android:contentDescription="@string/order_reserve_select_dish"
+        android:focusable="false"
+        android:buttonTint="@color/color_primary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/iv_dish_image" />
+
+    <LinearLayout
+        android:id="@+id/ll_dish_quantity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/barrier_dialog_content_bottom">
+
+        <TextView
+            android:id="@+id/tv_quantity_minus"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/order_reserve_quantity_minus"
+            android:gravity="center"
+            android:text="@string/order_reserve_minus_symbol"
+            android:textColor="@color/textTitle"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/tv_dish_quantity"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:background="@drawable/order_bg_quantity_box"
+            android:gravity="center"
+            android:minWidth="44dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:textColor="@color/textTitle"
+            android:textSize="14sp"
+            tools:text="1" />
+
+        <TextView
+            android:id="@+id/tv_quantity_plus"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/order_reserve_quantity_plus"
+            android:gravity="center"
+            android:text="@string/order_reserve_plus_symbol"
+            android:textColor="@color/textTitle"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/tv_dish_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_marginStart="10dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:gravity="center"
+            android:minHeight="36dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:text="@string/order_reserve_delete_dish"
+            android:textColor="@color/color_primary"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

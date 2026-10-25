@@ -78,7 +78,9 @@
     <string name="cookbook_action_collected">已收藏</string>
     <string name="cookbook_action_share">分享</string>
     <string name="cookbook_action_reserve">加入购物车（预订）</string>
-    <string name="cookbook_reserve_unavailable">预订功能将在后续阶段开放</string>
+    <string name="cookbook_reserve_self">不能预订自己的菜谱</string>
+    <string name="cookbook_reserve_not_friend">仅好友之间可以预订</string>
+    <string name="cookbook_reserve_author_missing">暂时无法预订该菜谱</string>
     <string name="cookbook_author_profile_hint">查看作者主页</string>
     <string name="cookbook_author_arrow" translatable="false">›</string>
     <string name="cookbook_section_ingredients">食材</string>

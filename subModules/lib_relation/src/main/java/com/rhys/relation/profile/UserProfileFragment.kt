@@ -23,8 +23,10 @@ import com.campaign.common.constants.Constants.KEY_BUNDLE_PEER_AVATAR
 import com.campaign.common.constants.Constants.KEY_BUNDLE_PEER_NICKNAME
 import com.campaign.common.constants.Constants.KEY_BUNDLE_PEER_USER_ID
 import com.campaign.common.constants.Constants.KEY_BUNDLE_RECIPE_ID
+import com.campaign.common.constants.Constants.KEY_USER_ID
 import com.campaign.common.constants.RoutePath.PAGE_CHAT_DETAIL
 import com.campaign.common.constants.RoutePath.PAGE_COOK_BOOK_DETAIL
+import com.campaign.common.constants.RoutePath.PAGE_ORDER_INFO
 import com.campaign.common.constants.RoutePath.PAGE_USER_PROFILE
 import com.example.network.AuthException
 import com.example.network.NetworkConfig
@@ -130,6 +132,7 @@ class UserProfileFragment :
         binding.btnAddFriend.setOnClickListener { sendFriendRequest() }
         binding.btnMessage.setOnClickListener { openChat() }
         binding.btnUnfriend.setOnClickListener { confirmUnfriend() }
+        binding.btnReserveDishes.setOnClickListener { openReserveDishes() }
         binding.btnLogin.setOnClickListener {
             if (!openLoginPage(this)) toast(R.string.relation_login_failed)
         }
@@ -288,11 +291,18 @@ class UserProfileFragment :
                 binding.btnMessage.visible()
                 binding.btnUnfriend.visible()
                 binding.btnUnfriend.isEnabled = true
+                val canReserve = UserProfileActionResolver.canReserveDishes(
+                    isLoggedIn = loggedIn,
+                    isSelf = isSelf,
+                    isFriend = userProfile.isFriend
+                )
+                if (canReserve) binding.btnReserveDishes.visible() else binding.btnReserveDishes.gone()
             }
 
             UserProfileAction.ADD_FRIEND -> {
                 binding.btnMessage.gone()
                 binding.btnUnfriend.gone()
+                binding.btnReserveDishes.gone()
                 binding.btnAddFriend.visible()
                 binding.btnAddFriend.isEnabled = !pendingRequested
                 binding.btnAddFriend.text = if (pendingRequested) {
@@ -308,6 +318,7 @@ class UserProfileFragment :
         binding.btnAddFriend.gone()
         binding.btnMessage.gone()
         binding.btnUnfriend.gone()
+        binding.btnReserveDishes.gone()
     }
 
     private fun renderRecipeContent() {
@@ -447,6 +458,23 @@ class UserProfileFragment :
                 .go()
         }.onFailure {
             toast(R.string.relation_error_default)
+        }
+    }
+
+    /**
+     * 好友主页“预订菜品”：只带对方用户 ID 进入 3.9 页面。
+     * 可预订菜品与好友关系由后端与 3.9 页面再次判定，入口本身不放宽权限。
+     */
+    private fun openReserveDishes() {
+        val current = profile ?: return
+        if (!loggedIn || current.id <= 0L || !current.isFriend) return
+        runCatching {
+            NRoute.withNavController(findNavController())
+                .deepLink(PAGE_ORDER_INFO)
+                .args(bundleOf(KEY_USER_ID to current.id))
+                .go()
+        }.onFailure {
+            toast(R.string.relation_navigation_failed)
         }
     }
 
