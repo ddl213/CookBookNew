@@ -219,7 +219,13 @@ class ChatRepository(
         return deliver(retrying, plaintext)
     }
 
-    /** 拉取预订通知并 upsert；按主键去重，不清空本地聊天消息。 */
+    /**
+     * P07 遗留的预订通知游标拉取；按主键去重 upsert，不清空本地聊天消息。
+     *
+     * 注意：P08 通知页未使用本方法（改走订单通知页码接口）；当前后端通知接口只支持
+     * `page/pageSize`，不接受游标。如后续复用，必须在数据源/客户端内部把游标转换为
+     * 页码，不得把 cursor 直接透传给后端。
+     */
     suspend fun refreshNotifications(
         cursor: String? = null
     ): CursorPage<ChatNotification> {

@@ -4,7 +4,7 @@
 - 已确认业务与目标协议：[P08 订单契约](04-order-contract.md)
 - 用户阶段验收：未接受
 - 验收依据：未提供
-- 下一动作：派发 P08-T05 六类订单通知适配与跳转；阶段 Gate 仍未接受。
+- 下一动作：派发 P08-T06 本地真实后端联调、真机 UI 验收与阶段收尾；阶段 Gate 仍未接受。
 
 ## 任务表
 
@@ -16,14 +16,14 @@
 | P08-T02 | Android 订单网络与数据层：Order/OrderItem DTO、OrderApi、错误映射、OrderDataSource(Mock/Remote)、OrderRepository、orderDataSource 切换、幂等键持久化/账号数据源隔离、超时待确认与原键重放、分页/迟到响应；不修改 UI 页面或后端 | standard-executor | Verified | `lib_network` 70 例 + `lib_order` 38 例、`compileDebugKotlin` PASS；R1/R2 两轮独立、R2 最终干净；索引 DATA-052～068/DEP-014/TEST-030～035；非阻塞观察留待 T05/T06 |
 | P08-T03 | 预订确认弹窗与预订入口：菜谱详情“加入购物车”接线、好友主页可预订菜品入口、多菜品/数量/删除/整单备注/提交中/结果待确认；不新增独立购物车/支付/配送 | standard-executor | Verified | lib_order 49 + lib_relation 20、app 编译 PASS；R1/R2 独立、R2 最终干净；UI 真机 NOT RUN 留 T06 |
 | P08-T04 | 双向订单列表与详情页：我的订单/我的销售分页与状态筛选、订单详情、逐项接受/拒绝/备货/待取货/完成/取消、整单取消、双方一致、空/加载/失败/重试、账号切换与迟到响应 | standard-executor | Verified | `lib_order` 65 例 0 failures/errors/skipped、`lib_mine`/`app` 编译 PASS；R1→F01→R2，R2 为最终干净轮次（限定代码/构建/静态范围）；UI 与 F01 运行时留 T06 |
-| P08-T05 | 六类订单通知适配与跳转：schemaVersion 2 payload、category=order 筛选与分页、旧 payload 兼容、同一订单详情跳转、账号/Mock/Remote/环境隔离、不增加未读已读 | standard-executor | 未开始 | 依赖：P08-T02；待派发 |
+| P08-T05 | 六类订单通知适配与跳转：schemaVersion 2 payload、category=order 筛选与分页、旧 payload 兼容、同一订单详情跳转、账号/Mock/Remote/环境隔离、不增加未读已读 | standard-executor | Verified | `lib_network` 70 + `lib_chat` 102（P07 83 仍过）、`app` 编译 PASS；R1→F01→R2，R2 为最终干净轮次（限定代码/构建/静态/索引）；UI 与真实后端 NOT RUN 留 T06 |
 | P08-T06 | 本地真实后端联调、代码索引增量与阶段收尾：Remote 双用户链路、契约 §7 验收矩阵、code-auditor 增量更新索引、两轮独立 verifier 完整验证与 Gate 材料 | verifier + code-auditor + progress-maintainer | 未开始 | 依赖：P08-T01～T05 完成；待派发 |
 
 - 依赖顺序：P08-T01 → P08-T02 → P08-T03/P08-T04/P08-T05（文件作用域互斥，重叠时顺序派发）→ P08-T06。
 
 ## 当前阻塞与待决事项
 
-- P08-T01 后端订单域、P08-T02 网络与数据层、P08-T03 预订弹窗/入口、P08-T04 双向订单列表与详情均已 Verified；P08-T05/T06 尚未实施，阶段验收仍未接受。
+- P08-T01 后端订单域、P08-T02 网络与数据层、P08-T03 预订弹窗/入口、P08-T04 双向订单列表与详情、P08-T05 六类订单通知适配均已 Verified；P08-T06 尚未实施，阶段验收仍未接受。
 - 后端旧版单菜品订单已由版本化迁移与回填覆盖；本地 dev DB 实际迁移前仍必须先做一致性备份。
 - 订单列表/详情 UI 真机运行、F01 失败回查时序运行时行为、极端字体/小屏尚未验证，留 T06。
 
@@ -43,19 +43,20 @@
 - P08-T01 已完成明细（后端多明细订单域、R1～R8 轮次、数据重置与 F01 补测、2026-10-25 技术接受）已完整归档至 [03-history-001.md](03-history-001.md)；结论仍为 Verified，阶段 Gate 未接受。
 - P08-T02 实施与 R1/R2 验证明细已归档至 [03-history-001.md](03-history-001.md)；结论仍为 Verified（网络与数据层，R2 最终干净）。
 - P08-T03 实施与 R1/R2 验证明细及 O1～O5 观察已归档至 [03-history-001.md](03-history-001.md)；结论仍为 Verified（预订弹窗/入口，UI 留 T06）。
-- P08-T04 实施结果：订单 Tab 双标签（我的订单/我的销售）、8 类状态筛选、分页、登录态/账号切换、迟到响应丢弃与返回刷新；订单详情按服务端 `allowedActions` 逐项显示接受/拒绝/备货/待取货/完成/取消，携带 `expectedVersion`，操作前确认，409 版本冲突后回查并提示；整单取消；Mock 标识；“我的-订单”切换订单 Tab。
-- P08-T04-F01：动作失败（非 401 的 AuthException 与普通 Exception）后保持按钮禁用并立即回查订单，回查完成后解锁；取消确认不发请求；不自动以新版本重试。仅修改 `OrderDetailFragment.kt`。
-- P08-T04 正式验证：Root 顺序新派不同独立 verifier，每轮从头强制 `--rerun-tasks` 构建；纯 JVM 用例独立内存，无 App 持久化数据，安装 N/A。
+- P08-T04 已完成明细（实施、F01、R1/R2 轮次、证据、O1～O9 观察与 2026-10-25 技术接受）已完整归档至 [03-history-001.md](03-history-001.md)；结论仍为 Verified（不含 UI 与 F01 运行时），UI 与 F01 运行时留 T06。
+- P08-T05 实施结果：`lib_network` 新增 `OrderNotificationDto`/payload/actor/item/buyer DTO 与 `NotificationApi.listOrderNotifications(category="order", page, pageSize)`；`lib_chat` 新增 `OrderNotificationMapper` 映射六类 `order_*` 与旧单菜品 payload，`OrderNotificationRepository` 跟随 `OrderDataSourceConfig` 选择 Remote（category=order 页码、失败不回退 Mock）/Mock（DATA-056 共享事件），按 owner/数据源/baseUrl 缓存隔离；通知页切换至该 Repository，支持首屏/下拉刷新、分页与空页跳过、Mock 横幅、同一订单详情跳转与 onResume 刷新；仍未增加未读/已读。
+- P08-T05 正式验证：Root 顺序新派不同独立 verifier，每轮从头强制 `--rerun-tasks`；纯 JVM 用例使用独立内存 fake，无 App 持久化数据，安装 N/A。
 
 | 轮次 | 独立 verifier | 复测次数 | 实际结果 |
 | --- | --- | --- | --- |
-| R1 | 本轮新派独立 verifier | 0 | `--rerun-tasks` 构建成功；`:lib_order:testDebugUnitTest` 65 例 0 failures/errors/skipped；`:lib_mine`/`:app` 编译 PASS；源码/布局/索引静态 PASS；R3 超时未回查、R4 409 后按钮提前解锁两处风险转 F01；UI 真机 NOT RUN |
-| F01 | 本轮新派独立 verifier | 1 | 仅改 `OrderDetailFragment.kt`；强制重跑 BUILD SUCCESSFUL，65 例全绿；R3/R4 时序问题修复并同轮复测通过（不计新轮） |
-| R2 | 本轮新派独立 verifier | 0 | 全新 verifier 强制 `--rerun-tasks`，221 tasks executed，65 例 0 failures/errors/skipped；列表/详情/F01 时序/我的入口/布局/索引逐项 PASS；最终干净轮次（限定代码/构建/静态范围）；UI/F01 运行时 NOT RUN 留 T06 |
+| R1 | 本轮新派独立 verifier | 0 | `--rerun-tasks` 构建成功；`:lib_network:testDebugUnitTest` 70 例、`:lib_chat:testDebugUnitTest` 102 例（P07 83 仍过），均 0 failures/errors/skipped；`:app:compileDebugKotlin` PASS；DTO/映射/Repository/页面/索引静态 PASS；F1 旧游标契约风险未记录转 F01；UI/真实后端 NOT RUN |
+| F01 | 本轮新派独立 verifier | 1 | 仅补 `NotificationApi` KDoc 并更新索引 DATA-030/ARCH-017；强制重跑通过，静态复核 PASS（不计新轮） |
+| R2 | 本轮新派独立 verifier | 0 | 全新 verifier 强制重跑 245 tasks，70/102 全绿 0 failures/errors/skipped；F01 KDoc/索引复核 PASS；完整清单无 FAIL；最终干净轮次（限定代码/构建/静态/索引范围）；UI/真实后端 NOT RUN 留 T06 |
 
-- P08-T04 证据：`:lib_order` 65 例（含 `OrderUiSupportTest` 16 例）、`lib_mine`/`app` 编译 PASS；索引 ARCH-020/008/010、VIEW-019/020、BIZ-015、DEP-015、TEST-037、RES-013、DATA-063；`python -X utf8 scripts/code_index_check.py check` 与 `python -X utf8 scripts/phase_flow.py check` 均 PASS。数据重置/新数据为每例独立内存对象，安装 N/A；UI 真机与 F01 运行时留 T06。
-- P08-T04 非阻断观察（不阻断 Verified，指向 T06）：O1 `OrderUiSupport.FILTERS`/`OrderFilter` 生产未接线（页面 chip 硬编码），索引已标注；O2 状态/动作中文文案在 `OrderUiSupport` 硬编码，与资源字符串重复；O3 动作失败且回查失败可能连续两条 toast；O4 回查 404/401 时启用已 GONE 的取消按钮，入口二次校验无功能影响；O5 非常规小数秒时间格式化未覆盖；O6 大字体/小屏按钮与摘要截断风险；O7 详情返回刷新依赖 Navigation replace 重建 HomeFragment，无 onResume 兜底；O8 `Constants.kt` 末尾缺换行（格式性）；O9 `00-INDEX.md` 14,180 bytes，低于硬限制、高于 12 KiB 建议线。
-- 2026-10-25 Root 技术接受 P08-T04 为 Verified（不含 UI 与 F01 运行时）；阶段 Gate 仍未接受。
+- P08-T05-F01：为 P07 旧 `listNotifications(limit, cursor)` 与后端页码契约不一致补充 KDoc，并在索引 DATA-030/ARCH-017 记录遗留风险——旧接口仅 P07 兼容、P08 未使用、不得透传 cursor；后续复用需在客户端内部转页码。
+- P08-T05 证据：索引 DATA-030/056/069/070/071、ARCH-017/008/020、TEST-038/039；`python -X utf8 scripts/code_index_check.py check` 与 `python -X utf8 scripts/phase_flow.py check` 均 PASS。数据重置/新数据为每例独立内存 fake，安装 N/A；UI 真机与真实后端联调留 T06。
+- P08-T05 非阻断观察（不阻断 Verified，指向 T06）：O1 Mock 通知受 200 条上限约束；O2 Mock 横幅沿用聊天文案；O3 触底阈值沿用聊天模式；O4 DTO `read` 默认值不影响当前消费；O5 `04-chat-network.md` 12,138 bytes，低于硬限制、高于 12 KiB 建议线；O6 进度状态已由本任务更新为 Verified（已关闭）。
+- 2026-10-25 Root 技术接受 P08-T05 为 Verified（不含 UI 与真实后端联调）；阶段 Gate 仍未接受。
 
 ## 问题 / 修复历史及归档引用
 
@@ -64,4 +65,5 @@
 - P08-T02 两轮均未发现 FAIL，无修复或复测记录；Remote 专项单测、通知存储运行时边界、Mock 幂等演示上下文及报错优先级观察不构成 Verified 阻断，见上节。
 - P08-T03 两轮均未发现 FAIL，无修复或复测记录；O1～O5 为非阻断观察，UI 真机与极端字体/IME/小屏确认留 T06。
 - P08-T04 两轮未发现 FAIL；R1 发现 R3 超时未回查、R4 409 后按钮提前解锁两处非 FAIL 风险，由 F01 修复并同轮复测通过，R2 从头完整执行且全程无问题。
-- P08-RULES-01、P08-CONTRACT-01、P08-T01 已完成明细见 [03-history-001.md](03-history-001.md)。
+- P08-T05 两轮未发现 FAIL；R1 发现旧游标接口契约风险未记录，由 F01 补 KDoc 与索引并同轮复测通过，R2 从头完整执行且全程无问题。
+- P08-RULES-01、P08-CONTRACT-01、P08-T01、P08-T04 已完成明细见 [03-history-001.md](03-history-001.md)。

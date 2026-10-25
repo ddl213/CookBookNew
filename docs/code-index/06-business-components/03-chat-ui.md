@@ -2,7 +2,7 @@
 
 > 返回分类首页：[06-business-components.md](../06-business-components.md)。登录态与关系操作见 [01-auth-relation.md](01-auth-relation.md)，菜谱/首页/创作者展示见 [02-recipes-index.md](02-recipes-index.md)。聊天页面结构见 ARCH-017，路由参数见 ARCH-018，数据层见 DATA-039。
 
-**收录范围：**`lib_chat` 三个页面共用的展示规则、路由参数读取/构建，以及好友主页进入聊天的入口边界。
+**收录范围：**`lib_chat` 三个页面共用的展示规则、路由参数读取/构建、好友主页进入聊天的入口边界，以及通知页订单通知数据源/跳转的核实结论。
 
 **索引原则：**只登记真实共享且有调用证据的能力；不把 Mock 数据描述为真实同步，不推断未读/已读或实时连接。
 
@@ -11,5 +11,7 @@
 | BIZ-012 | `ChatUiSupport`（`formatListTime`、`formatMessageTime`、`displayNickname`、`displayPreview`、`displayNotificationTitle`、`displayNotificationBody`、`avatarInitial`、`firstCharacter`、`avatarUrlOrNull`、`isUnavailable`、`bindAvatar`、`conversationArgs`、`readConversationArgs`、`conversationEntry`、`isOwnMessage`、`messageStatusLabel`、`realtimeBannerText`） | `lib_chat` 消息列表、预订通知与聊天详情共用的文案兜底、时间格式化、头像占位、消息归属/状态/实时文案与路由参数编解码。 | 全部为 `internal object`/`internal data class`，**仅 `lib_chat` 模块内可见**，不能跨模块复用。时间：`millis <= 0` 返回 null（页面隐藏时间）；列表今天 `HH:mm`、昨天用调用方传入文案、更早 `yyyy-MM-dd`；消息今天 `HH:mm`、其他日期 `yyyy-MM-dd HH:mm`。昵称/通知标题对空白与 `ChatCipher.UNAVAILABLE_TEXT` 回退安全文案；预览只对空白回退、保留不可用占位；头像 URL 拒绝空白与占位值；首字按首个 Unicode 码点处理，避免截断 emoji 代理对。`bindAvatar` 先经 DATA-003 `resolveMediaUrl`，无 URL 显示首字占位，有 URL 用 UTIL-005 加载。`conversationArgs` 只在昵称/头像可用时写 Key，避免 `"null"` 字面量；`readConversationArgs` 兼容 Bundle 类型值与 deep link query，非法归 0。`isOwnMessage` 在未确定当前用户时按对方处理；`messageStatusLabel` 只显示 SENDING/FAILED，SENT 返回 null，不伪造已读/送达；`realtimeBannerText` 对 UNAVAILABLE/DISCONNECTED/CONNECTING 返回提示、CONNECTED 返回 null。只做展示与参数转换，不访问数据源、不修改 Repository、不判断好友权限。 | `subModules/lib_chat/src/main/java/com/rhys/chat/ui/ChatUiSupport.kt` | `ChatFragment` 绑定会话头像/昵称/预览/时间并构建详情参数；`ChatNotificationsFragment` 绑定通知标题/正文/时间；`ChatDetailFragment` 绑定消息归属/状态/时间/实时横幅并按 `ConversationEntry` 分支；单测 `ChatUiSupportTest`（TEST-027，12 例）、`ChatRouteArgsTest`（TEST-028，7 例）、`ChatDetailUiSupportTest`（TEST-029，6 例）。 |
 | BIZ-013 | `UserProfileFragment.openChat()`、`btnMessage` 显隐边界 | 好友主页“发消息”进入一对一聊天详情；新增从用户资料发起聊天的入口优先复用该参数约定。 | 由 BIZ-004 `UserProfileActionResolver` 决定按钮：仅“已登录、非本人、`isFriend=true`”的 `MESSAGE_AND_UNFRIEND` 显示 `btnMessage`；未登录只显示登录引导，本人 `NONE`，非好友只显示加好友，均隐藏发消息。点击后只写 `KEY_BUNDLE_PEER_USER_ID`（必须 >0）与可用的昵称/头像，不传 `conversationId`；由 `ChatDetailFragment` 调用 `openConversation` 创建/打开会话。客户端只做入口约束，好友关系与会话参与方仍由服务端判定；`profile` 为空或 id<=0 时 no-op，导航失败提示通用错误。 | `subModules/lib_relation/src/main/java/com/rhys/relation/profile/UserProfileFragment.kt` | `initListener()` 绑定 `btnMessage` 到 `openChat()`；`renderProfile()` 按 BIZ-004 结果切换按钮；导航目标 `PAGE_CHAT_DETAIL` 与参数见 ARCH-018；聊天页接收分支见 ARCH-017。 |
 
-> 聊天详情页的 IME 输入栏 Insets、分页锚点与实时横幅约束见 ARCH-017；本表只登记页面间共享的展示/参数纯函数，不重复页面生命周期细节。
+**P08-T05 通知页核实：**`ChatNotificationsFragment` 仍复用 BIZ-012 的标题/正文/时间展示规则，但数据源已从聊天通知改为 DATA-071 `OrderNotificationRepository`：跟随订单 `OrderDataSourceConfig`（Remote `category=order`、`page/pageSize=20`；Mock 读 DATA-056 共享事件），支持下拉刷新/滚动分页/空加载错误、`isMock` 演示横幅、`onResume` 返回刷新；点击有效 `orderId` 以 `KEY_BUNDLE_ORDER_ID` 跳 `PAGE_ORDER_DETAIL`，缺失/非法只提示、不伪造订单；本期不做未读/已读、红点或推送。页面结构与生命周期细节见 ARCH-017，不为此新增重复业务组件条目。
+
+> 聊天详情页的 IME 输入栏 Insets、分页锚点与实时横幅约束见 ARCH-017；本表只登记页面间共享的展示/参数纯函数，不重复页面生命周期细节。订单通知 DTO/Mapper/Repository 见 DATA-069～DATA-071，测试见 TEST-038/TEST-039。
 

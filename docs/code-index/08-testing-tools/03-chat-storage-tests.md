@@ -1,12 +1,12 @@
 # 08-03 · 聊天、加密与账号隔离测试
 
-> 返回分类首页：[08-testing-tools.md](../08-testing-tools.md)。通用 Robolectric 配置见 [01-infrastructure.md](01-infrastructure.md)，其他业务回归测试见 [02-business-tests.md](02-business-tests.md)。
+> 返回分类首页：[08-testing-tools.md](../08-testing-tools.md)。通用 Robolectric 配置见 [01-infrastructure.md](01-infrastructure.md)，其他业务回归测试见 [02-business-tests.md](02-business-tests.md)，订单通知适配测试见 [05-order-notification-tests.md](05-order-notification-tests.md)。
 
 **收录范围：**聊天 DTO/错误映射、数据源配置与 Mock、Repository 加密缓存/发送状态/重试、AES-GCM、账号隔离守卫、聊天共享 UI/路由参数纯函数，以及 `lib_chat` 测试夹具。
 
 **索引原则：**测试通过只证明所列范围；均为本地/内存测试，不访问真实后端，不代表阶段验收。
 
-**计数基线（P07-T04）：**`lib_chat` 当前共 83 例测试（不含 `ChatTestSupport` 夹具）：`MockChatDataSourceTest` 16、`ChatRouteArgsTest` 7、`ChatRepositoryStorageTest` 19、`ChatUiSupportTest` 12、`ChatDetailUiSupportTest` 6、`ChatSessionGuardTest` 8、`ChatDataSourceConfigTest` 6、`AesGcmChatCipherTest` 5、`ChatRepositoryTest` 4。`lib_network` 另有 `ChatErrorMapperTest` 9、`CursorPageTest` 2。计数只随实际源码测试方法同步，不代表已执行通过。
+**计数基线（P08-T05）：**`lib_chat` 共 102 例（不含 `ChatTestSupport` 夹具；83 + 19）：`MockChatDataSourceTest` 16、`ChatRouteArgsTest` 7、`ChatRepositoryStorageTest` 19、`ChatUiSupportTest` 12、`ChatDetailUiSupportTest` 6、`ChatSessionGuardTest` 8、`ChatDataSourceConfigTest` 6、`AesGcmChatCipherTest` 5、`ChatRepositoryTest` 4；订单通知 19 例见 [05-order-notification-tests.md](05-order-notification-tests.md)。`lib_network` 共 70 例（聊天 11、订单 27 等，见 [04-order-tests.md](04-order-tests.md)）。计数只随实际源码测试方法同步，不代表已执行通过。
 
 | ID | 类 / API / 资源入口 | 用途与优先复用场景 | 调用方式、前提和限制 | 定义文件（项目相对路径） | 真实调用位置 / 核查证据 |
 | --- | --- | --- | --- | --- | --- |
@@ -23,6 +23,6 @@
 | TEST-028 | `ChatRouteArgsTest`（7 例） | 验证聊天详情路由参数：会话参数往返、deep link 字符串解析、缺失/非法 ID 归零且 `isValid=false`、**deep link/Bundle 负数一律归零**、不可用昵称/头像不写入、会话 ID 或好友 ID 单独存在均合法、入口优先会话再好友。 | 纯 JVM JUnit4（使用 Bundle）；执行 `./gradlew :lib_chat:testDebugUnitTest --tests com.rhys.chat.ui.ChatRouteArgsTest`。只验证 ARCH-018 的参数编解码，不验证 NRoute 实际导航、服务端会话创建或好友权限。 | `subModules/lib_chat/src/test/java/com/rhys/chat/ui/ChatRouteArgsTest.kt` | 被测入口 `ChatUiSupport.kt` 的 `conversationArgs/readConversationArgs/conversationEntry`（BIZ-012、ARCH-018）与 `ConversationRouteArgs`。 |
 | TEST-029 | `ChatDetailUiSupportTest`（6 例） | 验证聊天详情展示规则：仅正数当前用户匹配自己消息、消息时间今天/非今天/无效值、SENDING/FAILED 显示状态而 SENT 不显示、实时横幅仅 CONNECTED 隐藏。 | 纯 JVM JUnit4；执行 `./gradlew :lib_chat:testDebugUnitTest --tests com.rhys.chat.ui.ChatDetailUiSupportTest`。只覆盖 BIZ-012 纯函数，不覆盖发送/重试、分页锚点、权限分支或 Fragment 生命周期。 | `subModules/lib_chat/src/test/java/com/rhys/chat/ui/ChatDetailUiSupportTest.kt` | 被测入口 `ChatUiSupport.kt`（BIZ-012）；调用页 `ChatDetailFragment`（ARCH-017）。 |
 
-> 跨分类引用：聊天接口见 DATA-029～DATA-033，数据源见 DATA-034～DATA-038，Repository/领域模型见 DATA-039～DATA-042，加密与 Room 见 DATA-043～DATA-049，账号隔离见 DATA-050～DATA-051；聊天页面见 ARCH-017，共享 UI 见 BIZ-012；`lib_chat` 构建与 Robolectric 配置见 DEP-013，通用资源测试配置见 TEST-001。
+> 跨分类引用：聊天接口见 DATA-029～DATA-033，数据源见 DATA-034～DATA-038，Repository/领域模型见 DATA-039～DATA-042，加密与 Room 见 DATA-043～DATA-049，账号隔离见 DATA-050～DATA-051；订单通知适配见 DATA-069～DATA-071、TEST-038～TEST-039；聊天页面见 ARCH-017，共享 UI 见 BIZ-012；`lib_chat` 构建与 Robolectric 配置见 DEP-013，通用资源测试配置见 TEST-001。
 >
 > 未覆盖：聊天三页已接线，但没有 Fragment/Robolectric UI 测试（列表/通知/详情渲染、分页、发送/重试、权限分支、View 重建均未覆盖）；没有真实后端/网络契约测试、Keystore 真机密钥测试、数据库迁移测试、多进程账号切换或性能/压力测试。测试通过不代表聊天功能已对用户可用、真机 UI 已验收或阶段完成。

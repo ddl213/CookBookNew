@@ -1,5 +1,6 @@
 package com.rhys.chat
 
+import android.os.Bundle
 import android.widget.Toast
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -15,28 +16,34 @@ import com.android.common.ext.submitList
 import com.android.common.ext.visible
 import com.android.common.utils.RvDecoration
 import com.android.common.view.TitleBar
+import com.campaign.common.constants.Constants.KEY_BUNDLE_ORDER_ID
 import com.campaign.common.constants.RoutePath.PAGE_CHAT_NOTIFICATIONS
 import com.campaign.common.constants.RoutePath.PAGE_LOGIN
+import com.campaign.common.constants.RoutePath.PAGE_ORDER_DETAIL
 import com.example.network.AuthException
+import com.example.network.bean.PageResponse
 import com.example.network.session.AuthState
 import com.example.network.session.SessionManager
 import com.marky.route.annotation.Route
 import com.marky.route.api.NRoute
-import com.rhys.chat.data.ChatRepository
+import com.rhys.chat.data.OrderNotificationRepository
 import com.rhys.chat.databinding.ChatFragmentNotificationsBinding
 import com.rhys.chat.databinding.ChatItemNotificationBinding
 import com.rhys.chat.domain.ChatNotification
 import com.rhys.chat.ui.ChatUiSupport
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 /**
  * 独立的预订通知列表。
  *
- * 预订通知是消息列表外的独立项，不并入好友会话；本期无未读/已读、无分类过滤。
- * 登录、Repository 生命周期、Mock 标识和加载/空/失败/重试规则与消息列表一致。
- * 通知中的 orderId 只用于展示“关联订单”标签，不伪造订单详情跳转（P08 才接入）。
+ * P08 起数据源切换为 [OrderNotificationRepository]：跟随订单的 Mock/Remote 配置，
+ * 使用 `category=order` 页码分页，旧 P07 聊天通知 Room 缓存不再用于本页。
+ * 通知仍不并入好友会话，也不展示未读/已读/红点/推送。
+ *
+ * 点击带有效 orderId 的通知进入同一订单详情；旧 payload 没有订单关联时只提示
+ * “订单信息暂不可用”，不伪造跳转。从订单详情返回、进入页面和下拉刷新时都会
+ * 重新拉取第一页，确保接受/拒绝/取消/完成后的通知状态更新。
  */
 @Route(PAGE_CHAT_NOTIFICATIONS)
 class ChatNotificationsFragment :
@@ -44,10 +51,8 @@ class ChatNotificationsFragment :
 
     private val notifications = mutableListOf<ChatNotification>()
 
-    private var repository: ChatRepository? = null
+    private var repository: OrderNotificationRepository? = null
     private var repositoryOwnerId = 0L
-    private var observedRepository: ChatRepository? = null
-    private var observeJob: Job? = null
 
     private var loggedIn = false
     private var authExpired = false
@@ -55,9 +60,14 @@ class ChatNotificationsFragment :
     private var initialLoading = false
     private var loading = false
     private var loadingMore = false
-    private var nextCursor: String? = null
+    private var nextPage = 1
+    private var total = 0
+    private var hasMore = false
     private var lastError: String? = null
     private var requestGeneration = 0
+
+    /** 首次进入由登录流触发加载；只有真正暂停后再回来才额外刷新。 */
+    private var hasPausedSinceView = false
 
     override fun initTitleBar(): TitleBar = binding.titleBar
 
@@ -83,11 +93,22 @@ class ChatNotificationsFragment :
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (!hasPausedSinceView) return
+        hasPausedSinceView = false
+        if (view == null || !loggedIn || !hasLoadedOnce) return
+        // 从订单详情返回时刷新，使接受/拒绝/取消/完成后的通知及时更新。
+        refreshFirstPage()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (view != null) hasPausedSinceView = true
+    }
+
     override fun onViewDestroy() {
         requestGeneration++
-        observeJob?.cancel()
-        observeJob = null
-        observedRepository = null
         loading = false
         loadingMore = false
         initialLoading = false
@@ -125,11 +146,15 @@ class ChatNotificationsFragment :
                     itemBinding.tvTime.visible()
                 }
                 itemBinding.tvOrderTag.visibility =
-                    if (item.orderId != null) android.view.View.VISIBLE else android.view.View.GONE
+                    if (item.orderId?.let { it > 0L } == true) {
+                        android.view.View.VISIBLE
+                    } else {
+                        android.view.View.GONE
+                    }
             }
             setOnItemClickListener { _, _, position ->
-                if (notifications.getOrNull(position) == null) return@setOnItemClickListener
-                onNotificationClicked()
+                val item = notifications.getOrNull(position) ?: return@setOnItemClickListener
+                onNotificationClicked(item)
             }
         }
         binding.rv.submitList(notifications.toList())
@@ -161,40 +186,17 @@ class ChatNotificationsFragment :
                 authExpired = false
                 if (repository == null || repositoryOwnerId != ownerId) {
                     requestGeneration++
-                    observeJob?.cancel()
-                    observeJob = null
-                    observedRepository = null
                     notifications.clear()
                     binding.rv.submitList(emptyList<ChatNotification>())
                     resetLoadState()
-                    repository = ChatRepository()
+                    repository = OrderNotificationRepository()
                     repositoryOwnerId = ownerId
                     showLoadingPage()
                 }
-                repository?.let { startObserving(it) }
                 if (!hasLoadedOnce && !loading) {
                     refreshFirstPage()
                 } else {
                     renderPage()
-                }
-            }
-        }
-    }
-
-    private fun startObserving(repository: ChatRepository) {
-        if (view == null) return
-        if (observeJob?.isActive == true && observedRepository === repository) return
-        observeJob?.cancel()
-        observedRepository = repository
-        observeJob = viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                repository.observeNotifications().collect { items ->
-                    if (view == null || this@ChatNotificationsFragment.repository !== repository) return@collect
-                    notifications.clear()
-                    notifications.addAll(items)
-                    binding.rv.submitList(notifications.toList())
-                    renderPage()
-                    fillViewportIfNeeded()
                 }
             }
         }
@@ -214,9 +216,9 @@ class ChatNotificationsFragment :
         }
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                val page = repository.refreshNotifications()
+                val page = repository.fetch(1, PAGE_SIZE)
                 if (!isCurrent(generation)) return@launch
-                nextCursor = page.nextCursor
+                applyFirstPage(page)
                 hasLoadedOnce = true
                 lastError = null
             } catch (e: CancellationException) {
@@ -237,18 +239,42 @@ class ChatNotificationsFragment :
         }
     }
 
+    private fun applyFirstPage(page: PageResponse<ChatNotification>) {
+        notifications.clear()
+        notifications.addAll(page.items)
+        nextPage = 2
+        total = page.total
+        hasMore = page.hasMore
+        binding.rv.submitList(notifications.toList())
+    }
+
     private fun loadMore() {
         if (view == null || !loggedIn || loading || loadingMore) return
-        if (!hasLoadedOnce) return
+        if (!hasLoadedOnce || !hasMore) return
         val repository = repository ?: return
-        val cursor = nextCursor ?: return
         loadingMore = true
         val generation = requestGeneration
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                val page = repository.refreshNotifications(cursor = cursor)
-                if (!isCurrent(generation)) return@launch
-                nextCursor = page.nextCursor?.takeIf { it != cursor }
+                var page = nextPage
+                var skippedEmptyPages = 0
+                while (true) {
+                    val response = repository.fetch(page, PAGE_SIZE)
+                    if (!isCurrent(generation)) return@launch
+                    val existingIds = notifications.mapTo(HashSet()) { it.id }
+                    val additions = response.items.filter { existingIds.add(it.id) }
+                    notifications.addAll(additions)
+                    nextPage = page + 1
+                    total = response.total
+                    hasMore = response.hasMore
+                    // 服务端按 category 过滤后可能出现空页但仍有后续页，不能当作末页。
+                    if (response.items.isNotEmpty() || !hasMore) break
+                    if (++skippedEmptyPages >= MAX_EMPTY_PAGE_SKIPS) break
+                    page += 1
+                }
+                binding.rv.submitList(notifications.toList())
+                renderPage()
+                fillViewportIfNeeded()
             } catch (e: CancellationException) {
                 throw e
             } catch (e: AuthException) {
@@ -287,9 +313,6 @@ class ChatNotificationsFragment :
         loggedIn = false
         authExpired = expired
         requestGeneration++
-        observeJob?.cancel()
-        observeJob = null
-        observedRepository = null
         repository = null
         repositoryOwnerId = 0L
         notifications.clear()
@@ -306,7 +329,9 @@ class ChatNotificationsFragment :
         initialLoading = false
         loading = false
         loadingMore = false
-        nextCursor = null
+        nextPage = 1
+        total = 0
+        hasMore = false
         lastError = null
     }
 
@@ -383,7 +408,7 @@ class ChatNotificationsFragment :
     }
 
     private fun fillViewportIfNeeded() {
-        if (view == null || notifications.isEmpty() || nextCursor == null) return
+        if (view == null || notifications.isEmpty() || !hasMore) return
         binding.rv.post {
             if (view == null) return@post
             if (!binding.rv.canScrollVertically(1)) loadMore()
@@ -394,11 +419,24 @@ class ChatNotificationsFragment :
         loggedIn && generation == requestGeneration && view != null
 
     /**
-     * 订单事件属于 P08；这里只给诚实的后续开放提示，不构造无效的订单详情跳转。
+     * 只有带有效订单 ID 的通知才打开订单详情；旧 payload 无关联时诚实提示，
+     * 不伪造参数，也不尝试打开他人订单。
      */
-    private fun onNotificationClicked() {
+    private fun onNotificationClicked(item: ChatNotification) {
         if (view == null) return
-        toast(getString(R.string.chat_order_not_available))
+        val orderId = item.orderId
+        if (orderId == null || orderId <= 0L) {
+            toast(R.string.chat_order_unavailable)
+            return
+        }
+        runCatching {
+            NRoute.withNavController(findNavController())
+                .deepLink(PAGE_ORDER_DETAIL)
+                .args(Bundle().apply { putLong(KEY_BUNDLE_ORDER_ID, orderId) })
+                .go()
+        }.onFailure {
+            toast(R.string.chat_order_navigation_failed)
+        }
     }
 
     private fun openLogin() {
@@ -419,5 +457,12 @@ class ChatNotificationsFragment :
     private fun toast(message: String) {
         if (view == null) return
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
+
+    private companion object {
+        const val PAGE_SIZE = OrderNotificationRepository.DEFAULT_PAGE_SIZE
+
+        /** 连续空页最多跳过 3 页，避免服务端异常时无限请求。 */
+        const val MAX_EMPTY_PAGE_SKIPS = 3
     }
 }

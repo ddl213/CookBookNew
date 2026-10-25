@@ -1,6 +1,6 @@
 # P08 · 已完成历史归档 001
 
-- 归档范围：P08-RULES-01 已完成、无活动依赖的实施与验证明细，及 2026-10-25 文档提交/计划登记；P08-CONTRACT-01 契约归档验证；P08-T01 后端实施与 R1～R8 验证明细。原文自 `02-progress.md` 完整迁入，结论与证据未改写。
+- 归档范围：P08-RULES-01 已完成、无活动依赖的实施与验证明细，及 2026-10-25 文档提交/计划登记；P08-CONTRACT-01 契约归档验证；P08-T01 后端实施与 R1～R8 验证明细；P08-T04 双向订单列表/详情实施、F01、R1/R2 与 O1～O9 观察。原文自 `02-progress.md` 完整迁入，结论与证据未改写。
 
 - P08-RULES-01 实施结果：已同步 `CLAUDE.md`、`.claude/rules/02-stage-lifecycle.md`、`03-subagent-routing.md`、`04-verification-gates.md`、`.claude/agents/verifier.md`、`progress-maintainer.md` 及本记录；明确完整清单、顺序独立轮次、复测计数、最终干净轮次、清理/安装职责与证据边界。
 - 正式验证：Root 收到 R1 通过结果后才顺序派发 R2；两轮由不同独立 verifier 从头完成，未复用前轮结果抵扣本轮检查。
@@ -68,3 +68,19 @@
 - P08-T03 证据：索引 ARCH-019/008、VIEW-017/018、RES-013、BIZ-004/014、DEP-012/014、TEST-036；`python -X utf8 scripts/code_index_check.py check` 与 `python -X utf8 scripts/phase_flow.py check` 均 PASS。数据重置/新数据为每例独立内存对象，安装 N/A；UI 真机运行与极端字体/IME/小屏确认留 T06。
 - P08-T03 非阻断观察（不阻断 Verified，指向 T06）：O1 `ReservationDraft` 构造器非法初始值过滤无专项用例（实现正确）；O2 `order_strings.xml` 两个字符串暂未引用；O3 极端大字体+IME/小屏下弹窗与 3.9 列表内容高度可能被压缩；O4 Mock `buildDemoContext` 固定 `isFriend=true`，正常入口已先校验，绕过入口属演示态；O5 3.9 页 profile 与菜谱列表同一 try，菜谱 404 可能复用“用户不存在”文案，罕见，留 T04/T06 关注。
 - 2026-10-25 Root 审阅两轮独立证据后技术接受 P08-T03 为 Verified（不含 UI 真机）；阶段 Gate 仍未接受。
+
+## P08-T04 双向订单列表与详情
+
+- P08-T04 实施结果：订单 Tab 双标签（我的订单/我的销售）、8 类状态筛选、分页、登录态/账号切换、迟到响应丢弃与返回刷新；订单详情按服务端 `allowedActions` 逐项显示接受/拒绝/备货/待取货/完成/取消，携带 `expectedVersion`，操作前确认，409 版本冲突后回查并提示；整单取消；Mock 标识；“我的-订单”切换订单 Tab。
+- P08-T04-F01：动作失败（非 401 的 AuthException 与普通 Exception）后保持按钮禁用并立即回查订单，回查完成后解锁；取消确认不发请求；不自动以新版本重试。仅修改 `OrderDetailFragment.kt`。
+- P08-T04 正式验证：Root 顺序新派不同独立 verifier，每轮从头强制 `--rerun-tasks` 构建；纯 JVM 用例独立内存，无 App 持久化数据，安装 N/A。
+
+| 轮次 | 独立 verifier | 复测次数 | 实际结果 |
+| --- | --- | --- | --- |
+| R1 | 本轮新派独立 verifier | 0 | `--rerun-tasks` 构建成功；`:lib_order:testDebugUnitTest` 65 例 0 failures/errors/skipped；`:lib_mine`/`:app` 编译 PASS；源码/布局/索引静态 PASS；R3 超时未回查、R4 409 后按钮提前解锁两处风险转 F01；UI 真机 NOT RUN |
+| F01 | 本轮新派独立 verifier | 1 | 仅改 `OrderDetailFragment.kt`；强制重跑 BUILD SUCCESSFUL，65 例全绿；R3/R4 时序问题修复并同轮复测通过（不计新轮） |
+| R2 | 本轮新派独立 verifier | 0 | 全新 verifier 强制 `--rerun-tasks`，221 tasks executed，65 例 0 failures/errors/skipped；列表/详情/F01 时序/我的入口/布局/索引逐项 PASS；最终干净轮次（限定代码/构建/静态范围）；UI/F01 运行时 NOT RUN 留 T06 |
+
+- P08-T04 证据：`:lib_order` 65 例（含 `OrderUiSupportTest` 16 例）、`lib_mine`/`app` 编译 PASS；索引 ARCH-020/008/010、VIEW-019/020、BIZ-015、DEP-015、TEST-037、RES-013、DATA-063；`python -X utf8 scripts/code_index_check.py check` 与 `python -X utf8 scripts/phase_flow.py check` 均 PASS。数据重置/新数据为每例独立内存对象，安装 N/A；UI 真机与 F01 运行时留 T06。
+- P08-T04 非阻断观察（不阻断 Verified，指向 T06）：O1 `OrderUiSupport.FILTERS`/`OrderFilter` 生产未接线（页面 chip 硬编码），索引已标注；O2 状态/动作中文文案在 `OrderUiSupport` 硬编码，与资源字符串重复；O3 动作失败且回查失败可能连续两条 toast；O4 回查 404/401 时启用已 GONE 的取消按钮，入口二次校验无功能影响；O5 非常规小数秒时间格式化未覆盖；O6 大字体/小屏按钮与摘要截断风险；O7 详情返回刷新依赖 Navigation replace 重建 HomeFragment，无 onResume 兜底；O8 `Constants.kt` 末尾缺换行（格式性）；O9 `00-INDEX.md` 14,180 bytes，低于硬限制、高于 12 KiB 建议线。
+- 2026-10-25 Root 技术接受 P08-T04 为 Verified（不含 UI 与 F01 运行时）；阶段 Gate 仍未接受。
