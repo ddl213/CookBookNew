@@ -30,7 +30,7 @@
 - 构建会重写 `app/src/main/assets/nav/_nav*` 生成资源；`_navindex` 新增 `action://3006` 路由，其余 7 个路由表与 HEAD 一致。按既有提交惯例须随 P05 一并提交，尚未提交。
 - 第一轮真机验证已复测通过；第二轮 P05-T04 须再次清空后端与 App 全部数据。
 - 设备锁屏曾两次阻塞验证（2026-10-24 P05-T03 首次尝试、17:27 P05-T04 设备探测），均由用户手动解锁；第一轮 P05-T03 解锁后复测 12/12 PASS。当前设备已解锁，Root 已重新设置保持亮屏，供 P05-T04 使用；不记录、不要求 PIN。
-- P05-T04 开始时设备常亮原值：`screen_off_timeout=2147483647`、`stay_on_while_plugged_in=2`、`font_scale=1.0`、`airplane_mode_on=0`；本轮按要求保持未恢复。阶段 Gate 通过后按用户要求恢复（`svc power stayon false`、删除 `screen_off_timeout` 覆盖），结果见下方 Gate 记录。
+- P05-T04 开始时设备常亮原值：`screen_off_timeout=2147483647`、`stay_on_while_plugged_in=2`、`font_scale=1.0`、`airplane_mode_on=0`；本轮按要求保持未恢复。阶段 Gate 通过后已恢复：`adb shell svc power stayon false` EXIT 0；`adb shell settings delete system screen_off_timeout` 返回 `Deleted 1 rows`；复查 `settings get system screen_off_timeout`=`null`，`dumpsys power` 为 `mStayOn=false`、`mStayOnWhilePluggedInSetting=0`（2026-10-25）。
 
 ## 实施结果、验证与 Gate
 
