@@ -30,6 +30,8 @@ object RoutePath {
     const val PAGE_ORDER_INFO = "action://3005"
     //首页搜索页
     const val PAGE_INDEX_SEARCH = "action://3006"
+    //美食创作者与公开菜谱页
+    const val PAGE_CREATORS_PUBLIC = "action://3007"
 
 
     /**

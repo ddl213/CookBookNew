@@ -36,4 +36,13 @@
     <string name="index_user_login_required">用户搜索需要登录</string>
     <string name="index_user_login_desc">登录后可搜索用户并查看资料</string>
     <string name="index_go_login">去登录</string>
+
+    <!-- 美食创作者 / 公开菜谱 -->
+    <string name="index_creators_title">美食创作者</string>
+    <string name="index_creators_tab_masters">推荐大师</string>
+    <string name="index_creators_tab_public">公开菜谱</string>
+    <string name="index_creators_empty">暂无创作者</string>
+    <string name="index_creators_public_empty">暂无公开菜谱</string>
+    <string name="index_discover">发现</string>
+    <string name="index_discover_desc">发现美食创作者与公开菜谱</string>
 </resources>

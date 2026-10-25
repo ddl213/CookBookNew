@@ -15,6 +15,7 @@ import com.android.common.ext.liner
 import com.android.common.ext.submitList
 import com.android.common.ext.visible
 import com.android.common.utils.RvDecoration
+import com.campaign.common.constants.RoutePath.PAGE_CREATORS_PUBLIC
 import com.campaign.common.constants.RoutePath.PAGE_INDEX
 import com.campaign.common.constants.RoutePath.PAGE_INDEX_SEARCH
 import com.example.index.bindIndexRecipeCard
@@ -81,6 +82,7 @@ class IndexFragment : BaseBindFragment<IndexFragmentIndexBinding>(IndexFragmentI
     override fun initListener(binding: IndexFragmentIndexBinding) {
         binding.tvSearch.setOnClickListener { openSearch() }
         binding.ivSearch.setOnClickListener { openSearch() }
+        binding.btnDiscover.setOnClickListener { openCreators() }
         binding.btnRetry.setOnClickListener { loadFirstPage() }
         binding.btnLogin.setOnClickListener { openIndexLogin(this) }
         binding.appBar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
@@ -354,6 +356,16 @@ class IndexFragment : BaseBindFragment<IndexFragmentIndexBinding>(IndexFragmentI
         runCatching {
             NRoute.withNavController(findNavController())
                 .deepLink(PAGE_INDEX_SEARCH)
+                .go()
+        }.onFailure {
+            toastIndex(this, R.string.index_open_failed)
+        }
+    }
+
+    private fun openCreators() {
+        runCatching {
+            NRoute.withNavController(findNavController())
+                .deepLink(PAGE_CREATORS_PUBLIC)
                 .go()
         }.onFailure {
             toastIndex(this, R.string.index_open_failed)
