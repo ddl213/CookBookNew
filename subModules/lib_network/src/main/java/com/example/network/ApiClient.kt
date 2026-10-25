@@ -1,7 +1,9 @@
 package com.example.network
 
 import com.example.network.api.AuthApi
+import com.example.network.api.ChatApi
 import com.example.network.api.FriendApi
+import com.example.network.api.NotificationApi
 import com.example.network.api.RecipeApi
 import com.example.network.api.SocialApi
 import com.example.network.api.UploadApi
@@ -60,4 +62,8 @@ object ApiClient {
     val uploadApi: UploadApi by lazy { retrofit.create(UploadApi::class.java) }
 
     val socialApi: SocialApi by lazy { retrofit.create(SocialApi::class.java) }
+
+    val chatApi: ChatApi by lazy { retrofit.create(ChatApi::class.java) }
+
+    val notificationApi: NotificationApi by lazy { retrofit.create(NotificationApi::class.java) }
 }

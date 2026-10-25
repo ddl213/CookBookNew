@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 演示模式横幅：浅暖色底 + 深暖色文字，醒目但不抢占内容。 -->
+    <color name="chat_color_demo_background">#FFF3E0</color>
+    <color name="chat_color_demo_text">#A85B00</color>
+    <!-- 关联订单标签底色，与菜谱状态标签的浅主色保持一致。 -->
+    <color name="chat_color_primary_light">#FFF3E0</color>
+    <!-- 缓存仍在时的内联失败提示底色。 -->
+    <color name="chat_color_inline_error_background">#FFF4F4</color>
+    <!-- 对方消息气泡底色：浅中性色，与自己的主色气泡区分。 -->
+    <color name="chat_color_peer_bubble">#F4F5F7</color>
+</resources>

@@ -1,5 +1,6 @@
 package com.rhys.relation.profile
 
+import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
@@ -18,7 +19,11 @@ import com.android.common.ext.submitList
 import com.android.common.ext.visible
 import com.android.common.utils.RvDecoration
 import com.android.common.view.TitleBar
+import com.campaign.common.constants.Constants.KEY_BUNDLE_PEER_AVATAR
+import com.campaign.common.constants.Constants.KEY_BUNDLE_PEER_NICKNAME
+import com.campaign.common.constants.Constants.KEY_BUNDLE_PEER_USER_ID
 import com.campaign.common.constants.Constants.KEY_BUNDLE_RECIPE_ID
+import com.campaign.common.constants.RoutePath.PAGE_CHAT_DETAIL
 import com.campaign.common.constants.RoutePath.PAGE_COOK_BOOK_DETAIL
 import com.campaign.common.constants.RoutePath.PAGE_USER_PROFILE
 import com.example.network.AuthException
@@ -123,7 +128,7 @@ class UserProfileFragment :
 
     override fun initListener(binding: RelationFragmentUserProfileBinding) {
         binding.btnAddFriend.setOnClickListener { sendFriendRequest() }
-        binding.btnMessage.setOnClickListener { toast(R.string.relation_message_placeholder) }
+        binding.btnMessage.setOnClickListener { openChat() }
         binding.btnUnfriend.setOnClickListener { confirmUnfriend() }
         binding.btnLogin.setOnClickListener {
             if (!openLoginPage(this)) toast(R.string.relation_login_failed)
@@ -416,6 +421,32 @@ class UserProfileFragment :
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * 好友主页“发消息”：只带对方用户 ID 与可用的公开资料，由聊天详情页
+     * 调用服务端创建/打开会话。好友关系仍由服务端判定，客户端不自行放行。
+     */
+    private fun openChat() {
+        val current = profile ?: return
+        if (current.id <= 0L) return
+        val arguments = Bundle().apply {
+            putLong(KEY_BUNDLE_PEER_USER_ID, current.id)
+            current.displayName.trim()
+                .takeIf { it.isNotEmpty() }
+                ?.let { putString(KEY_BUNDLE_PEER_NICKNAME, it) }
+            current.avatar?.trim()
+                ?.takeIf { it.isNotEmpty() }
+                ?.let { putString(KEY_BUNDLE_PEER_AVATAR, it) }
+        }
+        runCatching {
+            NRoute.withNavController(findNavController())
+                .deepLink(PAGE_CHAT_DETAIL)
+                .args(arguments)
+                .go()
+        }.onFailure {
+            toast(R.string.relation_error_default)
         }
     }
 

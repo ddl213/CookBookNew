@@ -58,6 +58,8 @@ object RoutePath {
      * 聊天详情
      */
     const val PAGE_CHAT_DETAIL = "action://5001"
+    //消息列表中的独立预订通知页
+    const val PAGE_CHAT_NOTIFICATIONS = "action://5002"
 
 
     /**
