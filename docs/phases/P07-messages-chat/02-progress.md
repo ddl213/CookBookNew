@@ -43,3 +43,4 @@
 - 2026-10-25 P07-T02 三轮修复：Mock 发送者身份、Keystore 并发生成、退出在途写入、空文本密文、retryMessage owner 复核；P07-T03 参数语义修正。
 - 2026-10-25 P07-T04 修复：Major（Mock 重入非演示会话 404）与 Minor（pendingAnchor 优先级、深链负数归零）。
 - 2026-10-25 键盘遮挡输入栏：改为 IME Insets 监听修复，真机复测通过。
+- 2026-10-25 勘误：真机双轮烟测中，发送消息与历史展示实际经过生产 KeystoreChatCipher（AES-256-GCM）加密/解密；任务行中的“Android Keystore 真机加解密未执行”仅指未做独立密码学专项测试，不应理解为生产路径未运行。仍未做正式密码学审计、密钥失效/轮换、真机 Keystore 专项测试。
