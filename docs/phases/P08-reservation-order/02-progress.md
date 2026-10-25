@@ -4,7 +4,7 @@
 - 已确认业务与目标协议：[P08 订单契约](04-order-contract.md)
 - 用户阶段验收：未接受
 - 验收依据：未提供
-- 下一动作：后续按已确认订单契约接续业务实施与联调；本次仅完成文档归档，不启动业务代码。
+- 下一动作：派发 P08-T02 Android 订单网络与数据层；阶段 Gate 仍未接受。
 
 ## 任务表
 
@@ -12,10 +12,20 @@
 | --- | --- | --- | --- | --- |
 | P08-RULES-01 | 维护正式验收轮次、测试数据重置与 verifier 自行安装规则；仅修改本任务批准的 7 份文档 | progress-maintainer 实施；Root 审核并顺序派发独立 verifier | Verified | R1、R2 完整验证均 PASS，R2 为最终干净轮次；Root 已技术接受，不启动 P08 业务 |
 | P08-CONTRACT-01 | 归档精简订单契约，更新阶段需求/引用并完整同步当前任务；仅四份文档 | progress-maintainer 实施；Root 审核 | Verified | R1/R2 文档验证均 PASS，R2 为最终干净轮次；Root 已技术接受文档归档，业务代码及联调尚未执行 |
+| P08-T01 | 后端多明细订单域与迁移：`D:\CookBookService` 内实现契约 §1～§5 后端部分（版本化迁移、六态明细与整单汇总 CLOSED、allowedActions/计数/总份数、多明细创建与幂等指纹 v2、明细动作与整单取消、expectedVersion、同事务事件与六类通知、category=order 过滤、旧入口处置、README）；不修改 Android 仓库 | deep-executor | Verified | 后端 `npm test` 109/109 PASS、`npm run check` 退出 0；R1/R8 完整干净，R2～R7 产品检查 PASS 且问题均在验证工具/覆盖侧、无实现缺陷；F01 补测闭环；Root 已技术接受 |
+| P08-T02 | Android 订单网络与数据层：Order/OrderItem DTO、OrderApi、错误映射、OrderDataSource(Mock/Remote)、OrderRepository、orderDataSource 切换、幂等键持久化/账号数据源隔离、超时待确认与原键重放、分页/迟到响应；不修改 UI 页面或后端 | standard-executor | 未开始 | 依赖：P08-T01；待派发 |
+| P08-T03 | 预订确认弹窗与预订入口：菜谱详情“加入购物车”接线、好友主页可预订菜品入口、多菜品/数量/删除/整单备注/提交中/结果待确认；不新增独立购物车/支付/配送 | standard-executor | 未开始 | 依赖：P08-T02；待派发 |
+| P08-T04 | 双向订单列表与详情页：我的订单/我的销售分页与状态筛选、订单详情、逐项接受/拒绝/备货/待取货/完成/取消、整单取消、双方一致、空/加载/失败/重试、账号切换与迟到响应 | standard-executor | 未开始 | 依赖：P08-T02；待派发 |
+| P08-T05 | 六类订单通知适配与跳转：schemaVersion 2 payload、category=order 筛选与分页、旧 payload 兼容、同一订单详情跳转、账号/Mock/Remote/环境隔离、不增加未读已读 | standard-executor | 未开始 | 依赖：P08-T02；待派发 |
+| P08-T06 | 本地真实后端联调、代码索引增量与阶段收尾：Remote 双用户链路、契约 §7 验收矩阵、code-auditor 增量更新索引、两轮独立 verifier 完整验证与 Gate 材料 | verifier + code-auditor + progress-maintainer | 未开始 | 依赖：P08-T01～T05 完成；待派发 |
+
+- 依赖顺序：P08-T01 → P08-T02 → P08-T03/P08-T04/P08-T05（文件作用域互斥，重叠时顺序派发）→ P08-T06。
 
 ## 当前阻塞与待决事项
 
-- P08-RULES-01 无遗留验证问题；订单业务方案已确认，目标后端能力、客户端及联调尚未实施。当前仅落地 P08-CONTRACT-01 文档，不代表阶段验收。
+- P08-T01 后端多明细订单域已 Verified；Android 客户端网络/数据层、UI 与真实后端联调尚未实施，阶段验收仍未接受。
+- 后端旧版单菜品订单已由版本化迁移与回填覆盖；本地 dev DB 实际迁移前仍必须先做一致性备份。
+- 客户端订单 UI 仍为占位，P08-T02 起尚未接线。
 
 ## 用户决定与影响
 
@@ -43,7 +53,26 @@
 - 两轮各自运行 `python -X utf8 scripts/phase_flow.py check`，均退出 0：阶段总数 11、已完成 8、当前 P08，索引、完整需求副本、验收记录与文件上限一致。各自运行 `git --no-optional-locks diff --check` 均退出 0，仅有 LF→CRLF 提示，无空白错误。
 - 两轮各自确认数据清理、新数据、测试制品/版本、设备、安装执行人/动作/结果均不适用（N/A）：本次仅文档维护，无运行数据或应用安装需求。证据可追溯本会话上述两位具名 verifier 的最终报告与工具输出，无磁盘日志路径。
 - 2026-10-25 技术状态：Root 已审核实际 diff 和两轮独立证据，确认满足 04 门禁，接受 P08-RULES-01 为 Verified。本次仅规则维护通过；用户阶段验收仍为未接受，未切换阶段、未修改需求或开展 P08 业务。
+- 2026-10-25 文档提交与计划登记：已验证的规则门禁与订单契约以本地提交 `0b79baa` 固化，提交后工作树曾为空；随后登记 P08-T01～T06 实施计划、依赖顺序与新增阻塞。本记录仅为计划信息，不含验证 PASS、未启动业务实现，也不代表阶段完成。
+- P08-T01 实施结果：`D:\CookBookService` 内完成多明细订单域——`orders`/`order_items`/`order_events` 版本化迁移与旧单菜品回填；明细六态与整单 `CLOSED` 汇总；`allowedActions`、计数与总份数；多明细创建与幂等指纹 v2（兼容旧 v1）；明细动作、整单取消与 `expectedVersion`；同事务事件及六类通知（`category=order`）；旧入口 410；`ASSUMPTIONS.md`/`README.md` 同步。新增纯规则模块 `src/services/order-status.js`。
+- P08-T01 正式验证：每轮由 Root 顺序新派不同独立 verifier 从头执行，数据每轮重建，安装 N/A（纯后端）。实现方与最终轮运行 `npm test` 109/109 PASS、`npm run check` 退出 0。
+
+| 轮次 | 独立 verifier | 复测次数 | 实际结果 |
+| --- | --- | --- | --- |
+| R1 | 本轮新派独立 verifier | 0 | 完整流程 PASS，无问题 |
+| R2 | 本轮新派独立 verifier | 0 | 产品检查 PASS；verifier 夹具期望错误，非干净轮次 |
+| R3 | 本轮新派独立 verifier | 0 | 产品检查 PASS；verifier 断言期望错误，非干净轮次 |
+| R4 | 本轮新派独立 verifier | 0 | 产品检查 PASS；verifier 探针工具缺陷，非干净轮次 |
+| R5 | 本轮新派独立 verifier | 0 | 产品检查 PASS；verifier 探针断言错误，非干净轮次 |
+| R6 | 本轮新派独立 verifier | 0 | 产品检查 PASS；verifier 命令自身错误，非干净轮次 |
+| R7 | 本轮新派独立 verifier | 0 | 实现无缺陷；CLOSED 筛选、备注 500 边界、seller 分页缺运行时用例（清单未跑全），转 F01 补测 |
+| R8 | 本轮新派独立 verifier | 0 | 完整流程从零执行 PASS，无 FAIL/无漏项；最终干净轮次 |
+
+- 数据重置/新数据：每轮及复测前独立创建临时 SQLite 库并重新造数，未触碰真实 `data/cookbook.db*`；测试制品为后端源码，安装 N/A（无设备或应用制品）。
+- P08-T01-F01：仅修改 `test/orders.test.js`，新增/扩展 CLOSED 筛选、备注 500 边界与 seller 分页用例；测试 107→109，业务源码未改，补测已闭环。
+- 2026-10-25 Root 审阅实现结果、R1～R8 轮次结论与 F01 补测后，技术接受 P08-T01 为 Verified；阶段 Gate 仍未接受，未启动 P08-T02。
 
 ## 问题 / 修复历史及归档引用
 
 - P08-RULES-01 两轮均未发现缺陷，无修复或复测记录。
+- P08-T01 无实现缺陷修复；R2～R7 问题均位于验证工具/夹具/断言/命令侧，R7 覆盖缺口由 F01 补测关闭，R8 从头完整执行且全程无问题。
