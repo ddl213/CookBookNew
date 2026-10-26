@@ -4,7 +4,7 @@
 - 已确认业务与目标协议：[P08 订单契约](04-order-contract.md)
 - 用户阶段验收：未接受
 - 验收依据：未提供
-- 下一动作：派发 P08-T06 本地真实后端联调、真机 UI 验收与阶段收尾；阶段 Gate 仍未接受。
+- 下一动作：等待用户对 P08 阶段 Gate 的明确验收；用户接受后由进度 Agent 按 `02-stage-lifecycle.md` 记录验收依据并执行 `python scripts/phase_flow.py advance --user-accepted`。
 
 ## 任务表
 
@@ -17,15 +17,15 @@
 | P08-T03 | 预订确认弹窗与预订入口：菜谱详情“加入购物车”接线、好友主页可预订菜品入口、多菜品/数量/删除/整单备注/提交中/结果待确认；不新增独立购物车/支付/配送 | standard-executor | Verified | lib_order 49 + lib_relation 20、app 编译 PASS；R1/R2 独立、R2 最终干净；UI 真机 NOT RUN 留 T06 |
 | P08-T04 | 双向订单列表与详情页：我的订单/我的销售分页与状态筛选、订单详情、逐项接受/拒绝/备货/待取货/完成/取消、整单取消、双方一致、空/加载/失败/重试、账号切换与迟到响应 | standard-executor | Verified | `lib_order` 65 例 0 failures/errors/skipped、`lib_mine`/`app` 编译 PASS；R1→F01→R2，R2 为最终干净轮次（限定代码/构建/静态范围）；UI 与 F01 运行时留 T06 |
 | P08-T05 | 六类订单通知适配与跳转：schemaVersion 2 payload、category=order 筛选与分页、旧 payload 兼容、同一订单详情跳转、账号/Mock/Remote/环境隔离、不增加未读已读 | standard-executor | Verified | `lib_network` 70 + `lib_chat` 102（P07 83 仍过）、`app` 编译 PASS；R1→F01→R2，R2 为最终干净轮次（限定代码/构建/静态/索引）；UI 与真实后端 NOT RUN 留 T06 |
-| P08-T06 | 本地真实后端联调、代码索引增量与阶段收尾：Remote 双用户链路、契约 §7 验收矩阵、code-auditor 增量更新索引、两轮独立 verifier 完整验证与 Gate 材料 | verifier + code-auditor + progress-maintainer | 未开始 | 依赖：P08-T01～T05 完成；待派发 |
+| P08-T06 | 本地真实后端联调、代码索引增量与阶段收尾：Remote 双用户链路、契约 §7 验收矩阵、code-auditor 增量更新索引、两轮独立 verifier 完整验证与 Gate 材料 | verifier + code-auditor + progress-maintainer | Verified | R1 两 FAIL（旧 `_nav*` 路由、弹窗键盘塌缩）→ F02 修复 → R2 全新独立 verifier、全新测试库/账号/数据、亲自安装 Remote/Mock，完整 A～O 全 PASS；Remote/Mock 真机、正常增量构建路由资产、键盘 1.0/1.3/小屏/长备注、失败/重试/幂等/版本冲突/权限/账号隔离均通过；证据 `build/p08-ui-smoke/r2/`；2026-10-26 Root 技术接受 |
 
 - 依赖顺序：P08-T01 → P08-T02 → P08-T03/P08-T04/P08-T05（文件作用域互斥，重叠时顺序派发）→ P08-T06。
 
 ## 当前阻塞与待决事项
 
-- P08-T01 后端订单域、P08-T02 网络与数据层、P08-T03 预订弹窗/入口、P08-T04 双向订单列表与详情、P08-T05 六类订单通知适配均已 Verified；P08-T06 尚未实施，阶段验收仍未接受。
-- 后端旧版单菜品订单已由版本化迁移与回填覆盖；本地 dev DB 实际迁移前仍必须先做一致性备份。
-- 订单列表/详情 UI 真机运行、F01 失败回查时序运行时行为、极端字体/小屏尚未验证，留 T06。
+- P08-T01～T06 均已 Verified；无活动实现阻塞。阶段 Gate 等待用户明确验收，未切换 P09。
+- 后端旧版单菜品订单已由版本化迁移与回填覆盖；本次联调使用独立 3002 测试库，3000 开发服务与 dev DB 未触碰。
+- T06 非阻断覆盖缺口见“实施结果、验证与 Gate”节；P07 旧游标接口仅为遗留兼容。
 
 ## 用户决定与影响
 
@@ -44,19 +44,21 @@
 - P08-T02 实施与 R1/R2 验证明细已归档至 [03-history-001.md](03-history-001.md)；结论仍为 Verified（网络与数据层，R2 最终干净）。
 - P08-T03 实施与 R1/R2 验证明细及 O1～O5 观察已归档至 [03-history-001.md](03-history-001.md)；结论仍为 Verified（预订弹窗/入口，UI 留 T06）。
 - P08-T04 已完成明细（实施、F01、R1/R2 轮次、证据、O1～O9 观察与 2026-10-25 技术接受）已完整归档至 [03-history-001.md](03-history-001.md)；结论仍为 Verified（不含 UI 与 F01 运行时），UI 与 F01 运行时留 T06。
-- P08-T05 实施结果：`lib_network` 新增 `OrderNotificationDto`/payload/actor/item/buyer DTO 与 `NotificationApi.listOrderNotifications(category="order", page, pageSize)`；`lib_chat` 新增 `OrderNotificationMapper` 映射六类 `order_*` 与旧单菜品 payload，`OrderNotificationRepository` 跟随 `OrderDataSourceConfig` 选择 Remote（category=order 页码、失败不回退 Mock）/Mock（DATA-056 共享事件），按 owner/数据源/baseUrl 缓存隔离；通知页切换至该 Repository，支持首屏/下拉刷新、分页与空页跳过、Mock 横幅、同一订单详情跳转与 onResume 刷新；仍未增加未读/已读。
-- P08-T05 正式验证：Root 顺序新派不同独立 verifier，每轮从头强制 `--rerun-tasks`；纯 JVM 用例使用独立内存 fake，无 App 持久化数据，安装 N/A。
+- P08-T05 实施与 R1/R2 验证明细已归档至 [03-history-002.md](03-history-002.md)；结论仍为 Verified（通知适配，UI/真实后端留 T06）。
+- P08-T06 实施结果：code-auditor 增量更新 6 份索引；F02 重构预订弹窗——顶部居中全高悬浮窗、`BottomSheetBehavior` EXPANDED/skipCollapsed、`NestedScrollView` 滚动内容区 + 固定底部提交栏、按可用高度收缩滚动区、备注聚焦自动滚动；8 个受跟踪 `_nav*` 路由资产随本任务提交。
+- P08-T06 正式验证：Root 顺序派发全新 verifier；每轮使用独立 3002 测试库与 A/B/C 新账号，`pm clear` 后重新造数，Remote/Mock 安装由当轮 verifier 亲自执行；3000 开发服务与 dev DB 未触碰。
 
 | 轮次 | 独立 verifier | 复测次数 | 实际结果 |
 | --- | --- | --- | --- |
-| R1 | 本轮新派独立 verifier | 0 | `--rerun-tasks` 构建成功；`:lib_network:testDebugUnitTest` 70 例、`:lib_chat:testDebugUnitTest` 102 例（P07 83 仍过），均 0 failures/errors/skipped；`:app:compileDebugKotlin` PASS；DTO/映射/Repository/页面/索引静态 PASS；F1 旧游标契约风险未记录转 F01；UI/真实后端 NOT RUN |
-| F01 | 本轮新派独立 verifier | 1 | 仅补 `NotificationApi` KDoc 并更新索引 DATA-030/ARCH-017；强制重跑通过，静态复核 PASS（不计新轮） |
-| R2 | 本轮新派独立 verifier | 0 | 全新 verifier 强制重跑 245 tasks，70/102 全绿 0 failures/errors/skipped；F01 KDoc/索引复核 PASS；完整清单无 FAIL；最终干净轮次（限定代码/构建/静态/索引范围）；UI/真实后端 NOT RUN 留 T06 |
+| R1 | 本轮新派独立 verifier | 0 | 正常增量构建 APK 内 `_nav*` 为旧版，缺 action://3005 与 action://6001（FAIL-1）；预订弹窗备注键盘弹出后塌缩、提交不可达（FAIL-2）；其余链路未完成全矩阵 |
+| F02 | 本轮新派独立 verifier | 1 | 弹窗重构后真机 1.0/1.3 字体、小屏、键盘开合自测通过；证据 `build/p08-ui-smoke/fix-f02/`（不计新轮） |
+| R2 | 本轮新派全新独立 verifier | 0 | 全新测试库/账号/数据，亲自安装 Remote/Mock；A～O 全 PASS；FAIL-1/FAIL-2 复测 PASS；正常增量构建 `_navorder` 含 2004/3005/6001；键盘 1.0/1.3、小屏、长备注不塌缩且提交可达；Remote 双账号下单/接单/备货/取货、拒单+取消 CLOSED、整单取消、通知、失败重试/幂等、版本冲突、权限、账号隔离、大字体 PASS；Mock 双账号、六类通知、演示横幅、后端订单数不增加、重启清空 PASS；logcat Remote/Mock 无 FATAL/AndroidRuntime/ANR；最终干净轮次；证据 `build/p08-ui-smoke/r2/` |
 
-- P08-T05-F01：为 P07 旧 `listNotifications(limit, cursor)` 与后端页码契约不一致补充 KDoc，并在索引 DATA-030/ARCH-017 记录遗留风险——旧接口仅 P07 兼容、P08 未使用、不得透传 cursor；后续复用需在客户端内部转页码。
-- P08-T05 证据：索引 DATA-030/056/069/070/071、ARCH-017/008/020、TEST-038/039；`python -X utf8 scripts/code_index_check.py check` 与 `python -X utf8 scripts/phase_flow.py check` 均 PASS。数据重置/新数据为每例独立内存 fake，安装 N/A；UI 真机与真实后端联调留 T06。
-- P08-T05 非阻断观察（不阻断 Verified，指向 T06）：O1 Mock 通知受 200 条上限约束；O2 Mock 横幅沿用聊天文案；O3 触底阈值沿用聊天模式；O4 DTO `read` 默认值不影响当前消费；O5 `04-chat-network.md` 12,138 bytes，低于硬限制、高于 12 KiB 建议线；O6 进度状态已由本任务更新为 Verified（已关闭）。
-- 2026-10-25 Root 技术接受 P08-T05 为 Verified（不含 UI 与真实后端联调）；阶段 Gate 仍未接受。
+- P08-T06 R1 根因与 F02 修复：FAIL-1 为此前提交误将 KSP 生成资产还原为旧版，正常增量构建不会重写资产；处理为强制重新生成、解密核对 action 集合后保留正确文件。FAIL-2 为底部弹层在 IME 弹出后可用高度不足、内容区不可滚动；F02 改为全高悬浮窗 + 可收缩 `NestedScrollView` + 固定底部提交栏并自动滚动备注。
+- 路由资产规则：`app/src/main/assets/nav/_nav*` 是受跟踪的 KSP 生成资产；路由变更后必须强制重新生成、解密核对 action 集合再提交；禁止用 `git checkout` 还原旧版。本次 8 个资产随 P08-T06 提交。
+- P08-T06 数据与安装：R1/R2 各自使用独立 3002 测试库与 A/B/C 新账号，每轮及复测前 `pm clear` 并重新造数；Remote/Mock 由当轮 verifier 亲自安装；3000 开发服务与 dev DB 未触碰；测试数据与临时库已清理。
+- P08-T06 非阻断风险：未覆盖“服务端已创建但客户端超时”的真幂等重放、云端部署、多设备并发、ROM IME 变体、1.5+ 超大字体；Mock 通知仍受 200 条上限约束；P07 旧游标接口仅为遗留兼容。
+- 2026-10-26 Root 技术接受 P08-T06 为 Verified；用户阶段验收仍未接受，不切换 P09。
 
 ## 问题 / 修复历史及归档引用
 
@@ -66,4 +68,5 @@
 - P08-T03 两轮均未发现 FAIL，无修复或复测记录；O1～O5 为非阻断观察，UI 真机与极端字体/IME/小屏确认留 T06。
 - P08-T04 两轮未发现 FAIL；R1 发现 R3 超时未回查、R4 409 后按钮提前解锁两处非 FAIL 风险，由 F01 修复并同轮复测通过，R2 从头完整执行且全程无问题。
 - P08-T05 两轮未发现 FAIL；R1 发现旧游标接口契约风险未记录，由 F01 补 KDoc 与索引并同轮复测通过，R2 从头完整执行且全程无问题。
-- P08-RULES-01、P08-CONTRACT-01、P08-T01、P08-T04 已完成明细见 [03-history-001.md](03-history-001.md)。
+- P08-T06：R1 发现 2 FAIL（旧 `_nav*` 路由资产；预订弹窗键盘塌缩），分别由强制重新生成并保留正确资产、F02 弹窗重构修复；R2 从头完整执行，两个 FAIL 复测均 PASS 且全程无新问题。
+- P08-RULES-01、P08-CONTRACT-01、P08-T01、P08-T04 已完成明细见 [03-history-001.md](03-history-001.md)；P08-T05 已完成明细见 [03-history-002.md](03-history-002.md)。

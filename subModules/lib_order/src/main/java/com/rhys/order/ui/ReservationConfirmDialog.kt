@@ -3,13 +3,14 @@ package com.rhys.order.ui
 import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.Toast
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.android.common.base.BaseBottomSheetDialog
 import com.android.common.ext.buildAdapter
 import com.android.common.ext.dp
@@ -82,8 +83,9 @@ class ReservationConfirmDialog(
     private var submitting = false
     private var viewAlive = false
     private var requestGeneration = 0
-    private var baseBottomPadding = 0
     private var defaultListHeight = 0
+    private var maxSheetHeight = 0
+    private var imeVisible = false
 
     private var pending: PendingOrderCreate? = null
     private var currentRecipeUnavailable = false
@@ -91,7 +93,6 @@ class ReservationConfirmDialog(
 
     override fun initView(binding: OrderDialogReservationConfirmBinding) {
         viewAlive = true
-        baseBottomPadding = binding.root.paddingBottom
         binding.tvReservationSubtitle.text = context.getString(
             R.string.order_reserve_subtitle,
             safeSellerName()
@@ -187,30 +188,73 @@ class ReservationConfirmDialog(
             }
         })
 
-        // 键盘弹出时给底部弹窗增加 IME 高度内边距，保证备注与提交按钮可见。
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
-            if (!viewAlive) return@setOnApplyWindowInsetsListener insets
-            val imeBottom = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
-            view.setPadding(
-                view.paddingLeft,
-                view.paddingTop,
-                view.paddingRight,
-                baseBottomPadding + imeBottom
-            )
-            if (defaultListHeight > 0) {
-                val targetHeight = if (imeBottom > 0) {
-                    (defaultListHeight * 0.5f).toInt().coerceAtLeast(120.dp().toInt())
-                } else {
-                    defaultListHeight
-                }
-                if (binding.rvReservation.layoutParams.height != targetHeight) {
-                    binding.rvReservation.layoutParams =
-                        binding.rvReservation.layoutParams.apply { height = targetHeight }
-                }
+        // 固定为展开态并禁用折叠，避免 IME 出现时被 BottomSheet 收成窄条/半屏。
+        val sheet = binding.root.parent as? View
+        sheet?.let {
+            BottomSheetBehavior.from(it).apply {
+                state = BottomSheetBehavior.STATE_EXPANDED
+                skipCollapsed = true
             }
-            insets
         }
-        window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+
+        // 弹窗窗口固定为全高、顶部对齐，并保持原有左右留白宽度：
+        // 浮动弹窗若使用 wrap 高度，IME adjustResize 时会被系统居中压缩成窄条。
+        window?.apply {
+            setGravity(Gravity.TOP or Gravity.CENTER_HORIZONTAL)
+            setLayout(
+                context.resources.displayMetrics.widthPixels - 40.dp().toInt(),
+                WindowManager.LayoutParams.MATCH_PARENT
+            )
+            setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+        }
+
+        // 键盘弹出时系统只改变弹层可用高度；据此限制滚动区域高度，
+        // 头部/菜品/备注在区域内滚动，提交按钮始终固定在键盘上方。
+        val coordinator = sheet?.parent as? View
+        coordinator?.addOnLayoutChangeListener { _, _, top, _, bottom, _, _, _, _ ->
+            if (!viewAlive) return@addOnLayoutChangeListener
+            val available = bottom - top
+            if (available > maxSheetHeight) maxSheetHeight = available
+            val targetVisible = maxSheetHeight - available > 80.dp().toInt()
+            val entering = targetVisible && !imeVisible
+            imeVisible = targetVisible
+            applyBodyViewport(available, targetVisible)
+            if (entering && binding.etNote.hasFocus()) {
+                binding.nsvReservationBody.post { scrollNoteIntoView() }
+            }
+        }
+    }
+
+    /**
+     * 键盘弹出时把可滚动内容区限制在键盘上方的可用高度，提交按钮固定在弹层底部；
+     * 收起后恢复为 wrap_content，保持原有完整弹层高度。
+     */
+    private fun applyBodyViewport(available: Int, keyboardVisible: Boolean) {
+        if (!viewAlive) return
+        val params = binding.nsvReservationBody.layoutParams
+        val targetHeight = if (keyboardVisible && available > 0) {
+            val submitHeight = binding.btnReservationSubmit.height
+                .takeIf { it > 0 } ?: 48.dp().toInt()
+            (available -
+                binding.root.paddingTop -
+                binding.root.paddingBottom -
+                submitHeight -
+                10.dp().toInt())
+                .coerceAtLeast(96.dp().toInt())
+        } else {
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        }
+        if (params.height != targetHeight) {
+            params.height = targetHeight
+            binding.nsvReservationBody.layoutParams = params
+        }
+    }
+
+    /** 备注获得焦点时将滚动区滚到底部，确保备注与汇总行都可见。 */
+    private fun scrollNoteIntoView() {
+        if (!viewAlive) return
+        val overflow = binding.clReservationContent.height - binding.nsvReservationBody.height
+        binding.nsvReservationBody.scrollTo(0, overflow.coerceAtLeast(0))
     }
 
     override fun initListener(binding: OrderDialogReservationConfirmBinding) {
@@ -226,10 +270,18 @@ class ReservationConfirmDialog(
             override fun afterTextChanged(s: Editable?) {
                 draft.setNote(s)
                 updateSummary()
+                if (binding.etNote.hasFocus()) {
+                    binding.nsvReservationBody.post { scrollNoteIntoView() }
+                }
             }
         }
         noteWatcher = watcher
         binding.etNote.addTextChangedListener(watcher)
+        binding.etNote.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                binding.nsvReservationBody.post { scrollNoteIntoView() }
+            }
+        }
     }
 
     override fun initData(binding: OrderDialogReservationConfirmBinding) {
