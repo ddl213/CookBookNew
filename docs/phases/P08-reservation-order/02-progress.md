@@ -2,9 +2,12 @@
 
 - 本阶段需求源：`docs/phases/P08-reservation-order/01-requirements.md`
 - 已确认业务与目标协议：[P08 订单契约](04-order-contract.md)
-- 用户阶段验收：未接受
-- 验收依据：未提供
-- 下一动作：等待用户对 P08 阶段 Gate 的明确验收；用户接受后由进度 Agent 按 `02-stage-lifecycle.md` 记录验收依据并执行 `python scripts/phase_flow.py advance --user-accepted`。
+- 用户阶段验收：已接受
+- 验收依据：2026-10-26 用户明确接受 P08 阶段；T01～T06 均 Verified，T06 R2 为最终干净轮次，详见下方。
+  - 依据：T06 R2 全新独立 verifier 在真机完成 Remote/Mock 双账号 A～O 全链路（下单/接单/备货/取货/拒单/取消/CLOSED/整单取消/六类通知/失败重试/版本冲突/权限/账号隔离/大字体/键盘）全 PASS；后端 109 例、lib_network 70、lib_order 65、lib_chat 102、lib_relation 20；logcat 无 FATAL/ANR。
+  - 残余风险：未真实演练“服务端已创建但客户端超时”的幂等重放；未部署云端；未做多设备真并发；ROM IME 变体/1.5+ 超大字体未覆盖；Mock 进程内且通知最多 200 条；P07 旧游标通知接口仅遗留兼容；当前 3000 开发后端仍为旧代码，手动使用需备份并重启迁移。
+  - 既有技术验收与证据引用保留于本文件及 [03-history-001.md](03-history-001.md)、[03-history-002.md](03-history-002.md)。
+- 下一动作：P08 阶段 Gate 已关闭，已按 `02-stage-lifecycle.md` 执行 `python scripts/phase_flow.py advance --user-accepted` 切换至 P09；P09 仅等待用户授权，不启动业务实现。
 
 ## 任务表
 
@@ -23,7 +26,7 @@
 
 ## 当前阻塞与待决事项
 
-- P08-T01～T06 均已 Verified；无活动实现阻塞。阶段 Gate 等待用户明确验收，未切换 P09。
+- P08-T01～T06 均已 Verified；无活动实现阻塞。2026-10-26 用户明确接受 P08 阶段，阶段 Gate 已关闭并切换至 P09。
 - 后端旧版单菜品订单已由版本化迁移与回填覆盖；本次联调使用独立 3002 测试库，3000 开发服务与 dev DB 未触碰。
 - T06 非阻断覆盖缺口见“实施结果、验证与 Gate”节；P07 旧游标接口仅为遗留兼容。
 
@@ -58,7 +61,7 @@
 - 路由资产规则：`app/src/main/assets/nav/_nav*` 是受跟踪的 KSP 生成资产；路由变更后必须强制重新生成、解密核对 action 集合再提交；禁止用 `git checkout` 还原旧版。本次 8 个资产随 P08-T06 提交。
 - P08-T06 数据与安装：R1/R2 各自使用独立 3002 测试库与 A/B/C 新账号，每轮及复测前 `pm clear` 并重新造数；Remote/Mock 由当轮 verifier 亲自安装；3000 开发服务与 dev DB 未触碰；测试数据与临时库已清理。
 - P08-T06 非阻断风险：未覆盖“服务端已创建但客户端超时”的真幂等重放、云端部署、多设备并发、ROM IME 变体、1.5+ 超大字体；Mock 通知仍受 200 条上限约束；P07 旧游标接口仅为遗留兼容。
-- 2026-10-26 Root 技术接受 P08-T06 为 Verified；用户阶段验收仍未接受，不切换 P09。
+- 2026-10-26 Root 技术接受 P08-T06 为 Verified；同日用户明确接受整个 P08 阶段，阶段 Gate 关闭并切换 P09。
 
 ## 问题 / 修复历史及归档引用
 
