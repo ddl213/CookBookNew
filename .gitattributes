@@ -1,0 +1,2 @@
+# 保证 shell 脚本以 LF 检出（仓库启用了 core.autocrlf）
+*.sh text eol=lf
