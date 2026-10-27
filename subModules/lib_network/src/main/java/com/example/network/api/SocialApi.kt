@@ -4,6 +4,7 @@ import com.example.network.bean.CollectionStateDto
 import com.example.network.bean.CommentCreateBody
 import com.example.network.bean.CommentDto
 import com.example.network.bean.PageResponse
+import com.example.network.bean.RecipeDto
 import com.example.network.bean.ShareBody
 import com.example.network.bean.ShareResultDto
 import retrofit2.http.Body
@@ -34,6 +35,12 @@ interface SocialApi {
         @Path("id") recipeId: Long,
         @Body body: CommentCreateBody
     ): CommentDto
+
+    @GET("me/collections")
+    suspend fun listCollections(
+        @Query("page") page: Int,
+        @Query("pageSize") pageSize: Int
+    ): PageResponse<RecipeDto>
 
     @PUT("recipes/{id}/collection")
     suspend fun addCollection(@Path("id") recipeId: Long): CollectionStateDto

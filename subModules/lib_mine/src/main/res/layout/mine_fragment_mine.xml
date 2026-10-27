@@ -94,8 +94,12 @@
                 android:visibility="gone">
 
                 <LinearLayout
+                    android:id="@+id/ll_profile"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingStart="20dp"
@@ -163,6 +167,16 @@
                             android:textSize="14sp" />
 
                         <TextView
+                            android:id="@+id/tv_user_id"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:textColor="@color/textNormal"
+                            android:textSize="14sp" />
+
+                        <TextView
                             android:id="@+id/tv_bio"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -173,6 +187,14 @@
                             android:textSize="14sp"
                             android:visibility="gone" />
                     </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="@string/mine_row_arrow"
+                        android:textColor="@color/color_999999"
+                        android:textSize="18sp" />
                 </LinearLayout>
 
                 <View

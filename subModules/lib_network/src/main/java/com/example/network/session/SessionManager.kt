@@ -2,6 +2,7 @@ package com.example.network.session
 
 import com.example.network.AuthException
 import com.example.network.bean.AuthResponse
+import com.example.network.bean.UserDto
 import com.example.network.repository.AuthRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -95,5 +96,28 @@ object SessionManager {
         generation.incrementAndGet()
         repository.clearSession()
         _state.value = AuthState.LoggedOut
+    }
+
+    /**
+     * 资料更新成功后同步本地缓存的用户信息。
+     * 不改变登录代际：这不是新的登录流程，不能使进行中的 restore 结果失效。
+     *
+     * 写缓存前必须确认仍处于该用户的登录态：资料请求在途期间可能已登出
+     * 或切换账号，此时旧响应不能覆盖新会话。
+     */
+    suspend fun updateUser(user: UserDto) {
+        authMutex.withLock {
+            val token = repository.currentToken()
+            if (token.isNullOrBlank()) {
+                _state.value = AuthState.LoggedOut
+                return
+            }
+            val current = _state.value
+            if (current !is AuthState.LoggedIn || current.user.id != user.id) {
+                return
+            }
+            repository.saveSession(AuthResponse(token = token, user = user))
+            _state.value = AuthState.LoggedIn(user)
+        }
     }
 }

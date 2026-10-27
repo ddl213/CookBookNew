@@ -14,9 +14,46 @@
     <string name="mine_logout">退出登录</string>
     <string name="mine_row_arrow">›</string>
 
-    <string name="mine_placeholder_toast">该功能将在后续阶段开放</string>
+    <string name="mine_user_id_format">ID：%1$d</string>
     <string name="mine_browse_failed">请点击底部“首页”浏览应用</string>
     <string name="mine_login_failed">暂时无法打开登录页，请稍后重试</string>
     <string name="mine_friends_failed">暂时无法打开好友列表，请稍后重试</string>
     <string name="mine_orders_failed">暂时无法打开订单页，请点击底部“订单”查看</string>
+    <string name="mine_profile_failed">暂时无法打开个人信息，请稍后重试</string>
+    <string name="mine_collections_failed">暂时无法打开我的收藏，请稍后重试</string>
+    <string name="mine_settings_failed">暂时无法打开设置，请稍后重试</string>
+
+    <string name="mine_settings_title">设置</string>
+    <string name="mine_settings_privacy">隐私设置</string>
+    <string name="mine_settings_notification">通知设置</string>
+    <string name="mine_settings_help">应用帮助</string>
+    <string name="mine_settings_open_failed">暂时无法打开该页面，请稍后重试</string>
+
+    <string name="mine_privacy_title">隐私设置</string>
+    <string name="mine_privacy_body">菜谱可见性分为“好友可见”和“所有人可见”，由数据访问侧统一校验，客户端不会绕过该规则。\n\n好友可见的菜谱只对好友展示；解除好友关系后，该菜谱将不再对你可见。\n\n用户资料查询需要登录后才能进行。\n\n当前版本暂无可配置的隐私开关。</string>
+
+    <string name="mine_notification_title">通知设置</string>
+    <string name="mine_notification_body">与预订相关的通知会展示在“消息”页的预订通知列表中。\n\n当前版本没有通知开关或推送设置，暂无可配置项。</string>
+
+    <string name="mine_help_title">应用帮助</string>
+    <string name="mine_help_body">首页：浏览公共菜谱和美食创作者。\n\n菜谱：浏览、创建和管理自己的菜谱，可将菜谱设置为好友可见或所有人可见。\n\n消息：与好友一对一聊天，并查看预订相关通知。\n\n订单：查看发起的订单和收到的销售，管理预订状态。\n\n我的：查看收藏、好友、订单和设置。\n\n当前版本不支持支付、群聊或直播功能。</string>
+    <string name="mine_help_version_format">版本 %1$s</string>
+    <string name="mine_help_version_unknown">未知</string>
+
+    <string name="mine_info_title">个人信息</string>
+    <string name="mine_info_avatar_hint">点击更换头像</string>
+    <string name="mine_info_nickname_hint">昵称</string>
+    <string name="mine_info_bio_hint">简介（选填）</string>
+    <string name="mine_info_save">保存</string>
+    <string name="mine_info_saving">保存中…</string>
+    <string name="mine_info_save_success">保存成功</string>
+    <string name="mine_info_save_failed">保存失败，请稍后重试</string>
+    <string name="mine_info_nickname_invalid">昵称需为 1-32 个字符</string>
+    <string name="mine_info_bio_too_long">简介不能超过 500 个字符</string>
+    <string name="mine_info_session_expired">登录已失效，请重新登录</string>
+    <string name="mine_info_image_invalid_type">请选择 JPG、PNG 或 WebP 图片</string>
+    <string name="mine_info_image_too_large">图片不能超过 5MB</string>
+    <string name="mine_info_image_read_failed">图片读取失败，请重新选择</string>
+    <string name="mine_info_image_upload_failed">头像上传失败，请稍后重试</string>
+    <string name="mine_info_image_upload_pending">头像上传中，请稍后保存</string>
 </resources>

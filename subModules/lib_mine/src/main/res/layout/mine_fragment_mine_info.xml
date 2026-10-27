@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <com.android.common.view.TitleBar
+        android:id="@+id/title_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        app:left_src="@drawable/common_ic_back_black"
+        app:layout_constraintTop_toTopOf="parent"
+        app:title_text="@string/mine_info_title"
+        app:title_text_color="@color/textTitle" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title_bar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="20dp"
+            android:paddingTop="24dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="32dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="88dp"
+                    android:layout_height="88dp">
+
+                    <com.android.common.view.base.GImageView
+                        android:id="@+id/iv_avatar"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:background="@color/color_e8edf2"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:scaleType="centerCrop"
+                        android:visibility="gone"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:radius="44dp" />
+
+                    <TextView
+                        android:id="@+id/tv_avatar_fallback"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:background="@drawable/mine_bg_avatar_placeholder"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:textColor="@color/white"
+                        android:textSize="34sp"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tv_avatar_hint"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="8dp"
+                        android:text="@string/mine_info_avatar_hint"
+                        android:textColor="@color/color_primary"
+                        android:textSize="14sp" />
+
+                    <ProgressBar
+                        android:id="@+id/pb_avatar_upload"
+                        style="?android:attr/progressBarStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:indeterminateTint="@color/color_primary"
+                        android:visibility="gone" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <com.android.common.view.base.GEditText
+                android:id="@+id/et_nickname"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:background="@color/color_e8edf2"
+                android:hint="@string/mine_info_nickname_hint"
+                android:importantForAutofill="no"
+                android:inputType="text"
+                android:maxLines="1"
+                android:padding="14dp"
+                android:singleLine="true"
+                android:textColor="@color/textTitle"
+                android:textColorHint="@color/color_999999"
+                android:textSize="15sp"
+                app:radius="12dp" />
+
+            <com.android.common.view.base.GEditText
+                android:id="@+id/et_bio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@color/color_e8edf2"
+                android:gravity="top|start"
+                android:hint="@string/mine_info_bio_hint"
+                android:importantForAutofill="no"
+                android:inputType="textMultiLine"
+                android:minLines="3"
+                android:padding="14dp"
+                android:textColor="@color/textTitle"
+                android:textColorHint="@color/color_999999"
+                android:textSize="15sp"
+                app:radius="12dp" />
+
+            <TextView
+                android:id="@+id/tv_error"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:textColor="@color/red"
+                android:textSize="13sp"
+                android:visibility="gone" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_save"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/mine_bg_primary_button"
+                android:minHeight="48dp"
+                android:text="@string/mine_info_save"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <ProgressBar
+        android:id="@+id/pb_page_loading"
+        style="?android:attr/progressBarStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminateTint="@color/color_primary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title_bar" />
+</androidx.constraintlayout.widget.ConstraintLayout>

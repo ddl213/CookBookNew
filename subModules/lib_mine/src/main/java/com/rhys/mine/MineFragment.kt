@@ -14,6 +14,9 @@ import com.android.common.view.TitleBar
 import com.campaign.common.constants.RoutePath.PAGE_FRIENDS
 import com.campaign.common.constants.RoutePath.PAGE_LOGIN
 import com.campaign.common.constants.RoutePath.PAGE_MINE
+import com.campaign.common.constants.RoutePath.PAGE_MINE_INFO
+import com.campaign.common.constants.RoutePath.PAGE_MY_COLLECTIONS
+import com.campaign.common.constants.RoutePath.PAGE_SETTING
 import com.campaign.common.listener.MainTabController
 import com.example.network.NetworkConfig
 import com.example.network.bean.UserDto
@@ -28,8 +31,8 @@ import kotlinx.coroutines.launch
 /**
  * “我的”页。
  *
- * 只负责根据登录态展示入口，权限最终仍由后端校验；
- * 页面不伪造任何未实现功能，占位入口统一提示后续阶段开放。
+ * 只负责根据登录态展示资料与入口；页面跳转失败给出提示，
+ * 权限与数据可见性最终仍由后端校验。
  */
 @Route(PAGE_MINE)
 class MineFragment : BaseBindFragment<MineFragmentMineBinding>(MineFragmentMineBinding::inflate) {
@@ -55,10 +58,17 @@ class MineFragment : BaseBindFragment<MineFragmentMineBinding>(MineFragmentMineB
         binding.btnLogout.setOnClickListener {
             SessionManager.logout()
         }
-        binding.rowCollections.setOnClickListener { showPlaceholder() }
+        binding.llProfile.setOnClickListener {
+            openPage(PAGE_MINE_INFO, R.string.mine_profile_failed)
+        }
+        binding.rowCollections.setOnClickListener {
+            openPage(PAGE_MY_COLLECTIONS, R.string.mine_collections_failed)
+        }
         binding.rowFriends.setOnClickListener { openFriends() }
         binding.rowOrders.setOnClickListener { openOrders() }
-        binding.rowSettings.setOnClickListener { showPlaceholder() }
+        binding.rowSettings.setOnClickListener {
+            openPage(PAGE_SETTING, R.string.mine_settings_failed)
+        }
     }
 
     override fun initObserver(binding: MineFragmentMineBinding) {
@@ -100,6 +110,7 @@ class MineFragment : BaseBindFragment<MineFragmentMineBinding>(MineFragmentMineB
         val displayName = user.displayName
         binding.tvNickname.text = displayName
         binding.tvUsername.text = "@${user.username}"
+        binding.tvUserId.text = getString(R.string.mine_user_id_format, user.id)
 
         val bio = user.bio.orEmpty().trim()
         binding.tvBio.text = bio
@@ -127,22 +138,21 @@ class MineFragment : BaseBindFragment<MineFragmentMineBinding>(MineFragmentMineB
     }
 
     private fun openLogin() {
-        runCatching {
-            NRoute.withNavController(findNavController())
-                .deepLink(PAGE_LOGIN)
-                .go()
-        }.onFailure {
-            toast(R.string.mine_login_failed)
-        }
+        openPage(PAGE_LOGIN, R.string.mine_login_failed)
     }
 
     private fun openFriends() {
+        openPage(PAGE_FRIENDS, R.string.mine_friends_failed)
+    }
+
+    /** 通过 deep link 打开已注册页面；路由失败时提示对应文案。 */
+    private fun openPage(path: String, errorRes: Int) {
         runCatching {
             NRoute.withNavController(findNavController())
-                .deepLink(PAGE_FRIENDS)
+                .deepLink(path)
                 .go()
         }.onFailure {
-            toast(R.string.mine_friends_failed)
+            toast(errorRes)
         }
     }
 
@@ -164,10 +174,6 @@ class MineFragment : BaseBindFragment<MineFragmentMineBinding>(MineFragmentMineB
             return
         }
         controller.switchTab(0)
-    }
-
-    private fun showPlaceholder() {
-        toast(R.string.mine_placeholder_toast)
     }
 
     private fun toast(messageRes: Int) {

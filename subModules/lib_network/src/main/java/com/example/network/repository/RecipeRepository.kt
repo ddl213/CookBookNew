@@ -164,6 +164,18 @@ class RecipeRepository {
         }
     }
 
+    /** 我的收藏列表（需要登录）；排序与可见性由后端决定，客户端不做本地过滤。 */
+    suspend fun listCollections(
+        page: Int = 1,
+        pageSize: Int = DEFAULT_PAGE_SIZE
+    ): PageResponse<RecipeDto> {
+        val safePage = normalizedPage(page)
+        val safePageSize = normalizedPageSize(pageSize)
+        return callRelationApi {
+            ApiClient.socialApi.listCollections(safePage, safePageSize)
+        }
+    }
+
     companion object {
         const val DEFAULT_PAGE_SIZE = 20
         const val MAX_PAGE_SIZE = 50

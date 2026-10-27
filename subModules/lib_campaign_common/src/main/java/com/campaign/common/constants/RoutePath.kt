@@ -32,6 +32,8 @@ object RoutePath {
     const val PAGE_INDEX_SEARCH = "action://3006"
     //美食创作者与公开菜谱页
     const val PAGE_CREATORS_PUBLIC = "action://3007"
+    //我的收藏页
+    const val PAGE_MY_COLLECTIONS = "action://3008"
 
 
     /**
@@ -77,5 +79,11 @@ object RoutePath {
     const val PAGE_ADD_ADDRESS = "action://7003"
     //个人信息页
     const val PAGE_MINE_INFO = "action://7004"
+    //隐私设置页
+    const val PAGE_SETTING_PRIVACY = "action://7005"
+    //通知设置页
+    const val PAGE_SETTING_NOTIFICATION = "action://7006"
+    //帮助与反馈页
+    const val PAGE_SETTING_HELP = "action://7007"
 
 }

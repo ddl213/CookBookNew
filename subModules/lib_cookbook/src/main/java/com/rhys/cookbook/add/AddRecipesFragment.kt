@@ -1,9 +1,7 @@
 package com.rhys.cookbook.add
 
-import android.content.ContentResolver
 import android.net.Uri
 import android.os.Bundle
-import android.provider.OpenableColumns
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
@@ -20,6 +18,7 @@ import com.campaign.common.constants.Constants.KEY_BUNDLE_RECIPE_ID
 import com.campaign.common.constants.RoutePath.PAGE_COOK_BOOK_ADD
 import com.example.network.AuthException
 import com.example.network.NetworkConfig
+import com.example.network.PickedImageReader
 import com.example.network.RecipeMediaRules
 import com.example.network.bean.RecipeDto
 import com.example.network.bean.RecipeWriteBody
@@ -233,8 +232,8 @@ class AddRecipesFragment :
         val resolver = requireContext().contentResolver
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                val meta = withContext(Dispatchers.IO) { queryImageMeta(resolver, uri) }
-                val mime = resolveMimeType(resolver, uri, meta.fileName)
+                val meta = withContext(Dispatchers.IO) { PickedImageReader.queryMeta(resolver, uri) }
+                val mime = PickedImageReader.resolveMimeType(resolver, uri, meta.fileName)
                 if (mime == null || !RecipeMediaRules.isAllowedMimeType(mime)) {
                     showImageError(R.string.cookbook_form_image_invalid_type)
                     return@launch
@@ -246,7 +245,7 @@ class AddRecipesFragment :
                     showImageError(R.string.cookbook_form_image_too_large)
                     return@launch
                 }
-                val bytes = withContext(Dispatchers.IO) { readImageBytes(resolver, uri) }
+                val bytes = withContext(Dispatchers.IO) { PickedImageReader.readBytes(resolver, uri) }
                 if (bytes == null || bytes.isEmpty()) {
                     showImageError(R.string.cookbook_form_image_read_failed)
                     return@launch
@@ -468,48 +467,6 @@ class AddRecipesFragment :
         val direct = arguments.getLong(KEY_BUNDLE_RECIPE_ID, 0L)
         if (direct > 0L) return direct
         return NRoute.getArgument(arguments, KEY_BUNDLE_RECIPE_ID).toLongOrNull() ?: 0L
-    }
-
-    private fun resolveMimeType(resolver: ContentResolver, uri: Uri, fileName: String?): String? {
-        val declared = runCatching { resolver.getType(uri) }.getOrNull()
-        if (RecipeMediaRules.isAllowedMimeType(declared)) {
-            return declared?.trim()?.lowercase()
-        }
-        return RecipeMediaRules.mimeTypeForFileName(fileName)
-    }
-
-    private data class ImageMeta(val fileName: String?, val size: Long?)
-
-    private fun queryImageMeta(resolver: ContentResolver, uri: Uri): ImageMeta {
-        var fileName: String? = null
-        var size: Long? = null
-        runCatching {
-            resolver.query(
-                uri,
-                arrayOf(OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE),
-                null,
-                null,
-                null
-            )?.use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-                    if (nameIndex >= 0 && !cursor.isNull(nameIndex)) {
-                        fileName = cursor.getString(nameIndex)
-                    }
-                    val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
-                    if (sizeIndex >= 0 && !cursor.isNull(sizeIndex)) {
-                        size = cursor.getLong(sizeIndex)
-                    }
-                }
-            }
-        }
-        return ImageMeta(fileName, size)
-    }
-
-    private fun readImageBytes(resolver: ContentResolver, uri: Uri): ByteArray? {
-        return runCatching {
-            resolver.openInputStream(uri)?.use { it.readBytes() }
-        }.getOrNull()
     }
 
     private fun toast(messageRes: Int) {

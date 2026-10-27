@@ -1,10 +1,14 @@
 package com.example.network.api
 
 import com.example.network.bean.PageResponse
+import com.example.network.bean.ProfileUpdateBody
 import com.example.network.bean.RecipeDto
+import com.example.network.bean.UserDto
 import com.example.network.bean.UserListItemDto
 import com.example.network.bean.UserProfileDto
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.PATCH
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -30,4 +34,7 @@ interface UserApi {
         @Query("page") page: Int,
         @Query("pageSize") pageSize: Int
     ): PageResponse<RecipeDto>
+
+    @PATCH("users/me")
+    suspend fun updateProfile(@Body body: ProfileUpdateBody): UserDto
 }
