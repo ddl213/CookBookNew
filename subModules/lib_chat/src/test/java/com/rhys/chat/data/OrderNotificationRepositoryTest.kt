@@ -6,6 +6,7 @@ import com.example.network.bean.ChatNotificationDto
 import com.example.network.bean.CursorPage
 import com.example.network.bean.OrderNotificationActorDto
 import com.example.network.bean.OrderNotificationDto
+import com.example.network.bean.OrderNotificationFromUserDto
 import com.example.network.bean.OrderNotificationItemDto
 import com.example.network.bean.OrderNotificationPayloadDto
 import com.example.network.bean.PageResponse
@@ -55,6 +56,59 @@ class OrderNotificationRepositoryTest {
         assertEquals(listOf(1, 2), api.requestedPages)
         assertEquals(listOf(2, 2), api.requestedPageSizes)
         assertEquals("order", api.lastCategory)
+    }
+
+    @Test
+    fun `all notifications request omits category and maps recipe share`() = runBlocking {
+        val api = FakeNotificationApi().apply {
+            allPages[1] = PageResponse(
+                items = listOf(shareDto(21L, recipeId = 88L)),
+                page = 1,
+                pageSize = 20,
+                total = 1
+            )
+        }
+        val repository = newRepository(OrderDataSourceKind.REMOTE, api)
+
+        val page = repository.fetchAll(1, 20)
+
+        assertEquals(1, page.items.size)
+        val item = page.items.first()
+        assertEquals("菜谱分享", item.title)
+        assertEquals("「小林」分享了「番茄炒蛋」", item.body)
+        assertEquals(88L, item.recipeId)
+        assertNull(item.orderId)
+        assertEquals(listOf(1), api.allRequestedPages)
+        assertEquals(listOf(20), api.allRequestedPageSizes)
+        // 全部通知与仅订单是两条不同请求：all 路径不得触发 category=order。
+        assertTrue(api.requestedPages.isEmpty())
+        assertNull(api.lastCategory)
+    }
+
+    @Test
+    fun `cache scope separates all and order notifications`() = runBlocking {
+        val api = FakeNotificationApi().apply {
+            pages[1] = PageResponse(items = listOf(dto(1L)), page = 1, pageSize = 20, total = 1)
+            allPages[1] = PageResponse(
+                items = listOf(shareDto(21L, recipeId = 88L)),
+                page = 1,
+                pageSize = 20,
+                total = 1
+            )
+        }
+        val repository = newRepository(OrderDataSourceKind.REMOTE, api)
+
+        repository.fetch(1, 20)
+        assertNotNull(repository.cached(1, 20, NotificationScope.ORDER))
+        assertNull(repository.cached(1, 20, NotificationScope.ALL))
+
+        repository.fetchAll(1, 20)
+        assertNotNull(repository.cached(1, 20, NotificationScope.ALL))
+        assertNull(repository.cached(1, 20, NotificationScope.ORDER))
+
+        repository.fetch(1, 20)
+        assertNotNull(repository.cached(1, 20, NotificationScope.ORDER))
+        assertNull(repository.cached(1, 20, NotificationScope.ALL))
     }
 
     @Test
@@ -239,6 +293,26 @@ class OrderNotificationRepositoryTest {
         createdAt = "2026-10-20T09:10:00Z"
     )
 
+    private fun shareDto(
+        id: Long,
+        recipeId: Long,
+        nickname: String = "小林",
+        recipeName: String = "番茄炒蛋"
+    ): OrderNotificationDto = OrderNotificationDto(
+        id = id,
+        type = "recipe_share",
+        payload = OrderNotificationPayloadDto(
+            recipeId = recipeId,
+            recipeName = recipeName,
+            fromUser = OrderNotificationFromUserDto(
+                id = 9L,
+                username = "lin_xiaochu",
+                nickname = nickname
+            )
+        ),
+        createdAt = "2026-10-20T09:10:00Z"
+    )
+
     private fun event(
         recipientId: Long,
         type: String,
@@ -271,6 +345,11 @@ class OrderNotificationRepositoryTest {
         var lastCategory: String? = null
         var failure: Throwable? = null
 
+        val allPages = mutableMapOf<Int, PageResponse<OrderNotificationDto>>()
+        val allRequestedPages = mutableListOf<Int>()
+        val allRequestedPageSizes = mutableListOf<Int>()
+        var allFailure: Throwable? = null
+
         override suspend fun listNotifications(
             limit: Int,
             cursor: String?
@@ -286,6 +365,21 @@ class OrderNotificationRepositoryTest {
             requestedPageSizes += pageSize
             failure?.let { throw it }
             return pages[page] ?: PageResponse(
+                items = emptyList(),
+                page = page,
+                pageSize = pageSize,
+                total = 0
+            )
+        }
+
+        override suspend fun listAllNotifications(
+            page: Int,
+            pageSize: Int
+        ): PageResponse<OrderNotificationDto> {
+            allRequestedPages += page
+            allRequestedPageSizes += pageSize
+            allFailure?.let { throw it }
+            return allPages[page] ?: PageResponse(
                 items = emptyList(),
                 page = page,
                 pageSize = pageSize,

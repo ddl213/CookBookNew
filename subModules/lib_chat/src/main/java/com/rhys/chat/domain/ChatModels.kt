@@ -49,13 +49,15 @@ enum class ChatMessageStatus {
     }
 }
 
-/** 消息列表中的独立预订通知（本期不实现未读/已读）。 */
+/** 消息列表中的独立通知（本期不实现未读/已读）。 */
 data class ChatNotification(
     val id: Long,
     val type: String,
     val title: String,
     val body: String,
     val orderId: Long?,
+    /** 菜谱分享通知关联的菜谱 ID；订单通知或其他通知为 null。 */
+    val recipeId: Long? = null,
     val createdAt: Long,
     val createdAtRaw: String?
 )

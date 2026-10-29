@@ -6,7 +6,7 @@
 
 **索引原则：**测试通过只证明所列范围；均为本地/内存测试，不访问真实后端，不代表阶段验收。
 
-**计数基线（P08-T05）：**`lib_chat` 共 102 例（不含 `ChatTestSupport` 夹具；83 + 19）：`MockChatDataSourceTest` 16、`ChatRouteArgsTest` 7、`ChatRepositoryStorageTest` 19、`ChatUiSupportTest` 12、`ChatDetailUiSupportTest` 6、`ChatSessionGuardTest` 8、`ChatDataSourceConfigTest` 6、`AesGcmChatCipherTest` 5、`ChatRepositoryTest` 4；订单通知 19 例见 [05-order-notification-tests.md](05-order-notification-tests.md)。`lib_network` 共 70 例（聊天 11、订单 27 等，见 [04-order-tests.md](04-order-tests.md)）。计数只随实际源码测试方法同步，不代表已执行通过。
+**计数基线（P10-T02-F01）：**`lib_chat` 共 108 例（不含 `ChatTestSupport` 夹具；83 + 25）：`MockChatDataSourceTest` 16、`ChatRouteArgsTest` 7、`ChatRepositoryStorageTest` 19、`ChatUiSupportTest` 12、`ChatDetailUiSupportTest` 6、`ChatSessionGuardTest` 8、`ChatDataSourceConfigTest` 6、`AesGcmChatCipherTest` 5、`ChatRepositoryTest` 4；订单通知/菜谱分享 25 例见 [05-order-notification-tests.md](05-order-notification-tests.md)。`lib_network` 共 70 例（聊天 11、订单 27 等，见 [04-order-tests.md](04-order-tests.md)）。计数只随实际源码测试方法同步，不代表已执行通过。
 
 | ID | 类 / API / 资源入口 | 用途与优先复用场景 | 调用方式、前提和限制 | 定义文件（项目相对路径） | 真实调用位置 / 核查证据 |
 | --- | --- | --- | --- | --- | --- |

@@ -18,3 +18,10 @@
 - `P09-T05`（设置页组）：新增 `SettingsFragment`（`@Route(PAGE_SETTING=7001)`）与抽象基类 `SettingInfoFragment`，以及 `PrivacySettingsFragment`（7005）、`NotificationSettingsFragment`（7006）、`HelpFragment`（7007）。设置页只导航到三个说明页，不读写开关、不调用后端；说明页只读文本，`HelpFragment` 从 `PackageManager` 读取真实 `versionName`，失败显示“未知”，不伪造版本。索引更新：ARCH-021、ARCH-008。
 - 路由资源：解密核对工作树 `app/src/main/assets/nav/_navmine` 含 `action://2005`/`action://7001`/`action://7004`/`action://7005`/`action://7006`/`action://7007`，`_navcookbook` 含 `action://3008`。`_nav*` 是受跟踪的 KSP 生成资产，路由变更须强制重新生成并提交。
 - 依赖与测试：`lib_mine` 与 `lib_cookbook` 的 `build.gradle.kts` 本批未改，**未新增模块或三方依赖**（DEP-015）。本批未新增自动化 UI/契约测试；收藏页、资料页、设置页仅有构建验证，待正式 UI 验证（分类 08 覆盖与缺口已注明）。
+
+## 2026-10-29 · P10-T02-F01 增量维护
+
+- 通知数据层：`NotificationApi.listAllNotifications`（不带 category）；订单通知 payload 增加 `recipeImage`/`fromUser` 与 `OrderNotificationFromUserDto`；`OrderNotificationMapper` 增加 `recipe_share` 分支；`OrderNotificationRepository` 增加 `fetchAll`/`NotificationScope`，缓存按 owner/数据源/baseUrl/请求范围隔离。索引更新：DATA-030、DATA-069～DATA-071 迁入新子表 `12-notifications.md`（05 分类拆为十二个子表），DATA-039/DATA-040/DATA-056 校正。
+- 通知页：`ChatNotificationsFragment` 改用 `fetchAll`，展示订单与菜谱分享，按 orderId/recipeId 分别跳订单/菜谱详情，无关联时提示；标题与入口文案统一为“通知”。索引更新：ARCH-017、ARCH-008、06-03 通知页核实与 06 分类结论。
+- 菜谱详情：预订按钮移出滚动区、固定于评论输入栏上方，loading/error/not-found 隐藏（ARCH-013）；订单条目昵称/份数/时间允许 2 行（RES-013）。
+- 依赖与测试：`lib_campaign_common` 补 `testImplementation(libs.junit)`（DEP-004/TEST-004）；TEST-038 14 例、TEST-039 11 例，`lib_chat` 108 例（仅计数，本任务未执行）。未覆盖通知页 UI 测试、`recipeImage` 展示与全部通知真实后端契约。

@@ -33,8 +33,11 @@ data class OrderNotificationPayloadDto(
     // P07 旧 payload（单菜品）
     val recipeId: Long? = null,
     val recipeName: String? = null,
+    val recipeImage: String? = null,
     val status: String? = null,
     val buyer: OrderNotificationBuyerDto? = null,
+    // recipe_share 通知的分享者快照
+    val fromUser: OrderNotificationFromUserDto? = null,
     // 部分旧通知可能把标题/正文放在 payload 内
     val title: String? = null,
     val body: String? = null
@@ -55,6 +58,17 @@ data class OrderNotificationItemDto(
     val fromStatus: String? = null,
     val toStatus: String = ""
 )
+
+/** `recipe_share` 通知中分享者的用户快照。 */
+data class OrderNotificationFromUserDto(
+    val id: Long = 0L,
+    val username: String = "",
+    val nickname: String = "",
+    val avatar: String? = null
+) {
+    val displayName: String
+        get() = nickname.ifBlank { username }
+}
 
 /** P07 旧 payload 中的预订方；用于没有 actor 时生成“谁预订了”的文案。 */
 data class OrderNotificationBuyerDto(

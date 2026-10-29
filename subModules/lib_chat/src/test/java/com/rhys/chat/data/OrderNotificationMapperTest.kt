@@ -3,6 +3,7 @@ package com.rhys.chat.data
 import com.example.network.bean.OrderNotificationActorDto
 import com.example.network.bean.OrderNotificationBuyerDto
 import com.example.network.bean.OrderNotificationDto
+import com.example.network.bean.OrderNotificationFromUserDto
 import com.example.network.bean.OrderNotificationItemDto
 import com.example.network.bean.OrderNotificationPayloadDto
 import com.example.network.order.OrderNotificationType
@@ -172,6 +173,91 @@ class OrderNotificationMapperTest {
         )
         requireNotNull(mapped)
         assertEquals(456L, mapped.orderId)
+    }
+
+    @Test
+    fun `recipe share maps title body and recipe id`() {
+        val mapped = OrderNotificationMapper.map(
+            OrderNotificationDto(
+                id = 11L,
+                type = "recipe_share",
+                payload = OrderNotificationPayloadDto(
+                    recipeId = 88L,
+                    recipeName = "番茄炒蛋",
+                    recipeImage = "https://cdn.example.com/recipe.png",
+                    fromUser = OrderNotificationFromUserDto(
+                        id = 2L,
+                        username = "lin_xiaochu",
+                        nickname = "小林"
+                    )
+                ),
+                createdAt = "2026-10-20T09:10:00Z"
+            )
+        )
+        requireNotNull(mapped)
+        assertEquals("菜谱分享", mapped.title)
+        assertEquals("「小林」分享了「番茄炒蛋」", mapped.body)
+        assertEquals(88L, mapped.recipeId)
+        assertNull(mapped.orderId)
+        assertEquals("recipe_share", mapped.type)
+    }
+
+    @Test
+    fun `recipe share falls back to username when nickname is blank`() {
+        val mapped = OrderNotificationMapper.map(
+            OrderNotificationDto(
+                id = 12L,
+                type = "recipe_share",
+                payload = OrderNotificationPayloadDto(
+                    recipeId = 89L,
+                    recipeName = "红烧肉",
+                    fromUser = OrderNotificationFromUserDto(
+                        id = 3L,
+                        username = "wang_xiaochu",
+                        nickname = ""
+                    )
+                )
+            )
+        )
+        requireNotNull(mapped)
+        assertEquals("「wang_xiaochu」分享了「红烧肉」", mapped.body)
+        assertEquals(89L, mapped.recipeId)
+    }
+
+    @Test
+    fun `recipe share explicit title and body win`() {
+        val mapped = OrderNotificationMapper.map(
+            OrderNotificationDto(
+                id = 13L,
+                type = "recipe_share",
+                title = "好友分享",
+                body = "快来看看",
+                payload = OrderNotificationPayloadDto(
+                    recipeId = 90L,
+                    recipeName = "番茄炒蛋",
+                    fromUser = OrderNotificationFromUserDto(nickname = "小林")
+                )
+            )
+        )
+        requireNotNull(mapped)
+        assertEquals("好友分享", mapped.title)
+        assertEquals("快来看看", mapped.body)
+        assertEquals(90L, mapped.recipeId)
+    }
+
+    @Test
+    fun `recipe share without recipe id keeps null and safe copy`() {
+        val mapped = OrderNotificationMapper.map(
+            OrderNotificationDto(
+                id = 14L,
+                type = "recipe_share",
+                payload = OrderNotificationPayloadDto(recipeName = "")
+            )
+        )
+        requireNotNull(mapped)
+        assertEquals("菜谱分享", mapped.title)
+        assertEquals("「好友」分享了「菜谱」", mapped.body)
+        assertNull(mapped.recipeId)
     }
 
     @Test

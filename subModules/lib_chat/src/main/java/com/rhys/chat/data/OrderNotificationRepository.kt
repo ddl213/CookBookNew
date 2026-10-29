@@ -17,13 +17,15 @@ import com.rhys.chat.domain.ChatNotification
 import kotlinx.coroutines.CancellationException
 
 /**
- * 预订通知页的数据访问层。
+ * 通知页的数据访问层。
  *
  * - 数据源跟随订单：`OrderDataSourceConfig` 决定 Mock/Remote，**不使用 `chatDataSource`**；
- * - Remote 走 `GET notifications?category=order` 页码分页，失败不回退 Mock；
+ * - [fetch] 仅订单（Remote 走 `GET notifications?category=order`），[fetchAll] 为全部通知
+ *   （Remote 不带 `category`，同时包含 `recipe_share` 等非订单通知）；失败均不回退 Mock；
  * - Mock 读取 `InMemoryOrderNotificationStore` 中当前接收方的事件，按时间倒序内存分页；
- * - 缓存按 `ownerId + Mock/Remote + baseUrl` 隔离，账号或环境变化时清空，避免串号与
- *   Mock/远端通知 ID 碰撞；
+ *   全部通知与仅订单共用同一批 Mock 事件，不为 Mock 伪造分享通知；
+ * - 缓存按 `ownerId + Mock/Remote + baseUrl + 请求范围` 隔离，账号、环境或“全部/仅订单”
+ *   切换时清空，避免串号、串数据与 Mock/远端通知 ID 碰撞；
  * - 本期不读写未读/已读状态，不新增本地订单通知表，也不改动聊天 Room 缓存。
  */
 class OrderNotificationRepository(
@@ -45,25 +47,40 @@ class OrderNotificationRepository(
     private val pageCache = mutableMapOf<Int, PageResponse<ChatNotification>>()
 
     /**
-     * 拉取一页订单通知。
+     * 拉取一页订单通知（`category=order`）。
      *
      * 未登录抛 `UNAUTHORIZED`；任意失败都原样抛出可展示异常，不返回空成功页。
      */
-    suspend fun fetch(page: Int, pageSize: Int): PageResponse<ChatNotification> {
-        val ownerId = ownerProvider() ?: throw unauthorized("登录后才能查看预订通知")
+    suspend fun fetch(page: Int, pageSize: Int): PageResponse<ChatNotification> =
+        fetch(page, pageSize, NotificationScope.ORDER)
+
+    /**
+     * 拉取一页全部通知（不带 `category`），返回订单通知与菜谱分享等通知。
+     *
+     * 与 [fetch] 共用分页与账号隔离规则；缓存作用域包含请求范围，二者不会串数据。
+     */
+    suspend fun fetchAll(page: Int, pageSize: Int): PageResponse<ChatNotification> =
+        fetch(page, pageSize, NotificationScope.ALL)
+
+    private suspend fun fetch(
+        page: Int,
+        pageSize: Int,
+        notificationScope: NotificationScope
+    ): PageResponse<ChatNotification> {
+        val ownerId = ownerProvider() ?: throw unauthorized("登录后才能查看通知")
         val safePage = page.coerceAtLeast(1)
         val safePageSize = pageSize.coerceIn(1, MAX_PAGE_SIZE)
-        val scope = scopeOf(ownerId)
+        val scope = scopeOf(ownerId, notificationScope)
         resetCacheIfScopeChanged(scope)
 
         val result = if (isMock) {
             fetchMock(ownerId, safePage, safePageSize)
         } else {
-            fetchRemote(safePage, safePageSize)
+            fetchRemote(safePage, safePageSize, notificationScope)
         }
 
-        // 数据源返回期间账号或环境变化：旧结果既不能返回给新账号，也不能写入新作用域缓存。
-        if (ownerProvider() != ownerId || scopeOf(ownerId) != scope) {
+        // 数据源返回期间账号、环境或请求范围变化：旧结果既不能返回给新作用域，也不能写入缓存。
+        if (ownerProvider() != ownerId || scopeOf(ownerId, notificationScope) != scope) {
             throw unauthorized("登录状态已变更，请刷新后重试")
         }
         synchronized(cacheLock) {
@@ -72,13 +89,17 @@ class OrderNotificationRepository(
         return result
     }
 
-    /** 当前作用域下已成功拉取过的页面；账号/环境变化后返回 null。 */
-    fun cached(page: Int, pageSize: Int): PageResponse<ChatNotification>? {
+    /** 当前作用域下已成功拉取过的页面；账号/环境/请求范围变化后返回 null。 */
+    fun cached(
+        page: Int,
+        pageSize: Int,
+        notificationScope: NotificationScope = NotificationScope.ORDER
+    ): PageResponse<ChatNotification>? {
         val ownerId = ownerProvider() ?: return null
         val safePage = page.coerceAtLeast(1)
         val safePageSize = pageSize.coerceIn(1, MAX_PAGE_SIZE)
         synchronized(cacheLock) {
-            val scope = scopeOf(ownerId)
+            val scope = scopeOf(ownerId, notificationScope)
             if (cachedScope != scope) {
                 pageCache.clear()
                 cachedScope = scope
@@ -114,13 +135,24 @@ class OrderNotificationRepository(
         return PageResponse(items = items, page = page, pageSize = pageSize, total = total)
     }
 
-    private suspend fun fetchRemote(page: Int, pageSize: Int): PageResponse<ChatNotification> {
+    private suspend fun fetchRemote(
+        page: Int,
+        pageSize: Int,
+        notificationScope: NotificationScope
+    ): PageResponse<ChatNotification> {
         val response = try {
-            notificationApi.listOrderNotifications(
-                category = CATEGORY_ORDER,
-                page = page,
-                pageSize = pageSize
-            )
+            when (notificationScope) {
+                NotificationScope.ORDER -> notificationApi.listOrderNotifications(
+                    category = CATEGORY_ORDER,
+                    page = page,
+                    pageSize = pageSize
+                )
+
+                NotificationScope.ALL -> notificationApi.listAllNotifications(
+                    page = page,
+                    pageSize = pageSize
+                )
+            }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -146,8 +178,8 @@ class OrderNotificationRepository(
         }
     }
 
-    private fun scopeOf(ownerId: Long): String =
-        "$ownerId|${if (isMock) SOURCE_MOCK else SOURCE_REMOTE}|${baseUrlProvider()}"
+    private fun scopeOf(ownerId: Long, notificationScope: NotificationScope): String =
+        "$ownerId|${if (isMock) SOURCE_MOCK else SOURCE_REMOTE}|${baseUrlProvider()}|$notificationScope"
 
     private fun unauthorized(message: String): AuthException = AuthException(
         code = "UNAUTHORIZED",
@@ -164,4 +196,14 @@ class OrderNotificationRepository(
         private const val SOURCE_REMOTE = "remote"
         private const val UNAUTHORIZED_MESSAGE = "登录已失效，请重新登录"
     }
+}
+
+/**
+ * 通知请求范围：仅订单（`category=order`）或全部通知（不带 `category`）。
+ *
+ * 仓库缓存按该范围隔离，切换后不会复用另一范围的页面数据。
+ */
+enum class NotificationScope {
+    ORDER,
+    ALL
 }

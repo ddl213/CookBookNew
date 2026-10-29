@@ -866,6 +866,7 @@ class CookBookDetailFragment :
         if (view == null) return
         binding.pbPageLoading.visible()
         binding.scrollContent.gone()
+        binding.btnReserve.gone()
         binding.llError.gone()
         binding.llNotFound.gone()
         binding.llCommentInput.gone()
@@ -875,6 +876,7 @@ class CookBookDetailFragment :
         if (view == null) return
         binding.pbPageLoading.gone()
         binding.scrollContent.gone()
+        binding.btnReserve.gone()
         binding.llNotFound.gone()
         binding.llCommentInput.gone()
         binding.tvError.text = message?.takeIf { it.isNotBlank() }
@@ -891,6 +893,7 @@ class CookBookDetailFragment :
         resetComments()
         binding.pbPageLoading.gone()
         binding.scrollContent.gone()
+        binding.btnReserve.gone()
         binding.llError.gone()
         binding.llCommentInput.gone()
         binding.llNotFound.visible()

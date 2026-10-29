@@ -17,7 +17,9 @@ import com.android.common.ext.visible
 import com.android.common.utils.RvDecoration
 import com.android.common.view.TitleBar
 import com.campaign.common.constants.Constants.KEY_BUNDLE_ORDER_ID
+import com.campaign.common.constants.Constants.KEY_BUNDLE_RECIPE_ID
 import com.campaign.common.constants.RoutePath.PAGE_CHAT_NOTIFICATIONS
+import com.campaign.common.constants.RoutePath.PAGE_COOK_BOOK_DETAIL
 import com.campaign.common.constants.RoutePath.PAGE_LOGIN
 import com.campaign.common.constants.RoutePath.PAGE_ORDER_DETAIL
 import com.example.network.AuthException
@@ -35,14 +37,15 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
 /**
- * 独立的预订通知列表。
+ * 独立通知列表：订单通知与菜谱分享通知。
  *
- * P08 起数据源切换为 [OrderNotificationRepository]：跟随订单的 Mock/Remote 配置，
- * 使用 `category=order` 页码分页，旧 P07 聊天通知 Room 缓存不再用于本页。
+ * 数据源为 [OrderNotificationRepository]：跟随订单的 Mock/Remote 配置，使用
+ * `GET notifications?page&pageSize`（不带 category）页码分页，同时展示
+ * `recipe_share`；旧 P07 聊天通知 Room 缓存不再用于本页。
  * 通知仍不并入好友会话，也不展示未读/已读/红点/推送。
  *
- * 点击带有效 orderId 的通知进入同一订单详情；旧 payload 没有订单关联时只提示
- * “订单信息暂不可用”，不伪造跳转。从订单详情返回、进入页面和下拉刷新时都会
+ * 点击订单通知进入订单详情，点击菜谱分享通知进入菜谱详情；关联 ID 无效时只提示
+ * “关联内容暂不可用”，不伪造跳转。从详情返回、进入页面和下拉刷新时都会
  * 重新拉取第一页，确保接受/拒绝/取消/完成后的通知状态更新。
  */
 @Route(PAGE_CHAT_NOTIFICATIONS)
@@ -216,7 +219,7 @@ class ChatNotificationsFragment :
         }
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                val page = repository.fetch(1, PAGE_SIZE)
+                val page = repository.fetchAll(1, PAGE_SIZE)
                 if (!isCurrent(generation)) return@launch
                 applyFirstPage(page)
                 hasLoadedOnce = true
@@ -259,7 +262,7 @@ class ChatNotificationsFragment :
                 var page = nextPage
                 var skippedEmptyPages = 0
                 while (true) {
-                    val response = repository.fetch(page, PAGE_SIZE)
+                    val response = repository.fetchAll(page, PAGE_SIZE)
                     if (!isCurrent(generation)) return@launch
                     val existingIds = notifications.mapTo(HashSet()) { it.id }
                     val additions = response.items.filter { existingIds.add(it.id) }
@@ -419,23 +422,40 @@ class ChatNotificationsFragment :
         loggedIn && generation == requestGeneration && view != null
 
     /**
-     * 只有带有效订单 ID 的通知才打开订单详情；旧 payload 无关联时诚实提示，
-     * 不伪造参数，也不尝试打开他人订单。
+     * 订单通知打开订单详情，菜谱分享通知打开菜谱详情；两者都没有有效关联 ID 时
+     * 诚实提示“关联内容暂不可用”，不伪造参数，也不尝试打开他人内容。
      */
     private fun onNotificationClicked(item: ChatNotification) {
         if (view == null) return
         val orderId = item.orderId
-        if (orderId == null || orderId <= 0L) {
-            toast(R.string.chat_order_unavailable)
+        if (orderId != null && orderId > 0L) {
+            openPage(
+                route = PAGE_ORDER_DETAIL,
+                args = Bundle().apply { putLong(KEY_BUNDLE_ORDER_ID, orderId) },
+                failureRes = R.string.chat_order_navigation_failed
+            )
             return
         }
+        val recipeId = item.recipeId
+        if (recipeId != null && recipeId > 0L) {
+            openPage(
+                route = PAGE_COOK_BOOK_DETAIL,
+                args = Bundle().apply { putLong(KEY_BUNDLE_RECIPE_ID, recipeId) },
+                failureRes = R.string.chat_recipe_navigation_failed
+            )
+            return
+        }
+        toast(R.string.chat_notification_unavailable)
+    }
+
+    private fun openPage(route: String, args: Bundle, failureRes: Int) {
         runCatching {
             NRoute.withNavController(findNavController())
-                .deepLink(PAGE_ORDER_DETAIL)
-                .args(Bundle().apply { putLong(KEY_BUNDLE_ORDER_ID, orderId) })
+                .deepLink(route)
+                .args(args)
                 .go()
         }.onFailure {
-            toast(R.string.chat_order_navigation_failed)
+            toast(failureRes)
         }
     }
 

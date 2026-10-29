@@ -41,4 +41,16 @@ interface NotificationApi {
         @Query("page") page: Int,
         @Query("pageSize") pageSize: Int
     ): PageResponse<OrderNotificationDto>
+
+    /**
+     * 全部通知分页；**不带 `category`**，同时返回订单通知与 `recipe_share` 等
+     * 非订单通知，由客户端按 `type` 区分展示和跳转。
+     *
+     * 调用方必须传入归一化后的 `page>=1`、`pageSize=1..50`；失败经 ChatErrorMapper 映射。
+     */
+    @GET("notifications")
+    suspend fun listAllNotifications(
+        @Query("page") page: Int,
+        @Query("pageSize") pageSize: Int
+    ): PageResponse<OrderNotificationDto>
 }

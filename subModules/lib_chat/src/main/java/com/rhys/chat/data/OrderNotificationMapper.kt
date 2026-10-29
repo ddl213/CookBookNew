@@ -14,6 +14,7 @@ import com.rhys.chat.domain.ChatNotification
  * 规则：
  * - 顶层 `title/body/orderId` 与 payload 内旧字段优先，保证 P07 通知继续可用；
  * - 没有显式文案时按六类订单事件生成中文，未知 type 使用通用“预订通知”；
+ * - `recipe_share` 生成“菜谱分享 / 「分享者」分享了「菜名」”并携带菜谱 ID，不伪造订单 ID；
  * - `read/readAt` 不参与映射，不生成未读/已读状态；
  * - `id<=0`、payload 或多数字段缺失时安全返回 null/兜底，不抛异常。
  */
@@ -22,11 +23,18 @@ internal object OrderNotificationMapper {
     private const val ACTOR_FALLBACK = "好友"
     private const val ITEM_FALLBACK = "你的菜品"
     private const val MAX_ITEMS = 2
+    private const val TYPE_RECIPE_SHARE = "recipe_share"
+    private const val RECIPE_SHARE_TITLE = "菜谱分享"
+    private const val RECIPE_NAME_FALLBACK = "菜谱"
 
     fun map(dto: OrderNotificationDto): ChatNotification? {
         if (dto.id <= 0L) return null
         val payload = dto.payload
         val type = trimOrEmpty(dto.type)
+        val createdAtRaw = dto.createdAt?.takeIf { it.isNotBlank() }
+        if (type.equals(TYPE_RECIPE_SHARE, ignoreCase = true)) {
+            return mapRecipeShare(dto, payload, type, createdAtRaw)
+        }
         val orderId = positive(dto.orderId) ?: positive(payload?.orderId)
         val generated = generatedCopy(
             type = type,
@@ -39,13 +47,42 @@ internal object OrderNotificationMapper {
         val body = trimOrEmpty(dto.body)
             .ifEmpty { trimOrEmpty(payload?.body) }
             .ifEmpty { generated.second }
-        val createdAtRaw = dto.createdAt?.takeIf { it.isNotBlank() }
         return ChatNotification(
             id = dto.id,
             type = type,
             title = title,
             body = body,
             orderId = orderId,
+            createdAt = ChatTime.parseMillis(createdAtRaw),
+            createdAtRaw = createdAtRaw
+        )
+    }
+
+    /**
+     * `recipe_share` 通知：标题“菜谱分享”，正文“「分享者」分享了「菜名」”，
+     * 只携带菜谱 ID，不伪造订单关联；显式 title/body 仍优先。
+     */
+    private fun mapRecipeShare(
+        dto: OrderNotificationDto,
+        payload: OrderNotificationPayloadDto?,
+        type: String,
+        createdAtRaw: String?
+    ): ChatNotification {
+        val sharer = shareUserName(payload)
+        val recipeName = trimOrEmpty(payload?.recipeName).ifEmpty { RECIPE_NAME_FALLBACK }
+        val title = trimOrEmpty(dto.title)
+            .ifEmpty { trimOrEmpty(payload?.title) }
+            .ifEmpty { RECIPE_SHARE_TITLE }
+        val body = trimOrEmpty(dto.body)
+            .ifEmpty { trimOrEmpty(payload?.body) }
+            .ifEmpty { "「$sharer」分享了「$recipeName」" }
+        return ChatNotification(
+            id = dto.id,
+            type = type,
+            title = title,
+            body = body,
+            orderId = null,
+            recipeId = positive(payload?.recipeId),
             createdAt = ChatTime.parseMillis(createdAtRaw),
             createdAtRaw = createdAtRaw
         )
@@ -129,6 +166,13 @@ internal object OrderNotificationMapper {
             return if (items.size > MAX_ITEMS) "${shown}等" else shown
         }
         return trimOrEmpty(payload?.recipeName).ifEmpty { ITEM_FALLBACK }
+    }
+
+    /** 分享者昵称优先，其次用户名，缺失时使用安全占位。 */
+    private fun shareUserName(payload: OrderNotificationPayloadDto?): String {
+        val nickname = trimOrEmpty(payload?.fromUser?.nickname)
+        if (nickname.isNotEmpty()) return nickname
+        return trimOrEmpty(payload?.fromUser?.username).ifEmpty { ACTOR_FALLBACK }
     }
 
     private fun positive(value: Long?): Long? = value?.takeIf { it > 0L }

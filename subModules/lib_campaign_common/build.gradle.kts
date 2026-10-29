@@ -44,4 +44,5 @@ dependencies {
     api(libs.com.github.wheel.picker.common)
     api(libs.com.github.wheel.picker.color)
 
+    testImplementation(libs.junit)
 }
