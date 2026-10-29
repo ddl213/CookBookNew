@@ -12,10 +12,10 @@
 - [P07 · 消息中心与好友一对一聊天](phases/P07-messages-chat/01-requirements.md)
 - [P08 · 菜品预订与双向订单管理](phases/P08-reservation-order/01-requirements.md)
 - [P09 · 个人中心、收藏与设置整合](phases/P09-profile-settings/01-requirements.md)
+- [P10 · 全链路集成、非功能验证与交付](phases/P10-integration-acceptance/01-requirements.md)
 
 ## 当前
 
-- [P10 · 全链路集成、非功能验证与交付](phases/P10-integration-acceptance/01-requirements.md)
 
 ## 未完成
 
